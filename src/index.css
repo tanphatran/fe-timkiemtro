@@ -1,3 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Questrial&display=swap');
+
+body::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Đảm bảo nội dung vẫn có thể cuộn */
+  body {
+    overflow: -moz-scrollbars-none;
+    -ms-overflow-style: none;
+  }
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,8 +22,6 @@
         --radius: 0.5rem;
     }
 }
-
-body {
-
-    font-family: Inter, Arial, Helvetica, sans-serif;
+html {
+    font-family: "Questrial", sans-serif;
 }
