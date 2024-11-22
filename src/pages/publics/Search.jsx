@@ -22,21 +22,21 @@ const Search = () => {
 
     const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
     const itemsPerPage = 9; // Số phòng hiển thị mỗi trang
-    const [rooms] = useState([
-        { featuredImage: Room1, name: "CHO THUÊ NHÀ ĐƯỜNG NGUYỄN ĐÌNH QUÂN P5 ĐÀ LẠT", price: 2000000, electricityPrice: 2500, waterPrice: 25000, size: 50, time: "Today" },
-        { featuredImage: Room4, name: "cho thuê nhà nguyên căn 2", price: 3000000, electricityPrice: 2000, waterPrice: 22000, size: 70, time: "2 days ago" },
-        { featuredImage: Room1, name: "cho thuê nhà nguyên căn 2 mặt tiền đường chính", price: 5000000, electricityPrice: 3500, waterPrice: 30000, size: 120, time: "Today" },
-        { featuredImage: Room5, name: "Room E", price: 800000, electricityPrice: 2500, waterPrice: 18000, size: 20, time: "Last week" },
-        { featuredImage: Room6, name: "cho thuê nhà nguyên căn ĐƯỜNG NGUYỄN ĐÌNH QUÂN P5 ĐÀ LẠT", price: 1500000, electricityPrice: 3000, waterPrice: 20000, size: 30, time: "Yesterday" },
-        { featuredImage: Room3, name: "Room C", price: 3000000, electricityPrice: 2000, waterPrice: 22000, size: 70, time: "2 days ago" },
-        { featuredImage: Room4, name: "cho thuê nhà nguyên căn 2 mặt tiền đường chính", price: 5000000, electricityPrice: 3500, waterPrice: 30000, size: 120, time: "Today" },
-        { featuredImage: Room2, name: "Room E", price: 800000, electricityPrice: 2500, waterPrice: 18000, size: 20, time: "Last week" },
-        { featuredImage: Room4, name: "cho thuê nhà nguyên căn 2", price: 3000000, electricityPrice: 2000, waterPrice: 22000, size: 70, time: "2 days ago" },
-        { featuredImage: Room3, name: "cho thuê nhà nguyên căn 2 mặt tiền đường chính", price: 5000000, electricityPrice: 3500, waterPrice: 30000, size: 120, time: "Today" },
-        { featuredImage: Room5, name: "Room E", price: 800000, electricityPrice: 2500, waterPrice: 18000, size: 20, time: "Last week" },
-        { featuredImage: Room6, name: "cho thuê nhà nguyên căn ĐƯỜNG NGUYỄN ĐÌNH QUÂN P5 ĐÀ LẠT", price: 1500000, electricityPrice: 3000, waterPrice: 20000, size: 30, time: "Yesterday" },
-        { featuredImage: Room3, name: "Room C", price: 3000000, electricityPrice: 2000, waterPrice: 22000, size: 70, time: "2 days ago" },
-        { featuredImage: Room3, name: "ĐƯỜNG NGUYỄN ĐÌNH QUÂN P5 ĐÀ LẠT", price: 4500000, electricityPrice: 3000, waterPrice: 28000, size: 150, time: "Yesterday" },
+    const [rooms, setRooms] = useState([
+        { id: 1, featuredImage: Room1, name: "CHO THUÊ NHÀ ĐƯỜNG NGUYỄN ĐÌNH QUÂN P5 ĐÀ LẠT", price: 2000000, electricityPrice: 2500, waterPrice: 25000, size: 50, time: "Today" },
+        { id: 2, featuredImage: Room4, name: "cho thuê nhà nguyên căn 2", price: 3000000, electricityPrice: 2000, waterPrice: 22000, size: 70, time: "2 days ago" },
+        { id: 3, featuredImage: Room1, name: "cho thuê nhà nguyên căn 2 mặt tiền đường chính", price: 5000000, electricityPrice: 3500, waterPrice: 30000, size: 120, time: "Today" },
+        { id: 4, featuredImage: Room5, name: "Room E", price: 800000, electricityPrice: 2500, waterPrice: 18000, size: 20, time: "Last week" },
+        { id: 5, featuredImage: Room6, name: "cho thuê nhà nguyên căn ĐƯỜNG NGUYỄN ĐÌNH QUÂN P5 ĐÀ LẠT", price: 1500000, electricityPrice: 3000, waterPrice: 20000, size: 30, time: "Yesterday" },
+        { id: 6, featuredImage: Room3, name: "Room C", price: 3000000, electricityPrice: 2000, waterPrice: 22000, size: 70, time: "2 days ago" },
+        { id: 7, featuredImage: Room4, name: "cho thuê nhà nguyên căn 2 mặt tiền đường chính", price: 5000000, electricityPrice: 3500, waterPrice: 30000, size: 120, time: "Today" },
+        { id: 8, featuredImage: Room2, name: "Room E", price: 800000, electricityPrice: 2500, waterPrice: 18000, size: 20, time: "Last week" },
+        { id: 9, featuredImage: Room4, name: "cho thuê nhà nguyên căn 2", price: 3000000, electricityPrice: 2000, waterPrice: 22000, size: 70, time: "2 days ago" },
+        { id: 10, featuredImage: Room3, name: "cho thuê nhà nguyên căn 2 mặt tiền đường chính", price: 5000000, electricityPrice: 3500, waterPrice: 30000, size: 120, time: "Today" },
+        { id: 11, featuredImage: Room5, name: "Room E", price: 800000, electricityPrice: 2500, waterPrice: 18000, size: 20, time: "Last week" },
+        { id: 12, featuredImage: Room6, name: "cho thuê nhà nguyên căn ĐƯỜNG NGUYỄN ĐÌNH QUÂN P5 ĐÀ LẠT", price: 1500000, electricityPrice: 3000, waterPrice: 20000, size: 30, time: "Yesterday" },
+        { id: 13, featuredImage: Room3, name: "Room C", price: 3000000, electricityPrice: 2000, waterPrice: 22000, size: 70, time: "2 days ago" },
+        { id: 14, featuredImage: Room3, name: "ĐƯỜNG NGUYỄN ĐÌNH QUÂN P5 ĐÀ LẠT", price: 4500000, electricityPrice: 3000, waterPrice: 28000, size: 150, time: "Yesterday" },
     ]);
 
     // Hàm sắp xếp

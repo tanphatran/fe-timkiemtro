@@ -3,7 +3,9 @@ const pathnames = {
     publics: {
         layout: "/",
         home: "/",
-        search: "/search"
+        search: "/search",
+        roomdetail_id: "/roomdetail/:id",
+        roomdetail: "/roomdetail"
     },
     users: {
         layout: "thanh-vien",

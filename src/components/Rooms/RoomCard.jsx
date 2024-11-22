@@ -4,12 +4,14 @@ import { IoFlashOutline } from "react-icons/io5"; // Icon điện
 import { BsDroplet } from "react-icons/bs"; // Icon nước
 import { MdSquareFoot } from "react-icons/md"; // Icon diện tích
 import Room1 from "../../assets/room1.jpg";
+import { Link } from "react-router-dom";
+import pathnames from '@/lib/pathnames'
 
 const RoomCard = ({ room }) => {
     const [liked, setLiked] = useState(false); // Trạng thái thích
 
     return (
-        <div className="border rounded-md cursor-pointer hover:shadow-lg">
+        <div className="border rounded-md hover:shadow-lg">
             {/* Hình ảnh */}
             <img
                 src={room?.featuredImage || Room1}
@@ -19,8 +21,14 @@ const RoomCard = ({ room }) => {
 
             {/* Nội dung */}
             <div className="p-4 flex flex-col gap-2">
-                <h1 className="text-lg font-bold text-gray-700 truncate" style={{ maxWidth: "45ch" }}>
-                    {room?.name} </h1>
+
+                <Link to={pathnames.publics.roomdetail_id.replace(":id", room.id)}
+                    className="text-lg font-bold text-gray-700 truncate hover:underline"
+                    style={{ maxWidth: "45ch" }}
+                >
+                    {room?.name}
+                </Link>
+
                 <span className="text-text-base	 flex items-center gap-1 font-bold text-main-500">
                     {room?.price?.toLocaleString()} VNĐ
                 </span>
