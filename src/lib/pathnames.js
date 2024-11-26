@@ -5,7 +5,8 @@ const pathnames = {
         home: "/",
         search: "/search",
         roomdetail_id: "/roomdetail/:id",
-        roomdetail: "/roomdetail"
+        roomdetail: "/roomdetail",
+        post: "/post"
     },
     users: {
         layout: "thanh-vien",

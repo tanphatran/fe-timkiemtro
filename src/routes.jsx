@@ -5,6 +5,7 @@ import Home from './pages/publics/Home'
 import App from './App'
 import Search from './pages/publics/Search'
 import RoomDetail from './pages/publics/RoomDetail'
+import Post from './pages/users/Post'
 
 const routes = [
     {
@@ -26,6 +27,10 @@ const routes = [
                     {
                         path: pathnames.publics.roomdetail_id,
                         element: <RoomDetail />,
+                    },
+                    {
+                        path: pathnames.publics.post,
+                        element: <Post />,
                     }
                 ]
             }
