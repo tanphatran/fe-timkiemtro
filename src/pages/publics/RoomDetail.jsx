@@ -43,14 +43,14 @@ const RoomDetail = () => {
     }
 
     return (
-        <div className="w-full mt-16">
-            <div className="w-main pb-4 mx-28">
+        <div className="w-full mt-16 px-4 sm:px-8 lg:px-28">
+            <div className="w-full max-w-screen-xl mx-auto">
                 {/* Hiển thị hình ảnh */}
                 {room.postImages && <Images images={room.postImages} />}
 
-                <div className="grid my-8 grid-cols-10 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 mt-8">
                     {/* Cột chính */}
-                    <div className="col-span-7">
+                    <div className="lg:col-span-7">
                         <h1 className="font-bold text-2xl line-clamp-2">{room.title}</h1>
                         <h1 className="font-bold text-xl">{room.price.toLocaleString()} VND/tháng</h1>
                         <span className="flex items-center gap-3 mt-2">
@@ -97,7 +97,7 @@ const RoomDetail = () => {
                     </div>
 
                     {/* Cột tùy chọn */}
-                    <div className="col-span-3">
+                    <div className="lg:col-span-3">
                         <div className="p-4 border rounded-lg shadow-md bg-white">
                             {/* Thông tin liên hệ */}
                             <div className="mb-4">
@@ -115,6 +115,8 @@ const RoomDetail = () => {
                                 </button>
                             </div>
                         </div>
+
+                        {/* Lưu tin */}
                         <div className="my-4 flex justify-center items-center">
                             <button
                                 onClick={() => setLiked(!liked)}

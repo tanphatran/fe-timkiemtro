@@ -44,6 +44,12 @@ const Search = () => {
                 waterPrice: room.waterPrice,
                 size: room.area,
                 time: new Date(room.createdAt).toLocaleDateString("vi-VN"),
+                houseNumber: room.houseNumber,
+                street: room.street,
+                ward: room.ward,
+                district: room.district,
+                city: room.city,
+
             }));
 
             setRooms(formattedRooms);
@@ -66,17 +72,17 @@ const Search = () => {
     };
 
     return (
-        <div className="mt-14">
+        <div className="mt-14 px-4 sm:px-8 md:px-16 lg:px-28">
             <SearchFilter />
             <div className="w-full">
-                <div className="w-main mx-28">
+                <div className="w-full max-w-screen-xl mx-auto">
                     {/* Thanh sắp xếp */}
-                    <div className="mb-4 flex justify-normal items-center">
+                    <div className="mb-4 flex justify-start items-center">
                         <span className="text-base font-semibold text-gray-700 ml-2">Sắp xếp theo: </span>
                         <select
                             value={sortOption}
                             onChange={(e) => setSortOption(e.target.value)}
-                            className="border border-gray-300 rounded-md p-1 text-gray-700 focus:outline-primary focus:border-primary"
+                            className="border border-gray-300 rounded-md p-2 text-gray-700 focus:outline-primary focus:border-primary w-full sm:w-auto"
                         >
                             <option value="default">Mặc định</option>
                             <option value="price">Giá (Thấp đến Cao)</option>
@@ -86,9 +92,9 @@ const Search = () => {
                     </div>
 
                     {/* Danh sách phòng */}
-                    <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-6">
+                    <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                         {loading ? (
-                            <p>Đang tải dữ liệu...</p>
+                            <p className="text-center w-full">Đang tải dữ liệu...</p>
                         ) : (
                             rooms.map((room) => <RoomCard key={room.id} room={room} />)
                         )}
@@ -96,12 +102,13 @@ const Search = () => {
 
                     {/* Phân trang */}
                     <Pagination className="mt-6 mb-4">
-                        <PaginationContent>
+                        <PaginationContent className="flex justify-center space-x-2">
                             <PaginationItem>
                                 <PaginationPrevious
                                     href="#"
                                     onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                                     disabled={currentPage === 1}
+                                    className="px-3 py-2 border rounded-md"
                                 />
                             </PaginationItem>
                             {Array.from({ length: totalPages }, (_, index) => (
@@ -110,6 +117,7 @@ const Search = () => {
                                         href="#"
                                         isActive={index + 1 === currentPage}
                                         onClick={() => handlePageChange(index + 1)}
+                                        className="px-3 py-2 border rounded-md"
                                     >
                                         {index + 1}
                                     </PaginationLink>
@@ -122,6 +130,7 @@ const Search = () => {
                                         handlePageChange(Math.min(totalPages, currentPage + 1))
                                     }
                                     disabled={currentPage === totalPages}
+                                    className="px-3 py-2 border rounded-md"
                                 />
                             </PaginationItem>
                         </PaginationContent>

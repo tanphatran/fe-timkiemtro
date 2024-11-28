@@ -6,6 +6,7 @@ import { MdSquareFoot } from "react-icons/md"; // Icon diện tích
 import Room1 from "../../assets/room1.jpg";
 import { Link } from "react-router-dom";
 import pathnames from '@/lib/pathnames'
+import { GrLocation } from "react-icons/gr";
 
 const RoomCard = ({ room }) => {
     const [liked, setLiked] = useState(false); // Trạng thái thích
@@ -28,7 +29,12 @@ const RoomCard = ({ room }) => {
                 >
                     {room?.name}
                 </Link>
-
+                <span className="text-text-base	 flex items-center gap-1 font-bold text-main-500">
+                    <span className="text-green-600">
+                        <GrLocation size={18} />
+                    </span>
+                    <span>{` ${room.ward}, ${room.district}, ${room.city}`}</span>
+                </span>
                 <span className="text-text-base	 flex items-center gap-1 font-bold text-main-500">
                     {room?.price?.toLocaleString()} VNĐ
                 </span>
