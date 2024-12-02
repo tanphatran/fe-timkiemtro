@@ -1,87 +1,234 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
 import {
     Select,
-    SelectItem,
     SelectTrigger,
     SelectContent,
+    SelectItem,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { FiSearch, FiFilter } from "react-icons/fi"; // Icon
-import { MdLocationOn, MdOutlineHome, MdAttachMoney } from "react-icons/md"; // Icon
+import { FiSearch, FiFilter } from "react-icons/fi";
+import { MdLocationOn, MdOutlineHome } from "react-icons/md";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import apiAddress from "@/apis/apiAddress"; // Import API address functions
 
 const SearchFilter = () => {
-    const [region, setRegion] = useState("Toàn quốc");
-    const [propertyType, setPropertyType] = useState("Loại bất động sản");
-    const [rentalPrice, setRentalPrice] = useState("Giá thuê");
+    const [priceRange, setPriceRange] = useState([0, 100000000]);
+    const [appliedPriceRange, setAppliedPriceRange] = useState([0, 100000000]);
+
+    const [city, setCity] = useState("");
+    const [district, setDistrict] = useState("");
+    const [ward, setWard] = useState("");
+
+    const [provinces, setProvinces] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
+
+    // Fetch provinces (cities) on component mount
+    useEffect(() => {
+        const fetchProvinces = async () => {
+            try {
+                const data = await apiAddress.getProvinces(); // Assuming this function fetches provinces
+                setProvinces(data);
+            } catch (error) {
+                console.error("Không thể lấy danh sách tỉnh:", error);
+            }
+        };
+        fetchProvinces();
+    }, []);
+
+    // Fetch districts when a province is selected
+    useEffect(() => {
+        if (city) {
+            const fetchDistricts = async () => {
+                try {
+                    const data = await apiAddress.getDistricts(city); // Fetch districts based on selected province
+                    setDistricts(data);
+                    setDistrict("");  // Reset district when city changes
+                    setWard("");      // Reset ward when city changes
+                } catch (error) {
+                    console.error("Không thể lấy danh sách quận/huyện:", error);
+                }
+            };
+            fetchDistricts();
+        } else {
+            setDistricts([]);
+        }
+    }, [city]);
+
+    // Fetch wards when a district is selected
+    useEffect(() => {
+        if (district) {
+            const fetchWards = async () => {
+                try {
+                    const data = await apiAddress.getWards(district); // Fetch wards based on selected district
+                    setWards(data);
+                    setWard(""); // Reset ward when district changes
+                } catch (error) {
+                    console.error("Không thể lấy danh sách phường/xã:", error);
+                }
+            };
+            fetchWards();
+        } else {
+            setWards([]);
+        }
+    }, [district]);
+
+    const handleSliderChange = (value) => {
+        setPriceRange(value);
+    };
+
+    const applyPriceFilter = () => {
+        setAppliedPriceRange(priceRange); // Lưu giá trị đã áp dụng
+    };
+
+    const formatPrice = (value) => {
+        if (value >= 1000000) {
+            return `${(value / 1000000).toFixed(1)} triệu`;
+        } else if (value >= 1000) {
+            return `${(value / 1000).toFixed(1)} nghìn`;
+        }
+        return `${value} đ`;
+    };
+
+    const getPriceDisplay = () => {
+        const [min, max] = appliedPriceRange;
+        if (min === 0 && max === 100000000) return "Giá thuê";
+        return `${formatPrice(min)} - ${formatPrice(max)}`;
+    };
 
     return (
-        <div className="p-3 bg-white rounded-md shadow-sm flex flex-wrap gap-4 md:items-center md:justify-center">
+        <div className="p-4 bg-white rounded-md shadow-sm flex flex-col gap-6 md:flex-row md:items-center md:justify-center">
             {/* Input tìm kiếm */}
-            <div className="flex items-center w-full md:max-w-sm flex-grow">
+            <div className="flex items-center w-full md:max-w-sm">
                 <FiSearch className="mr-2 text-gray-400" size={20} />
                 <Input
-                    placeholder="Từ khóa, Đường, Quận, Dự án hoặc địa điểm..."
+                    placeholder="Tìm kiếm theo từ khóa..."
                     className="w-full"
                 />
             </div>
 
-            {/* Khu vực */}
-            <div className="hidden md:flex items-center">
-                <Select onValueChange={setRegion}>
-                    <SelectTrigger className="flex items-center w-36 border border-gray-300 rounded-lg p-2">
+            {/* Thành phố */}
+            <div className="flex items-center">
+                <Select onValueChange={(value) => setCity(value)}>
+                    <SelectTrigger className="flex items-center w-44 border border-gray-300 rounded-lg p-2">
                         <MdLocationOn className="mr-2 text-gray-500" size={20} />
-                        <span>{region}</span>
+                        <span>{city || "Chọn thành phố"}</span>
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="Toàn quốc">Toàn quốc</SelectItem>
-                        <SelectItem value="Hà Nội">Hà Nội</SelectItem>
-                        <SelectItem value="TP.HCM">TP.HCM</SelectItem>
-                        <SelectItem value="Đà Nẵng">Đà Nẵng</SelectItem>
+                        {provinces.map((province) => (
+                            <SelectItem key={province} value={province}>
+                                {province}
+                            </SelectItem>
+                        ))}
                     </SelectContent>
                 </Select>
             </div>
 
-            {/* Loại bất động sản */}
-            <div className="hidden md:flex items-center">
-                <Select onValueChange={setPropertyType}>
-                    <SelectTrigger className="flex items-center w-48 border border-gray-300 rounded-lg p-2">
-                        <MdOutlineHome className="mr-2 text-gray-500" size={20} />
-                        <span>{propertyType}</span>
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="Chung cư">Chung cư</SelectItem>
-                        <SelectItem value="Nhà phố">Nhà phố</SelectItem>
-                        <SelectItem value="Biệt thự">Biệt thự</SelectItem>
-                        <SelectItem value="Đất nền">Đất nền</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-
-            {/* Giá thuê */}
-            <div className="hidden md:flex items-center">
-                <Select onValueChange={setRentalPrice}>
+            {/* Quận */}
+            <div className="flex items-center">
+                <Select onValueChange={(value) => setDistrict(value)}>
                     <SelectTrigger className="flex items-center w-40 border border-gray-300 rounded-lg p-2">
-                        <MdAttachMoney className="mr-2 text-gray-500" size={20} />
-                        <span>{rentalPrice}</span>
+                        <MdOutlineHome className="mr-2 text-gray-500" size={20} />
+                        <span>{district || "Chọn quận"}</span>
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="Dưới 5 triệu">Dưới 5 triệu</SelectItem>
-                        <SelectItem value="5 - 10 triệu">5 - 10 triệu</SelectItem>
-                        <SelectItem value="10 - 20 triệu">10 - 20 triệu</SelectItem>
-                        <SelectItem value="Trên 20 triệu">Trên 20 triệu</SelectItem>
+                        {districts.map((district) => (
+                            <SelectItem key={district} value={district}>
+                                {district}
+                            </SelectItem>
+                        ))}
                     </SelectContent>
                 </Select>
             </div>
 
-            {/* Lọc thêm */}
-            <Button
-                variant="outline"
-                className="flex items-center gap-2 w-full md:w-auto border border-gray-300 rounded-lg p-2"
-            >
-                <FiFilter size={20} className="text-gray-600" />
-                <span className="hidden md:inline">Lọc thêm</span>
-            </Button>
+            {/* Phường */}
+            <div className="flex items-center">
+                <Select onValueChange={(value) => setWard(value)}>
+                    <SelectTrigger className="flex items-center w-40 border border-gray-300 rounded-lg p-2">
+                        <MdOutlineHome className="mr-2 text-gray-500" size={20} />
+                        <span>{ward || "Chọn phường"}</span>
+                    </SelectTrigger>
+                    <SelectContent>
+                        {wards.map((ward) => (
+                            <SelectItem key={ward} value={ward}>
+                                {ward}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+
+            {/* Khoảng giá */}
+            <Popover>
+                <PopoverTrigger asChild>
+                    <Button className=" bg-white text-gray flex items-center gap-2 border border-gray-300 rounded-lg p-2 ">
+                        <FiFilter size={20} />
+                        {getPriceDisplay()}
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-4 bg-white shadow-md rounded-lg border">
+                    <div className="text-sm font-medium mb-4">Chọn khoảng giá</div>
+                    <div className="flex justify-between text-sm text-gray-600">
+                        <span>0</span>
+                        <span>50 triệu</span>
+                    </div>
+                    <Slider
+                        className="mt-2"
+                        value={priceRange}
+                        min={0}
+                        max={50000000}
+                        step={500000} // Tăng/giảm 500 nghìn
+                        onValueChange={handleSliderChange}
+                    />
+                    <div className="flex gap-2 mt-4">
+                        <Input
+                            type="number"
+                            placeholder="Giá tối thiểu"
+                            value={priceRange[0]}
+                            onChange={(e) => {
+                                const newValue = [
+                                    Math.min(Number(e.target.value), priceRange[1]),
+                                    priceRange[1],
+                                ];
+                                setPriceRange(newValue);
+                            }}
+                            className="w-full"
+                        />
+                        <span>-</span>
+                        <Input
+                            type="number"
+                            placeholder="Giá tối đa"
+                            value={priceRange[1]}
+                            onChange={(e) => {
+                                const newValue = [
+                                    priceRange[0],
+                                    Math.max(priceRange[0], Number(e.target.value)),
+                                ];
+                                setPriceRange(newValue);
+                            }}
+                            className="w-full"
+                        />
+                    </div>
+                    <div className="flex justify-end gap-2 mt-4">
+                        <Button
+                            variant="outline"
+                            className="text-gray-600"
+                            onClick={() => setPriceRange([0, 100000000])}
+                        >
+                            Xóa
+                        </Button>
+                        <Button
+                            variant="default"
+                            className="bg-primary text-white"
+                            onClick={applyPriceFilter}
+                        >
+                            Áp dụng
+                        </Button>
+                    </div>
+                </PopoverContent>
+            </Popover>
         </div>
     );
 };

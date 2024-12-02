@@ -1,4 +1,3 @@
-
 const pathnames = {
     publics: {
         layout: "/",
@@ -11,7 +10,12 @@ const pathnames = {
     users: {
         layout: "thanh-vien",
         personal: "ca-nhan",
-    }
+        profilepage: "/users/profile-page",
+    },
+    admin: {
+        layout: "/admin", // route chính của admin
+        dashboard: "dashboard", // Thay đổi thành đường dẫn tương đối
+    },
 }
 
-export default pathnames
+export default pathnames;

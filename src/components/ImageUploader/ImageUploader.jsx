@@ -54,11 +54,11 @@ const ImageUploader = ({
                 },
             });
 
-            if (response.data.status === "success") {
+            if (response.data && response.data.status === "success") {
                 alert("Upload thành công!");
-                setSaved(true);  // Đánh dấu đã lưu ảnh
-                // Gọi callback để truyền thông tin ảnh lên các component khác
-                onUploadSuccess(response.data.images);  // Trả về dữ liệu ảnh đã upload
+                setSaved(true);
+                const uploadedImages = response.data.data; // Lấy URL ảnh từ API
+                if (onUploadSuccess) onUploadSuccess(uploadedImages); // Gọi callback với URL ảnh
             } else {
                 alert("Có lỗi khi tải ảnh lên.");
             }
@@ -66,7 +66,7 @@ const ImageUploader = ({
             console.error("Lỗi khi upload ảnh:", error);
             alert("Có lỗi khi upload ảnh.");
         } finally {
-            setUploading(false);  // Kết thúc upload
+            setUploading(false);
         }
     };
 

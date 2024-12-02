@@ -11,17 +11,23 @@ import axiosClient from "@/apis/axiosClient";
 const RoomDetail = () => {
     const { id } = useParams(); // Lấy id từ URL
     const [room, setRoom] = useState(null); // Dữ liệu phòng
+    const [userData, setUserData] = useState(null); // Dữ liệu người dùng
     const [liked, setLiked] = useState(false); // Trạng thái thích
     const [loading, setLoading] = useState(true); // Trạng thái loading
     const [error, setError] = useState(null); // Lỗi khi gọi API
+    const [isRevealed, setIsRevealed] = useState(false);
 
     useEffect(() => {
         const fetchRoomDetails = async () => {
             try {
                 const response = await axiosClient.getOne(`/post/${id}`);
                 setRoom(response.data); // Lưu dữ liệu bài đăng
+
+                // Gọi thêm thông tin người dùng từ API
+                const userResponse = await axiosClient.getOne(`/post/${id}/user`);
+                setUserData(userResponse.data);
             } catch (err) {
-                setError("Không thể tải dữ liệu phòng!");
+                setError("Không thể tải dữ liệu phòng hoặc người dùng!");
             } finally {
                 setLoading(false); // Tắt trạng thái loading
             }
@@ -41,6 +47,11 @@ const RoomDetail = () => {
     if (!room) {
         return <div>Phòng không tồn tại!</div>;
     }
+
+    // Số điện thoại đầy đủ
+    const fullPhone = userData?.phoneNumber || "N/A";
+    const hiddenPhone = fullPhone.slice(0, -3) + "xxx";
+    const displayedPhone = isRevealed ? fullPhone : hiddenPhone;
 
     return (
         <div className="w-full mt-16 px-4 sm:px-8 lg:px-28">
@@ -87,6 +98,15 @@ const RoomDetail = () => {
                                         <TableCell>Giá nước</TableCell>
                                         <TableCell>{room.waterPrice.toLocaleString()} VND/m³</TableCell>
                                     </TableRow>
+                                    <TableRow>
+                                        <TableCell>Diện tích</TableCell>
+                                        <TableCell>{room.area.toLocaleString()} m<sup>2</sup></TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>Ngày đăng bài</TableCell>
+                                        <TableCell>{new Date(room.createdAt).toLocaleDateString("vi-VN")}</TableCell>
+                                    </TableRow>
+
                                 </TableBody>
                             </Table>
                         </div>
@@ -99,15 +119,37 @@ const RoomDetail = () => {
                     {/* Cột tùy chọn */}
                     <div className="lg:col-span-3">
                         <div className="p-4 border rounded-lg shadow-md bg-white">
+                            {/* Avatar và thông tin */}
+                            <div className="flex items-center gap-4 mb-4">
+                                <img
+                                    src={userData?.profilePicture || "https://via.placeholder.com/50"}
+                                    alt="Avatar"
+                                    className="w-12 h-12 rounded-full border border-gray-300"
+                                />
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-800">
+                                        {userData?.fullName || "Tên không xác định"}
+                                    </h3>
+                                    <p className="text-sm text-gray-500">
+                                        Ngày tham gia:{" "}
+                                        {userData?.createdAt
+                                            ? new Date(userData.createdAt).toLocaleDateString("vi-VN")
+                                            : "N/A"}
+                                    </p>
+                                </div>
+                            </div>
+
                             {/* Thông tin liên hệ */}
                             <div className="mb-4">
-                                <button className="flex items-center justify-between w-full px-4 py-2 text-gray-700 bg-white border border-primary rounded-lg hover:bg-gray-100">
+                                <button
+                                    className="flex items-center justify-between w-full px-4 py-2 text-gray-700 bg-white border border-primary rounded-lg hover:bg-gray-100"
+                                    onClick={() => setIsRevealed(true)}
+                                >
                                     <MdLocalPhone className="text-primary hover:text-primary-dark size-6" />
-                                    <span>0911 649 xxx</span>
+                                    <span>{displayedPhone}</span>
                                     <span className="text-sm text-primary font-bold">Bấm để hiện số</span>
                                 </button>
                             </div>
-
                             <div className="mb-4">
                                 <button className="flex items-center justify-center w-full px-4 py-2 text-gray-700 bg-white border border-primary/50 rounded-lg hover:bg-gray-100">
                                     <AiFillMessage className="text-primary hover:text-primary-dark size-6 mr-3" />
