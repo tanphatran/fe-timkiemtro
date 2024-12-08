@@ -10,7 +10,7 @@ const Navbar = () => {
     const navigate = useNavigate(); // Khởi tạo useNavigate
 
     const handlePostNavigation = () => {
-        navigate("/post"); // Điều hướng đến trang "/post"
+        navigate("/users/create-posts"); // Điều hướng đến trang "/post"
     };
 
     return (
@@ -31,7 +31,7 @@ const Navbar = () => {
                     {/* Đăng nhập/Đăng ký */}
                     <Dialog>
                         <DialogTrigger asChild>
-                            <button className="hover:underline">Đăng nhập/ Đăng ký</button>
+                            <button className="hoder: underline">Đăng nhập/ Đăng ký</button>
                         </DialogTrigger>
                         <DialogContent isHideClose={true} className="min-w-[700px] p-0">
                             <DialogHeader>

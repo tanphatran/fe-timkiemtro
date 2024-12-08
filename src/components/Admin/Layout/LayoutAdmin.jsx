@@ -2,7 +2,7 @@ import React from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import SidebarAdmin from "../Sidebar/SidebarAdmin";
 import { Outlet } from "react-router-dom"; // Dùng Outlet để render route con
-
+import { AppSidebar } from "@/components/app-sidebar";
 const LayoutAdmin = () => {
     return (
         <SidebarProvider>

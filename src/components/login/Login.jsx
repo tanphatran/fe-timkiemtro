@@ -20,7 +20,6 @@ const registerSchema = z.object({
         .string()
         .min(10, { message: "Số điện thoại phải có ít nhất 10 chữ số." })
         .regex(/^\d+$/, { message: "Số điện thoại chỉ bao gồm chữ số." }),
-    email: z.string().email({ message: "Email không hợp lệ." }),
     password: z.string().min(6, { message: "Mật khẩu tối thiểu 6 kí tự." }),
     confirmPassword: z
         .string()
@@ -34,7 +33,7 @@ const Login = () => {
         resolver: zodResolver(isLogin ? loginSchema : registerSchema),
         defaultValues: isLogin
             ? { phone: "", password: "" }
-            : { fullName: "", phone: "", email: "", password: "", confirmPassword: "" },
+            : { fullName: "", phone: "", password: "", confirmPassword: "" },
     });
 
     const handleSubmit = (data) => {
@@ -61,8 +60,7 @@ const Login = () => {
                             <>
                                 {/* Form Đăng ký: Họ và tên */}
                                 <FormInput form={form} name="fullName" label="Họ và tên" placeholder="VD: Nguyễn Văn A" />
-                                {/* Form Đăng ký: Email */}
-                                <FormInput form={form} name="email" label="Email" placeholder="VD: example@gmail.com" type="email" />
+
                             </>
                         )}
 

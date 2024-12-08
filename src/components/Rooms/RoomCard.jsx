@@ -12,7 +12,7 @@ const RoomCard = ({ room }) => {
     const [liked, setLiked] = useState(false); // Trạng thái thích
 
     return (
-        <div className="border rounded-md hover:shadow-lg">
+        <div className="border rounded-md hover:shadow-lg transform hover:scale-[1.03] ease-in-out">
             {/* Hình ảnh */}
             <img
                 src={room?.featuredImage || Room1}

@@ -8,13 +8,19 @@ const pathnames = {
         post: "/post"
     },
     users: {
-        layout: "thanh-vien",
-        personal: "ca-nhan",
+        layout: "/users",
+        favoriteposts: "favorite-posts",
         profilepage: "/users/profile-page",
+        postmana: "/users/postmana",
+        createposts: "/users/create-posts",
+        verification: "/users/verification"
     },
     admin: {
-        layout: "/admin", // route chính của admin
-        dashboard: "dashboard", // Thay đổi thành đường dẫn tương đối
+        layout: "/admin",
+        dashboard: "dashboard",
+        hostmanagenment: "hostmanagenment",
+        employeemana: "employeemana",
+        usermana: "usermana",
     },
 }
 

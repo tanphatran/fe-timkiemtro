@@ -7,7 +7,8 @@ import {
     DialogTitle,
     DialogDescription,
     DialogFooter,
-} from "@/components/ui/dialog"; // Thư viện shadcn ui
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CiWarning } from "react-icons/ci";
@@ -67,6 +68,13 @@ const ReportRoom = () => {
                             </label>
                         </div>
                     ))}
+                    <div className="mb-6">
+                        <label className="block text-base font-medium text-gray-700 mb-2">
+                            Nhập ý kiến phản hồi
+                        </label>
+                        <Textarea placeholder="Nhập mô tả chi tiết..." rows={5}
+                        />
+                    </div>
                 </div>
                 <DialogFooter>
                     <Button className="text-base" onClick={handleSubmit}>Gửi</Button>

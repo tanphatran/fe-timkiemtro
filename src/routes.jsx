@@ -9,6 +9,12 @@ import Post from './pages/users/Post';
 import ProfilePage from './pages/users/ProfilePage';
 import LayoutAdmin from './components/Admin/Layout/LayoutAdmin';
 import Dashboard from './pages/admin/Dashboard';
+import HostManagement from './pages/admin/HostManagement';
+import PostManagement from './pages/users/PostManagement';
+import FavoritePosts from './pages/users/FavoritePosts';
+import VerificationSteps from './pages/users/VerificationSteps';
+import EmployeeManagement from './pages/admin/EmployeeManagement';
+import UserManagement from './pages/admin/UserManagement';
 
 const routes = [
     {
@@ -22,17 +28,51 @@ const routes = [
                     { path: pathnames.publics.home, element: <Home /> },
                     { path: pathnames.publics.search, element: <Search /> },
                     { path: pathnames.publics.roomdetail_id, element: <RoomDetail /> },
-                    { path: pathnames.publics.post, element: <Post /> },
-                    { path: pathnames.users.profilepage, element: <ProfilePage /> },
+                    {
+                        path: pathnames.users.layout,
+                        element: <ProfilePage />,
+                        children: [
+                            {
+                                path: pathnames.users.postmana,
+                                element: <PostManagement />,
+                            },
+                            {
+                                path: pathnames.users.createposts,
+                                element: <Post />,
+                            },
+                            {
+                                path: pathnames.users.favoriteposts,
+                                element: <FavoritePosts />,
+                            },
+                            {
+                                path: pathnames.users.verification,
+                                element: <VerificationSteps />,
+                            },
+
+                        ]
+                    },
                 ],
             },
+
             {
-                path: pathnames.admin.layout, // "/admin"
+                path: pathnames.admin.layout,
                 element: <LayoutAdmin />,
                 children: [
                     {
-                        path: pathnames.admin.dashboard, // "dashboard" (Đây là route con của /admin)
+                        path: pathnames.admin.dashboard,
                         element: <Dashboard />,
+                    },
+                    {
+                        path: pathnames.admin.hostmanagenment,
+                        element: <HostManagement />,
+                    },
+                    {
+                        path: pathnames.admin.employeemana,
+                        element: <EmployeeManagement />,
+                    },
+                    {
+                        path: pathnames.admin.usermana,
+                        element: <UserManagement />,
                     },
                 ]
             }

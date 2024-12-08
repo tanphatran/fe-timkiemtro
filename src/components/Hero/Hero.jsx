@@ -45,11 +45,11 @@ const Hero = () => {
                             {/* Loại nhà đất */}
                             <div>
                                 <label htmlFor="type" className="block text-gray-600 mb-1">
-                                    Loại nhà đất
+                                    Địa chỉ
                                 </label>
                                 <Select onValueChange={(value) => setSelectedType(value)}>
                                     <SelectTrigger className="w-full">
-                                        <span className="text-base" >{selectedType || "Chọn loại"}</span>
+                                        <span className="text-base" >{selectedType || "Địa chỉ"}</span>
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="Nhà trọ">Nhà trọ</SelectItem>

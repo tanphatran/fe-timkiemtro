@@ -89,7 +89,7 @@ const Post = () => {
 
 
     return (
-        <div className="border-2 border-dashed border-primary/20 mt-16 mb-4 max-w-5xl mx-auto p-6 bg-white shadow-md rounded-md">
+        <div className="border-2 border-dashed border-primary/10 mb-4  mx-auto p-6 bg-white shadow-md rounded-md">
             <h1 className="text-lg font-semibold mb-4 ">Đăng tin phòng trọ</h1>
             <div className="grid my-8 lg:grid-cols-10 gap-4">
                 {/* Cột chính */}

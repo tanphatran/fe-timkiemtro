@@ -7,6 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Pagination } from "@/components/ui/pagination";
 import PostDetailsDialog from "@/components/Admin/Posts/PostDetailsDialog";
 import { TfiReload } from "react-icons/tfi";
+import PostReportDialog from "@/components/Admin/Posts/PostReportDialog";
+import PaginationAdmin from "@/components/Admin/PaginationAdmin";
 
 const Dashboard = () => {
     const [activeTab, setActiveTab] = useState("pending");
@@ -18,11 +20,39 @@ const Dashboard = () => {
     const data = {
         pending: [
             {
-                id: 1,
+                id: "666597c19cf36db69c2ea79d",
                 title: "Nhà trọ cấp thuê Gò Vấp 2",
                 description: "Nhà cho thuê giá rẻ, điện nước giá nhà nước, có chỗ đậu xe riêng. Có nhiều phòng trống. Có thể ở được liền, điện 3k nước 15k q khối.",
                 author: "Nguyễn Kiều Anh",
-                date: "06-06-2024",
+                date: "06-12-2024",
+                postImages: [
+                    "https://cloud.mogi.vn/images/2023/11/17/565/a955f0448ece439189b8f6bbda4b917e.jpg",
+                    "https://cloud.mogi.vn/images/2024/11/20/369/a9b7bc00c2e84ecab35f64136834f9a1.jpg",
+                    "https://cloud.mogi.vn/images/2023/11/17/564/bb3a2b701a3845e998f0391de444aae8.jpg",
+                    "https://cloud.mogi.vn/images/2024/05/15/424/58d9e3ab867e40d6b7d09b5fe07a5432.jpg",
+                    "https://cloud.mogi.vn/images/2023/11/17/567/25dd7852e66f45a69690bdabde1485e2.jpg"
+                ],
+                price: 5,
+                area: 20,
+                furnitureStatus: "FULL",
+                numberOfRooms: 2,
+                electricityPrice: 3,
+                waterPrice: 1.5,
+                city: "Hồ Chí Minh",
+                district: "Gò Vấp",
+                ward: "Phường 4",
+                street: "Lê Lợi",
+                houseNumber: "12",
+                licensePcccUrl: "https://www.giayphepvesinhantoanthucpham.com/wp-content/uploads/2022/10/dich-vu-uy-tin-lam-nhanh-giay-phep-ho-kinh-doanh-quan-tan-phu-12097.jpg",
+                licenseBusinessUrl: "https://fahasasg.com.vn/wp-content/uploads/2022/06/GIAY-PHEP-DKKD_001.jpg",
+
+            },
+            {
+                id: "42459c2ea7c19cf36db6979d",
+                title: "Nhà trọ nhiều phòng tại Bình Thạnh đầy đủ điện nước",
+                description: "Phòng mới, đầy đủ tiện nghi, gần trường đại học và chợ",
+                author: "Nguyễn Hữu Văn",
+                date: "16-11-2024",
                 postImages: [
                     "https://cloud.mogi.vn/images/2023/11/17/565/a955f0448ece439189b8f6bbda4b917e.jpg",
                     "https://cloud.mogi.vn/images/2024/11/20/369/a9b7bc00c2e84ecab35f64136834f9a1.jpg",
@@ -43,6 +73,59 @@ const Dashboard = () => {
                 houseNumber: "12",
                 licensePcccUrl: "https://www.giayphepvesinhantoanthucpham.com/wp-content/uploads/2022/10/dich-vu-uy-tin-lam-nhanh-giay-phep-ho-kinh-doanh-quan-tan-phu-12097.jpg",
                 licenseBusinessUrl: "https://fahasasg.com.vn/wp-content/uploads/2022/06/GIAY-PHEP-DKKD_001.jpg",
+
+            },
+            {
+                id: "69cf3666597c1db69c2ea79d",
+                title: "Nhà trọ dạng studio ngay trường ĐH Luật",
+                description: "Có nhiều phòng trống. Có thể ở được liền, điện 3k nước 15k q khối. Nhà cho thuê giá rẻ, điện nước giá nhà nước, có chỗ đậu xe riêng. ",
+                author: "Trần Văn Thái",
+                date: "26-10-2024",
+                postImages: [
+                    "https://cloud.mogi.vn/images/2023/11/17/565/a955f0448ece439189b8f6bbda4b917e.jpg",
+                    "https://cloud.mogi.vn/images/2024/11/20/369/a9b7bc00c2e84ecab35f64136834f9a1.jpg",
+                    "https://cloud.mogi.vn/images/2023/11/17/564/bb3a2b701a3845e998f0391de444aae8.jpg",
+                    "https://cloud.mogi.vn/images/2024/05/15/424/58d9e3ab867e40d6b7d09b5fe07a5432.jpg",
+                    "https://cloud.mogi.vn/images/2023/11/17/567/25dd7852e66f45a69690bdabde1485e2.jpg"
+                ],
+                price: 5,
+                area: 20,
+                furnitureStatus: "FULL",
+                numberOfRooms: 2,
+                electricityPrice: 3,
+                waterPrice: 1.5,
+                city: "Hà Nội",
+                district: "Cầu Giấy",
+                ward: "Dịch Vọng",
+                street: "Trần Thái Tông",
+                houseNumber: "12",
+                licensePcccUrl: "https://www.giayphepvesinhantoanthucpham.com/wp-content/uploads/2022/10/dich-vu-uy-tin-lam-nhanh-giay-phep-ho-kinh-doanh-quan-tan-phu-12097.jpg",
+                licenseBusinessUrl: "https://fahasasg.com.vn/wp-content/uploads/2022/06/GIAY-PHEP-DKKD_001.jpg",
+
+            },
+            {
+                id: "1db69c2e69cf3666597ca79d",
+                title: "Phòng trọ gần Đại học Kinh tế",
+                description: "gần trường đại học và chợ, phòng mới, đầy đủ tiện nghi ",
+                author: "Phạm Minh Tuấn",
+                date: "04-06-2024",
+                postImages: [
+                    "https://via.placeholder.com/100",
+                    "https://via.placeholder.com/100"
+                ],
+                price: 6.5,
+                area: 25,
+                furnitureStatus: "SEMI",
+                numberOfRooms: 1,
+                electricityPrice: 4,
+                waterPrice: 2,
+                city: "Đà Nẵng",
+                district: "Hải Châu",
+                ward: "Hòa Cường Nam",
+                street: "Lê Thanh Nghị",
+                houseNumber: "45A",
+                licensePcccUrl: "https://via.placeholder.com/100",
+                licenseBusinessUrl: "https://via.placeholder.com/100",
             },
         ],
         approved: [
@@ -119,8 +202,7 @@ const Dashboard = () => {
                 ward: "Tân An",
                 street: "Nguyễn Trãi",
                 houseNumber: "27",
-                licensePcccUrl: "https://via.placeholder.com/100",
-                licenseBusinessUrl: "https://via.placeholder.com/100",
+                lydo: "Bài viết giả mạo"
             },
         ],
     };
@@ -154,8 +236,8 @@ const Dashboard = () => {
             <div className="rounded-lg border bg-white shadow overflow-hidden">
                 <Table className="w-full">
                     <TableHeader>
-                        <TableRow>
-                            <TableHead>#</TableHead>
+                        <TableRow className="bg-primary/5 text-black font-bold">
+                            <TableHead className="text-center">#</TableHead>
                             <TableHead>Tiêu đề</TableHead>
                             <TableHead>Mô tả</TableHead>
                             <TableHead>Tác giả</TableHead>
@@ -176,13 +258,20 @@ const Dashboard = () => {
                 </Table>
             </div>
 
-            {/* Popup hiển thị chi tiết */}
-            <PostDetailsDialog data={selectedPost} onCancel={() => setSelectedPost(null)} />
-
+            {/* Hiển thị dialog dựa trên tab */}
+            {activeTab === "reported" ? (
+                <PostReportDialog data={selectedPost} onCancel={() => setSelectedPost(null)} />
+            ) : (
+                selectedPost && <PostDetailsDialog data={selectedPost} onCancel={() => setSelectedPost(null)} />
+            )}
             {/* Phân trang */}
             <div className="mt-4 flex justify-end items-center gap-4">
-                <Pagination total={totalPage} page={currentPage} onChange={(page) => setCurrentPage(page)} />
-                <span className="text-sm text-gray-600">Trang {currentPage} / {totalPage}</span>
+                <PaginationAdmin
+                    total={totalPage}
+                    page={currentPage}
+                    onChange={(page) => setCurrentPage(page)}
+                />
+
             </div>
         </div>
     );
