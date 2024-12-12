@@ -17,9 +17,9 @@ const SearchFilter = () => {
     const [priceRange, setPriceRange] = useState([0, 100000000]);
     const [appliedPriceRange, setAppliedPriceRange] = useState([0, 100000000]);
 
-    const [city, setCity] = useState("");
-    const [district, setDistrict] = useState("");
-    const [ward, setWard] = useState("");
+    const [city, setCity] = useState(null);
+    const [district, setDistrict] = useState(null);
+    const [ward, setWard] = useState(null);
 
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -45,8 +45,8 @@ const SearchFilter = () => {
                 try {
                     const data = await apiAddress.getDistricts(city); // Fetch districts based on selected province
                     setDistricts(data);
-                    setDistrict("");  // Reset district when city changes
-                    setWard("");      // Reset ward when city changes
+                    setDistrict(null);  // Reset district when city changes
+                    setWard(null);      // Reset ward when city changes
                 } catch (error) {
                     console.error("Không thể lấy danh sách quận/huyện:", error);
                 }
@@ -64,7 +64,7 @@ const SearchFilter = () => {
                 try {
                     const data = await apiAddress.getWards(district); // Fetch wards based on selected district
                     setWards(data);
-                    setWard(""); // Reset ward when district changes
+                    setWard(null); // Reset ward when district changes
                 } catch (error) {
                     console.error("Không thể lấy danh sách phường/xã:", error);
                 }
@@ -98,8 +98,33 @@ const SearchFilter = () => {
         return `${formatPrice(min)} - ${formatPrice(max)}`;
     };
 
+    // Handle the "Apply Filter" button logic (even when values are null or empty)
+    const applyFilters = () => {
+        // Xây dựng query string cho URL
+        const queryParams = new URLSearchParams();
+
+        if (appliedPriceRange[0] !== 0) {
+            queryParams.append('minPrice', appliedPriceRange[0]);
+        }
+        if (appliedPriceRange[1] !== 100000000) {
+            queryParams.append('maxPrice', appliedPriceRange[1]);
+        }
+        if (city) {
+            queryParams.append('city', city);
+        }
+        if (district) {
+            queryParams.append('district', district);
+        }
+        if (ward) {
+            queryParams.append('ward', ward);
+        }
+
+        // Chuyển hướng tới trang kết quả với các tham số trong URL
+        navigate(`/search-results?${queryParams.toString()}`);
+    };
+
     return (
-        <div className="p-4 bg-white rounded-md shadow-sm flex flex-col gap-6 md:flex-row md:items-center md:justify-center">
+        <div className="p-3 bg-white rounded-md shadow-sm flex flex-col gap-6 md:flex-row md:items-center md:justify-center">
             {/* Input tìm kiếm */}
             <div className="flex items-center w-full md:max-w-sm">
                 <FiSearch className="mr-2 text-gray-400" size={20} />
@@ -229,6 +254,19 @@ const SearchFilter = () => {
                     </div>
                 </PopoverContent>
             </Popover>
+
+            {/* Apply Filter Button */}
+            <div className="flex items-center">
+                {/* Other filter elements here */}
+                <Button
+                    variant="default"
+                    className="bg-gradient-to-r from-primary to-secondary  text-white "
+                    onClick={applyFilters}
+                >
+                    Áp dụng
+                </Button>
+            </div>
+
         </div>
     );
 };

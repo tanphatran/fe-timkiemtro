@@ -1,29 +1,32 @@
-// apiClient.js
-// import getTokenFromCookies from "@utils/getCookie";
 import axios from "axios";
+import useMeStore from "@/zustand/useMeStore"; // Lấy token từ zustand store
 
 const baseURL = import.meta.env.VITE_API_URL;
 
 function createApiClient() {
     const client = axios.create({
         baseURL,
-        // timeout: 10000,
+        withCredentials: true,
         headers: {
             "Content-Type": "application/json",
         },
     });
 
-    // Interceptor to add the token to every request
+    // Interceptor để thêm token vào tất cả các request
     // client.interceptors.request.use(
-    //   (config) => {
-    //     const token = getTokenFromCookies();
-    //     if (token) {
-    //       config.headers["Authorization"] = `Bearer ${token}`;
-    //     }
-    //     return config;
-    //   },
-    //   (error) => Promise.reject(error)
+    //     (config) => {
+    //         const token = useMeStore.getState().token;
+    //         console.log("Token trong request:", token); // Log để kiểm tra token
+    //         if (token) {
+    //             config.headers.Authorization = `Bearer ${token}`;
+    //         } else {
+    //             console.warn("Không có token để gửi trong header Authorization");
+    //         }
+    //         return config;
+    //     },
+    //     (error) => Promise.reject(error)
     // );
+
 
     return {
         getOne: async (endpoint, params = {}) => {
@@ -73,7 +76,7 @@ function createApiClient() {
     };
 }
 
-// Create a default instance of the API client
+// Tạo một instance mặc định của API client
 const axiosClient = createApiClient();
 
 export default axiosClient;

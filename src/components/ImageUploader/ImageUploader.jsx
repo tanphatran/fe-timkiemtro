@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";  // Import axios để gửi API request
+import axiosClient from "@/apis/axiosClient";  // Import axios client đã có interceptor
 
 const ImageUploader = ({
     label = "Upload Image",
@@ -38,8 +39,8 @@ const ImageUploader = ({
             return;
         }
 
-        setUploading(true); // Bắt đầu upload
-        setErrorMessage(""); // Xóa thông báo lỗi nếu có
+        setUploading(true);  // Bắt đầu upload
+        setErrorMessage("");  // Xóa thông báo lỗi nếu có
 
         const formData = new FormData();
         images.forEach((image) => {
@@ -52,6 +53,8 @@ const ImageUploader = ({
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
+                withCredentials: true,
+
             });
 
             if (response.data && response.data.status === "success") {
@@ -69,6 +72,7 @@ const ImageUploader = ({
             setUploading(false);
         }
     };
+
 
     const removeImage = (index) => {
         URL.revokeObjectURL(images[index].preview);

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import AddressModal from "@/components/Address/AddressModal" // Import AddressModal
 import ImageUploader from "@/components/ImageUploader/ImageUploader";
+import axiosClient from "@/apis/axiosClient";  // Import axios client đã có interceptor
 
 const Post = () => {
     const [isModalOpen, setIsModalOpen] = useState(false); // state to control modal
@@ -59,18 +60,11 @@ const Post = () => {
             licensePcccUrl: formData.licensePcccUrl || "",
             licenseBusinessUrl: formData.licenseBusinessUrl || ""
         };
+        console.log("Payload:", payload); // Log payload để kiểm tra trước khi gửi
 
         try {
-            const response = await fetch(
-                "http://localhost:8080/api/post/create?userUuid=1271badd-96a9-11ef-8230-088fc3773299",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                }
-            );
+            const response = await axiosClient.post(`/post/create`, payload);
+
 
             if (!response.ok) {
                 const error = await response.json();

@@ -7,10 +7,24 @@ import Room1 from "../../assets/room1.jpg";
 import { Link } from "react-router-dom";
 import pathnames from '@/lib/pathnames'
 import { GrLocation } from "react-icons/gr";
+import axiosClient from "@/apis/axiosClient";
 
 const RoomCard = ({ room }) => {
     const [liked, setLiked] = useState(false); // Trạng thái thích
+    const handleFavorite = async () => {
+        try {
+            setLiked(!liked); // Cập nhật trạng thái thích trước (optimistic UI)
 
+            // Gọi API thêm hoặc xóa khỏi danh sách yêu thích
+            const response = await axiosClient.post(`/favorite-posts/create/${room.id}`);
+
+            console.log("Favorite API response:", response.data);
+        } catch (error) {
+            console.error("Error updating favorite status:", error);
+            // Nếu API thất bại, rollback trạng thái thích
+            setLiked(!liked);
+        }
+    };
     return (
         <div className="border rounded-md hover:shadow-lg transform hover:scale-[1.03] ease-in-out">
             {/* Hình ảnh */}
@@ -72,7 +86,7 @@ const RoomCard = ({ room }) => {
 
                 {/* Icon trái tim */}
                 <button
-                    onClick={() => setLiked(!liked)}
+                    onClick={handleFavorite}
                     className="text-gray-500 hover:text-red-500 transition"
                 >
                     {liked ? (

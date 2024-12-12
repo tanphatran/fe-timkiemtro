@@ -16,11 +16,24 @@ const RoomDetail = () => {
     const [loading, setLoading] = useState(true); // Trạng thái loading
     const [error, setError] = useState(null); // Lỗi khi gọi API
     const [isRevealed, setIsRevealed] = useState(false);
+    const handleFavorite = async () => {
+        try {
+            setLiked(!liked); // Cập nhật trạng thái thích trước (optimistic UI)
 
+            // Gọi API thêm hoặc xóa khỏi danh sách yêu thích
+            const response = await axiosClient.post(`/favorite-posts/create/${id}`);
+
+            console.log("Favorite API response:", response.data);
+        } catch (error) {
+            console.error("Error updating favorite status:", error);
+            // Nếu API thất bại, rollback trạng thái thích
+            setLiked(!liked);
+        }
+    };
     useEffect(() => {
         const fetchRoomDetails = async () => {
             try {
-                const response = await axiosClient.getOne(`/post/${id}`);
+                const response = await axiosClient.getOne(`/post/detail/${id}`);
                 setRoom(response.data); // Lưu dữ liệu bài đăng
 
                 // Gọi thêm thông tin người dùng từ API
@@ -35,6 +48,18 @@ const RoomDetail = () => {
 
         fetchRoomDetails();
     }, [id]);
+    // useEffect(() => {
+    //     const fetchFavoriteStatus = async () => {
+    //         try {
+    //             const response = await axiosClient.post(`/favorite-posts/status/${id}`);
+    //             setLiked(response.data.isFavorite); // Cập nhật trạng thái yêu thích từ API
+    //         } catch (error) {
+    //             console.error("Error fetching favorite status:", error);
+    //         }
+    //     };
+
+    //     fetchFavoriteStatus();
+    // }, [id]);
 
     if (loading) {
         return <div>Đang tải dữ liệu...</div>;
@@ -161,7 +186,7 @@ const RoomDetail = () => {
                         {/* Lưu tin */}
                         <div className="my-4 flex justify-center items-center">
                             <button
-                                onClick={() => setLiked(!liked)}
+                                onClick={handleFavorite} // Gắn hàm xử lý
                                 className="flex items-center justify-center w-1/2 px-4 py-2 text-gray-700 bg-white border border-primary/50 rounded-lg hover:bg-gray-100"
                             >
                                 {liked ? (
@@ -172,6 +197,7 @@ const RoomDetail = () => {
                                 <span>Lưu tin</span>
                             </button>
                         </div>
+
                     </div>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BannerLogin from "../../assets/banner-login.jpg"; // Đường dẫn banner
 import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
@@ -7,6 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "../ui/form"; // Form và FormInput giả sử đã tạo trước đó
 import { Button } from "../ui/button";
 import FormInput from "@/components/forms/FormInput";
+import useMeStore from "@/zustand/useMeStore";
+import axiosClient from "@/apis/axiosClient";
+import { useNavigate } from 'react-router-dom';
+
 // Định nghĩa schema cho Đăng nhập
 const loginSchema = z.object({
     phone: z.string().min(1, { message: "Bạn chưa nhập số điện thoại." }),
@@ -35,11 +39,40 @@ const Login = () => {
             ? { phone: "", password: "" }
             : { fullName: "", phone: "", password: "", confirmPassword: "" },
     });
+    // Trước khi sử dụng setToken và setMe, bạn phải lấy chúng từ useMeStore
+    const { setToken, setMe, role, setRole } = useMeStore();
+    const navigate = useNavigate();
 
-    const handleSubmit = (data) => {
-        console.log(isLogin ? "Login Data:" : "Register Data:", data);
-        // Logic xử lý Đăng nhập hoặc Đăng ký
+    useEffect(() => {
+        console.log("Role updated:", role);
+        if (role === "ADMIN") {
+            navigate("/admin");
+        }
+    }, [role, navigate]);
+
+    const handleSubmit = async (data) => {
+        try {
+            // Gọi API đăng nhập
+            const response = await axiosClient.post("/auth/login", {
+                phoneNumber: data.phone,
+                password: data.password,
+            });
+
+            if (response.status === "success") {
+                // Lưu token và thông tin người dùng vào zustand
+                setToken(response.data.accessToken);
+                setMe(response.data.fullName);
+                setRole(response.data.role);
+                console.log(response.data.accessToken)
+
+            } else {
+                console.error("Đăng nhập thất bại", response.message);
+            }
+        } catch (error) {
+            console.error("Lỗi khi đăng nhập:", error);
+        }
     };
+
 
     return (
         <div className="grid grid-cols-10">

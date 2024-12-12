@@ -11,20 +11,20 @@ import { Link } from "react-router-dom";
 
 const FooterLinks = [
     {
-        title: "Home",
+        title: "Trang chủ Trotot",
         link: "/",
     },
     {
-        title: "About",
-        link: "/about",
+        title: "Tìm kiếm phòng trọ",
+        link: "/search",
     },
     {
-        title: "Best Places",
-        link: "/best-places",
+        title: "Phòng trọ Hồ Chí Minh",
+        link: "/",
     },
     {
-        title: "Blogs",
-        link: "/blogs",
+        title: "Phòng trọ Hà Nội",
+        link: "/",
     },
 ];
 
@@ -70,7 +70,7 @@ const Footer = () => {
                             <div>
                                 <div className="py-8 px-4">
                                     <h1 className="text-xl font-bold text-justify sm:text-left mb-3">
-                                        Important Links
+                                        Tìm kiếm nhanh chóng
                                     </h1>
                                     <ul className="flex flex-col gap-3">
                                         {FooterLinks.map((link) => (
@@ -93,7 +93,7 @@ const Footer = () => {
                             <div>
                                 <div className="py-8 px-4">
                                     <h1 className="text-xl font-bold text-justify sm:text-left mb-3">
-                                        Important Links
+                                        Đăng tin dễ dàng
                                     </h1>
                                     <ul className="flex flex-col gap-3">
                                         {FooterLinks.map((link) => (
@@ -116,7 +116,7 @@ const Footer = () => {
                             <div>
                                 <div className="py-8 px-4">
                                     <h1 className="text-xl font-bold text-justify sm:text-left mb-3">
-                                        Important Links
+                                        Website Nhatot
                                     </h1>
                                     <ul className="flex flex-col gap-3">
                                         {FooterLinks.map((link) => (

@@ -1,135 +1,121 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosClient from "@/apis/axiosClient";  // Đảm bảo import axiosClient từ đúng vị trí
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PostCard from "@/components/Card/PostCard";
 import PaginationAdmin from "@/components/Admin/PaginationAdmin";
 import EditPostDialog from "./EditPostDialog";
 
 const PostManagement = () => {
-    const [status, setStatus] = useState("active"); // Trạng thái tab hiện tại
-    const [activePage, setActivePage] = useState(1); // Trang hiện tại
-    const postsPerPage = 2; // Số bài viết trên mỗi trang
+    const [status, setStatus] = useState("approved");  // Mặc định là "approved"
+    const [activePage, setActivePage] = useState(1);
+    const postsPerPage = 2;
     const [editingPost, setEditingPost] = useState(null);
+    const [posts, setPosts] = useState([]);
+    const [postCounts, setPostCounts] = useState({
+        approved: 0,
+        pending: 0,
+        rejected: 0,
+    });
+
     const handleSaveSuccess = () => {
-        setEditingPost(null); // Đóng dialog sau khi lưu thành công
+        setEditingPost(null);  // Đóng dialog sau khi lưu thành công
     };
+
     const handleEditPost = (post) => {
-        setEditingPost(post); // Gán bài viết được chọn
+        setEditingPost(post);  // Gán bài viết được chọn
     };
 
+    // Hàm gọi API để lấy bài viết theo trạng thái
+    const fetchPosts = async (status) => {
+        try {
+            const response = await axiosClient.getMany(`/post/${status}`);  // Gọi API từ axiosClient
+            console.log('API Response:', response.data);  // Kiểm tra dữ liệu trả về
 
+            if (response.data) {
+                setPosts(response.data.content);
+                console.log('API Response:', response.data.content); // Cập nhật bài viết từ dữ liệu trả về
+            }
+        } catch (error) {
+            console.error(`Error fetching ${status} posts:`, error);
+        }
+    };
+    const fetchPostsAndCounts = async () => {
+        try {
+            // Gọi API cho từng trạng thái và lấy số lượng bài viết
+            const statuses = ["approved", "pending", "rejected"];
+            const counts = {};
 
-    // Dữ liệu mẫu cho các bài viết
-    const posts = [
-        {
-            id: "86477e7f-8eea-4a2d-85d3-dbdfc8908bce",
-            featuredImage: "https://cloud.mogi.vn/images/2023/10/05/468/39883dc1f48440c1a8f76a320af4b7ac.jpg",
-            title: "Cho thuê nhà nguyên căn Quận Thủ Đức gần ĐH Ngân Hàng",
-            price: "1.200.000đ",
-            area: "12,12",
-            location: "206/3 Hoàng Diệu 2, Linh Chiểu, Thủ Đức, TP.HCM",
-            status: "active", // Trạng thái bài viết
-            waterPrice: "15000",
-            electricityPrice: "4000",
-        },
-        {
-            featuredImage: "https://cloud.mogi.vn/images/2024/11/26/539/4b264f3ba62a4ffe820b0bf542429cc4.jpg",
-            title: "Cho thuê nhà nguyên căn Quận 1",
-            price: "1.200.000đ",
-            area: "12,12",
-            location: "206/3 Hoàng Diệu 2, Linh Chiểu, Thủ Đức, TP.HCM",
-            status: "active", // Trạng thái bài viết
-            waterPrice: "15000",
-            electricityPrice: "4000",
-        },
-        {
-            featuredImage: "https://cloud.mogi.vn/images/2023/10/05/467/24a0aa2aa413438e9860dd822372cfa9.jpg",
-            title: "xxx",
-            price: "3.200.000đ",
-            area: "32",
-            location: "206/3 Hoàng Diệu 2, Linh Chiểu, Thủ Đức, TP.HCM",
-            status: "pending",
-            waterPrice: "15000",
-            electricityPrice: "4000",
-        },
-        {
-            featuredImage: "https://cloud.mogi.vn/images/2024/03/13/244/74cdce0df05c44fd8cdc5973e04dbd0e.jpg",
-            title: "aaa",
-            price: "1.800.000đ",
-            area: "20",
-            location: "206/3 Hoàng Diệu 2, Linh Chiểu, Thủ Đức, TP.HCM",
-            status: "report",
-            waterPrice: "15000",
-            electricityPrice: "4000",
-        },
-    ];
+            for (let status of statuses) {
+                const response = await axiosClient.getMany(`/post/${status}`);
+                if (response.data) {
+                    counts[status] = response.data.totalElements;  // Lưu số lượng bài viết
+                }
+            }
 
-    // Lọc bài viết theo trạng thái hiện tại
-    const filteredPosts = posts.filter((post) => post.status === status);
+            setPostCounts(counts);  // Lưu số lượng bài viết vào state
+            fetchPosts(status);     // Lấy bài viết cho trạng thái hiện tại
+        } catch (error) {
+            console.error("Error fetching posts counts:", error);
+        }
+    };
+    useEffect(() => {
+        fetchPostsAndCounts();  // Gọi API để lấy cả số lượng bài viết và bài viết
+    }, []);
+    useEffect(() => {
+        console.log("Bài viết đã được cập nhật 1:", posts);  // Kiểm tra khi posts thay đổi
+    }, [posts]);  // Chạy khi posts thay đổi
 
-    // Tính tổng số trang
-    const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+    // Gọi API khi trạng thái tab thay đổi
+    useEffect(() => {
+        fetchPosts(status);
+        console.log("Bài viết đã được cập nhật:", posts);
+    }, [status]);
 
-    // Lấy danh sách bài viết trên trang hiện tại
-    const currentPosts = filteredPosts.slice(
+    // Tính tổng số trang (dùng posts trực tiếp)
+    const totalPages = Math.ceil(posts.length / postsPerPage);
+
+    // Lấy danh sách bài viết trên trang hiện tại (dùng posts trực tiếp)
+    const currentPosts = posts.slice(
         (activePage - 1) * postsPerPage,
         activePage * postsPerPage
     );
 
-    // Hàm xử lý khi đổi tab
     const handleTabChange = (newStatus) => {
-        setStatus(newStatus); // Cập nhật trạng thái
-        setActivePage(1); // Đặt lại trang hiện tại về 1
+        setStatus(newStatus);  // Cập nhật trạng thái tab
+        setActivePage(1);  // Đặt lại trang về 1
     };
 
     return (
-        <Tabs defaultValue="active" className="w-full">
-            {/* Tabs List */}
+        <Tabs defaultValue="approved" className="w-full">
             <TabsList className="mb-4">
-                <TabsTrigger
-                    value="active"
-                    onClick={() => handleTabChange("active")}
-                >
-                    Đang hiển thị ({posts.filter((post) => post.status === "active").length})
+                <TabsTrigger value="approved" onClick={() => handleTabChange("approved")}>
+                    Đang hiển thị ({postCounts.approved})
                 </TabsTrigger>
-                <TabsTrigger
-                    value="pending"
-                    onClick={() => handleTabChange("pending")}
-                >
-                    Đang chờ duyệt ({posts.filter((post) => post.status === "pending").length})
+                <TabsTrigger value="pending" onClick={() => handleTabChange("pending")}>
+                    Đang chờ duyệt ({postCounts.pending})
                 </TabsTrigger>
-                <TabsTrigger
-                    value="report"
-                    onClick={() => handleTabChange("report")}
-                >
-                    Bị báo cáo ({posts.filter((post) => post.status === "report").length})
+                <TabsTrigger value="rejected" onClick={() => handleTabChange("rejected")}>
+                    Bị từ chối ({postCounts.rejected})
                 </TabsTrigger>
             </TabsList>
 
-            {/* Nội dung Tabs */}
             <TabsContent value={status}>
                 {currentPosts.map((post, index) => (
-                    <PostCard key={index} post={post} onEdit={handleEditPost} />
+                    <PostCard key={index} post={post} onEdit={handleEditPost} status={status} />
                 ))}
 
-                {/* Phân trang */}
                 <div className="flex justify-end mt-4">
-                    <PaginationAdmin
-                        total={totalPages}
-                        page={activePage}
-                        onChange={setActivePage}
-                    />
+                    <PaginationAdmin total={totalPages} page={activePage} onChange={setActivePage} />
                 </div>
             </TabsContent>
+
             {editingPost && (
                 <EditPostDialog
-                    postId={editingPost?.id} // Đảm bảo editingPost có giá trị
+                    postId={editingPost?.id}
                     userUuid="1271badd-96a9-11ef-8230-088fc3773299"
                     onSaveSuccess={handleSaveSuccess}
                 />
             )}
-
-
-
         </Tabs>
     );
 };

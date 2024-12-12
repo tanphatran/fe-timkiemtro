@@ -4,14 +4,37 @@ import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import Login from "../login/Login";
 import { FiMenu, FiX } from "react-icons/fi"; // Icons menu và đóng
+import useAuth from "@/hooks/useAuth"; // Import custom hook useAuth
+import useMeStore from "@/zustand/useMeStore";
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate(); // Khởi tạo useNavigate
+    const { isLoggedIn, me, clearAuth } = useAuth();
+    const { role } = useMeStore();
+    const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false); // Thêm trạng thái cho dialog
+
+    const handleLogout = () => {
+        clearAuth(); // Đăng xuất
+        navigate("/"); // Chuyển hướng về trang chủ
+    };
 
     const handlePostNavigation = () => {
-        navigate("/users/create-posts"); // Điều hướng đến trang "/post"
+        if (!isLoggedIn) {
+            // Nếu chưa đăng nhập, hiển thị dialog đăng nhập
+            setIsLoginDialogOpen(true); // Mở dialog đăng nhập
+            return;
+        }
+        if (role === "LANDLORD") {
+            navigate("/users/create-posts"); // Điều hướng phù hợp với LANDLORD
+        } else if (role === "TENANT") {
+            navigate("/users/verification"); // Điều hướng phù hợp với LANDLORD
+
+        } else {
+            // Mặc định
+        }
     };
+
 
     return (
         <div className="fixed top-0 right-0 w-full z-50 bg-white/80 backdrop-blur-sm text-black shadow-md">
@@ -29,17 +52,27 @@ const Navbar = () => {
                         Tìm kiếm
                     </Link>
                     {/* Đăng nhập/Đăng ký */}
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <button className="hoder: underline">Đăng nhập/ Đăng ký</button>
-                        </DialogTrigger>
-                        <DialogContent isHideClose={true} className="min-w-[700px] p-0">
-                            <DialogHeader>
-                                <DialogTitle></DialogTitle>
-                                <Login />
-                            </DialogHeader>
-                        </DialogContent>
-                    </Dialog>
+                    {isLoggedIn ? (
+                        <div className="flex items-center gap-2">
+                            <span>Chào, {me || "Người dùng"}!</span> {/* Hiển thị tên người dùng */}
+                            <button onClick={handleLogout} className="hover:underline">
+                                Đăng xuất
+                            </button>
+                        </div>
+                    ) : (
+                        <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
+                            <DialogTrigger asChild>
+                                <button className="hover:underline">Đăng nhập/ Đăng ký</button>
+                            </DialogTrigger>
+                            <DialogContent isHideClose={true} className="min-w-[700px] p-0">
+                                <DialogHeader>
+                                    <DialogTitle></DialogTitle>
+                                    <Login />
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+                    )}
+
                     {/* Đăng tin */}
                     <button
                         onClick={handlePostNavigation} // Gọi hàm điều hướng
