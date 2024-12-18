@@ -56,8 +56,10 @@ const PostCard = ({ post, onEdit, status }) => {
                     <Button
                         variant="outline"
                         className="text-primary hover:bg-primary hover:text-white transition duration-200"
-                        onClick={() => post && onEdit(post)}
-                    >
+                        onClick={() => {
+                            console.log("Post passed to onEdit:", post); // Kiểm tra post có được truyền đúng
+                            post && onEdit(post);
+                        }}                    >
                         Chỉnh sửa
                     </Button>
                 </div>

@@ -19,11 +19,15 @@ const PostManagement = () => {
 
     const handleSaveSuccess = () => {
         setEditingPost(null);  // Đóng dialog sau khi lưu thành công
+        fetchPosts(status);
     };
 
     const handleEditPost = (post) => {
-        setEditingPost(post);  // Gán bài viết được chọn
+        console.log("Post to edit:", post); // Thêm log kiểm tra
+        setEditingPost(post);
+
     };
+
 
     // Hàm gọi API để lấy bài viết theo trạng thái
     const fetchPosts = async (status) => {
@@ -111,8 +115,7 @@ const PostManagement = () => {
 
             {editingPost && (
                 <EditPostDialog
-                    postId={editingPost?.id}
-                    userUuid="1271badd-96a9-11ef-8230-088fc3773299"
+                    postId={editingPost?.postUuid}
                     onSaveSuccess={handleSaveSuccess}
                 />
             )}

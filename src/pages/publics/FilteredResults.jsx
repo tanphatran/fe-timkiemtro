@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import RoomCard from "@/components/Rooms/RoomCard";
-import SearchFilter from "@/components/Searchs/SearchFilter";
-import axiosClient from "@/apis/axiosClient"; // Đường dẫn tới apiClient.js
+import axiosClient from "@/apis/axiosClient";
+import { useLocation } from "react-router-dom";
 import {
     Pagination,
     PaginationContent,
@@ -10,61 +10,80 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import SearchFilter from "@/components/Searchs/SearchFilter";
 
-const Rooms = () => {
-    const [sortOption, setSortOption] = useState("default"); // Lựa chọn sắp xếp
-    const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-    const itemsPerPage = 9; // Số phòng hiển thị mỗi trang
+const FilteredResults = () => {
     const [rooms, setRooms] = useState([]); // Dữ liệu phòng
+    const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
     const [totalPages, setTotalPages] = useState(1); // Tổng số trang
     const [loading, setLoading] = useState(false); // Trạng thái loading
+    const location = useLocation();
 
-    // Hàm gọi API
-    const fetchRooms = async (page) => {
-        setLoading(true);
-        try {
-            const response = await axiosClient.getMany("/post", {
-                page: page - 1,
-                size: itemsPerPage,
-            });
-
-            console.log("API Response:", response);
-
-            const { content, totalPages } = response.data || {};
-            if (!content || !totalPages) {
-                throw new Error("API response does not have expected structure");
-            }
-
-            const formattedRooms = content.map((room) => ({
-                id: room.postUuid,
-                featuredImage: room.postImages[0],
-                name: room.title,
-                price: room.price,
-                electricityPrice: room.electricityPrice,
-                waterPrice: room.waterPrice,
-                size: room.area,
-                time: new Date(room.createdAt).toLocaleDateString("vi-VN"),
-                houseNumber: room.houseNumber,
-                street: room.street,
-                ward: room.ward,
-                district: room.district,
-                city: room.city,
-
-            }));
-
-            setRooms(formattedRooms);
-            setTotalPages(totalPages);
-        } catch (error) {
-            console.error("Error fetching rooms:", error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Gọi API khi component mount hoặc khi trang thay đổi
+    // Lấy tham số từ URL
     useEffect(() => {
-        fetchRooms(currentPage);
-    }, [currentPage]);
+        // Lấy các tham số lọc từ URL
+        const getFilterParams = () => {
+            const queryParams = new URLSearchParams(location.search); // Thay thế window.location.search
+            const minPrice = queryParams.get("minPrice");
+            const maxPrice = queryParams.get("maxPrice");
+            const city = queryParams.get("city");
+            const district = queryParams.get("district");
+            const ward = queryParams.get("ward");
+
+            return { minPrice, maxPrice, city, district, ward };
+        };
+
+        const fetchFilteredRooms = async (page) => {
+            setLoading(true);
+            try {
+                const { minPrice, maxPrice, city, district, ward } = getFilterParams();
+
+                const queryParams = {
+                    page: page - 1,
+                    size: 9,
+                    minPrice,
+                    maxPrice,
+                    city,
+                    district,
+                    ward,
+                };
+
+                const filteredParams = Object.entries(queryParams)
+                    .filter(([, value]) => value)
+                    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+                    .join("&");
+
+                const response = await axiosClient.getOne(`/post/filter?${filteredParams}`);
+
+                const formattedRooms = response.data.content.map((room) => ({
+                    id: room.postUuid,
+                    featuredImage: room.postImages?.[0] || "",
+                    name: room.title,
+                    price: room.price,
+                    electricityPrice: room.electricityPrice,
+                    waterPrice: room.waterPrice,
+                    size: room.area,
+                    time: new Date(room.createdAt).toLocaleDateString("vi-VN"),
+                    houseNumber: room.houseNumber || "",
+                    street: room.street || "",
+                    ward: room.ward || "",
+                    district: room.district || "",
+                    city: room.city || "",
+                }));
+
+                setRooms(formattedRooms);
+                setTotalPages(Math.ceil(response.data.totalElements / 9));
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu phòng:", error.message);
+                setRooms([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFilteredRooms(currentPage);
+    }, [location.search, currentPage]);  // Gọi lại khi tham số URL thay đổi
+
 
     // Xử lý thay đổi trang
     const handlePageChange = (page) => {
@@ -72,12 +91,13 @@ const Rooms = () => {
     };
 
     return (
-        <div className="mt-4 px-2 sm:px-8 md:px-16 lg:px-28">
+        <div className="mt-14 px-4 sm:px-8 md:px-16 lg:px-28">
+            <SearchFilter />
+
             <div className="w-full">
                 <div className="w-full max-w-screen-xl mx-auto">
-                    {/* Danh sách phòng */}
-                    <h1 className="text-xl font-bold">Danh sách tất cả các phòng trọ</h1>
 
+                    {/* Danh sách phòng */}
                     <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                         {loading ? (
                             <p className="text-center w-full">Đang tải dữ liệu...</p>
@@ -127,4 +147,4 @@ const Rooms = () => {
     );
 };
 
-export default Rooms;
+export default FilteredResults;

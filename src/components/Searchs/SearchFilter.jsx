@@ -12,6 +12,7 @@ import { FiSearch, FiFilter } from "react-icons/fi";
 import { MdLocationOn, MdOutlineHome } from "react-icons/md";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import apiAddress from "@/apis/apiAddress"; // Import API address functions
+import { useNavigate } from "react-router-dom";
 
 const SearchFilter = () => {
     const [priceRange, setPriceRange] = useState([0, 100000000]);
@@ -24,6 +25,8 @@ const SearchFilter = () => {
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
+
+    const navigate = useNavigate();
 
     // Fetch provinces (cities) on component mount
     useEffect(() => {
@@ -98,9 +101,8 @@ const SearchFilter = () => {
         return `${formatPrice(min)} - ${formatPrice(max)}`;
     };
 
-    // Handle the "Apply Filter" button logic (even when values are null or empty)
     const applyFilters = () => {
-        // Xây dựng query string cho URL
+        // Tạo chuỗi query cho URL
         const queryParams = new URLSearchParams();
 
         if (appliedPriceRange[0] !== 0) {
@@ -118,10 +120,11 @@ const SearchFilter = () => {
         if (ward) {
             queryParams.append('ward', ward);
         }
-
-        // Chuyển hướng tới trang kết quả với các tham số trong URL
-        navigate(`/search-results?${queryParams.toString()}`);
+        console.log("URL cập nhật:", `/results?${queryParams.toString()}`);
+        // Cập nhật URL với các tham số mới và làm mới trang
+        navigate(`/results?${queryParams.toString()}`, { replace: true });  // Sử dụng 'replace' để tránh thêm nhiều trang vào lịch sử
     };
+
 
     return (
         <div className="p-3 bg-white rounded-md shadow-sm flex flex-col gap-6 md:flex-row md:items-center md:justify-center">

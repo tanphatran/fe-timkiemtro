@@ -12,9 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CiWarning } from "react-icons/ci";
+import axiosClient from "@/apis/axiosClient"; // Import axiosClient đã được cấu hình
 
-const ReportRoom = () => {
+const ReportRoom = ({ roomId }) => {
     const [selectedReasons, setSelectedReasons] = useState([]);
+    const [details, setDetails] = useState("");
+    const [isDialogOpen, setIsDialogOpen] = useState(false); // Trạng thái mở/đóng dialog
 
     const handleCheckboxChange = (reason) => {
         setSelectedReasons((prev) =>
@@ -24,9 +27,30 @@ const ReportRoom = () => {
         );
     };
 
-    const handleSubmit = () => {
-        console.log("Reasons:", selectedReasons);
-        alert("Báo cáo vi phạm đã được gửi!");
+    const handleSubmit = async () => {
+        if (selectedReasons.length === 0 && !details.trim()) {
+            alert("Vui lòng chọn ít nhất một lý do hoặc nhập ý kiến phản hồi.");
+            return;
+        }
+
+        const payload = {
+            reason: selectedReasons.join(", "),
+            details: details,
+        };
+
+        try {
+            const response = await axiosClient.post(`/reports/create/${roomId}`, payload);
+
+            if (response.status === "success") {
+                alert(response.message);
+                setIsDialogOpen(false); // Đóng dialog sau khi gửi thành công
+            } else {
+                alert("Đã có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.");
+            }
+        } catch (error) {
+            console.error("Error submitting report:", error);
+            alert("Đã có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.");
+        }
     };
 
     const reasons = [
@@ -37,14 +61,16 @@ const ReportRoom = () => {
         "Bất động sản đã bán/cho thuê",
         "Tin không có thật",
         "Tin trùng với tin khác",
+        "Khác (nhập dưới mô tả):",
     ];
 
     return (
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="text-base" >
+                <Button variant="outline" className="text-base">
                     <CiWarning />
-                    Báo vi phạm</Button>
+                    Báo vi phạm
+                </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
@@ -70,15 +96,27 @@ const ReportRoom = () => {
                     ))}
                     <div className="mb-6">
                         <label className="block text-base font-medium text-gray-700 mb-2">
-                            Nhập ý kiến phản hồi
+                            Nhập mô tả:
                         </label>
-                        <Textarea placeholder="Nhập mô tả chi tiết..." rows={5}
+                        <Textarea
+                            placeholder="Nhập mô tả chi tiết..."
+                            rows={5}
+                            value={details}
+                            onChange={(e) => setDetails(e.target.value)}
                         />
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button className="text-base" onClick={handleSubmit}>Gửi</Button>
-                    <Button className="text-base" variant="secondary">Bỏ qua</Button>
+                    <Button className="text-base" onClick={handleSubmit}>
+                        Gửi
+                    </Button>
+                    <Button
+                        className="text-base"
+                        variant="secondary"
+                        onClick={() => setIsDialogOpen(false)} // Đóng dialog khi bấm hủy
+                    >
+                        Bỏ qua
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

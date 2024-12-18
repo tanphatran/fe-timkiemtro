@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { IoFlashOutline } from "react-icons/io5"; // Icon điện
 import { BsDroplet } from "react-icons/bs"; // Icon nước
@@ -11,20 +11,41 @@ import axiosClient from "@/apis/axiosClient";
 
 const RoomCard = ({ room }) => {
     const [liked, setLiked] = useState(false); // Trạng thái thích
+    const checkFavoriteStatus = async () => {
+        try {
+            const response = await axiosClient.getOne(`/favorite-posts/check-favorite/${room.id}`);
+            // Nếu bài viết đã được yêu thích, cập nhật trạng thái liked
+
+            setLiked(response.data); // data là true nếu đã yêu thích, false nếu chưa
+
+        } catch (error) {
+            console.error("Error checking favorite status:", error);
+        }
+    };
     const handleFavorite = async () => {
         try {
-            setLiked(!liked); // Cập nhật trạng thái thích trước (optimistic UI)
+            if (liked) {
+                // Gọi API xóa bài viết yêu thích
+                const response = await axiosClient.delete(`/favorite-posts/remove/${room.id}`);
+                console.log("Remove Favorite API response:", response.data);
+            } else {
+                // Gọi API thêm bài viết vào danh sách yêu thích
+                const response = await axiosClient.post(`/favorite-posts/create/${room.id}`);
+                console.log("Add Favorite API response:", response.data);
+            }
 
-            // Gọi API thêm hoặc xóa khỏi danh sách yêu thích
-            const response = await axiosClient.post(`/favorite-posts/create/${room.id}`);
-
-            console.log("Favorite API response:", response.data);
+            // Cập nhật trạng thái yêu thích
+            setLiked(!liked); // Cập nhật trạng thái yêu thích trước (optimistic UI)
         } catch (error) {
             console.error("Error updating favorite status:", error);
             // Nếu API thất bại, rollback trạng thái thích
             setLiked(!liked);
         }
     };
+    useEffect(() => {
+        checkFavoriteStatus();
+    }, [room.id]);
+
     return (
         <div className="border rounded-md hover:shadow-lg transform hover:scale-[1.03] ease-in-out">
             {/* Hình ảnh */}

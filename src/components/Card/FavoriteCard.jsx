@@ -1,14 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IoFlashOutline } from "react-icons/io5"; // Icon điện
 import { BsDroplet } from "react-icons/bs"; // Icon nước
 import { MdSquareFoot } from "react-icons/md"; // Icon diện tích
 import { GrLocation } from "react-icons/gr";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import axiosClient from "@/apis/axiosClient";
 
-const FavoriteCard = ({ post }) => {
+const FavoriteCard = ({ post, refreshFavoritePosts }) => {
     const [liked, setLiked] = useState(true); // Trạng thái thích
-
+    const handleFavorite = async () => {
+        try {
+            // Gọi API xóa bài viết yêu thích
+            await axiosClient.delete(`/favorite-posts/remove/${post.postUuid}`);
+            refreshFavoritePosts();
+        } catch (error) {
+            console.error("Error updating favorite status:", error);
+            // Nếu API thất bại, rollback trạng thái thích
+            setLiked(!liked);
+        }
+    };
     // Lấy hình ảnh đại diện từ mảng hình ảnh
     const featuredImage = post?.postImages?.[0] || "https://via.placeholder.com/150";
 
@@ -65,7 +76,7 @@ const FavoriteCard = ({ post }) => {
             </CardContent>
             <div className="p-4 flex justify-center items-center col-span-2">
                 <button
-                    onClick={() => setLiked(!liked)}
+                    onClick={handleFavorite}
                     className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${liked ? "bg-red-100 hover:bg-red-200" : "bg-gray-100 hover:bg-gray-200"
                         }`}
                 >

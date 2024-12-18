@@ -5,7 +5,8 @@ const pathnames = {
         search: "/search",
         roomdetail_id: "/roomdetail/:id",
         roomdetail: "/roomdetail",
-        post: "/post"
+        post: "/post",
+        results: "/results"
     },
     users: {
         layout: "/users",
@@ -13,7 +14,8 @@ const pathnames = {
         profilepage: "/users/profile-page",
         postmana: "/users/postmana",
         createposts: "/users/create-posts",
-        verification: "/users/verification"
+        verification: "/users/verification",
+        editprofile: "/users/editprofile"
     },
     admin: {
         layout: "/admin",

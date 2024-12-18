@@ -18,12 +18,18 @@ const RoomDetail = () => {
     const [isRevealed, setIsRevealed] = useState(false);
     const handleFavorite = async () => {
         try {
-            setLiked(!liked); // Cập nhật trạng thái thích trước (optimistic UI)
+            if (liked) {
+                // Gọi API xóa bài viết yêu thích
+                const response = await axiosClient.delete(`/favorite-posts/remove/${id}`);
+                console.log("Remove Favorite API response:", response.data);
+            } else {
+                // Gọi API thêm bài viết vào danh sách yêu thích
+                const response = await axiosClient.post(`/favorite-posts/create/${id}`);
+                console.log("Add Favorite API response:", response.data);
+            }
 
-            // Gọi API thêm hoặc xóa khỏi danh sách yêu thích
-            const response = await axiosClient.post(`/favorite-posts/create/${id}`);
-
-            console.log("Favorite API response:", response.data);
+            // Cập nhật trạng thái yêu thích
+            setLiked(!liked); // Cập nhật trạng thái yêu thích trước (optimistic UI)
         } catch (error) {
             console.error("Error updating favorite status:", error);
             // Nếu API thất bại, rollback trạng thái thích
@@ -48,18 +54,18 @@ const RoomDetail = () => {
 
         fetchRoomDetails();
     }, [id]);
-    // useEffect(() => {
-    //     const fetchFavoriteStatus = async () => {
-    //         try {
-    //             const response = await axiosClient.post(`/favorite-posts/status/${id}`);
-    //             setLiked(response.data.isFavorite); // Cập nhật trạng thái yêu thích từ API
-    //         } catch (error) {
-    //             console.error("Error fetching favorite status:", error);
-    //         }
-    //     };
+    useEffect(() => {
+        const fetchFavoriteStatus = async () => {
+            try {
+                const response = await axiosClient.getOne(`/favorite-posts/check-favorite/${id}`);
+                setLiked(response.data); // Cập nhật trạng thái yêu thích từ API
+            } catch (error) {
+                console.error("Error fetching favorite status:", error);
+            }
+        };
 
-    //     fetchFavoriteStatus();
-    // }, [id]);
+        fetchFavoriteStatus();
+    }, [id]);
 
     if (loading) {
         return <div>Đang tải dữ liệu...</div>;
@@ -136,8 +142,8 @@ const RoomDetail = () => {
                             </Table>
                         </div>
 
-                        <div className="flex justify-end">
-                            <ReportRoom />
+                        <div className="flex justify-end mb-3">
+                            <ReportRoom roomId={id} />
                         </div>
                     </div>
 

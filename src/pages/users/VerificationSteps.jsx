@@ -1,19 +1,53 @@
 import React, { useState } from "react";
-import { Input } from "@/components/ui/input"; // Input của ShadCN UI
-import { Button } from "@/components/ui/button"; // Button của ShadCN UI
+import axiosClient from "@/apis/axiosClient";  // Import axios client đã có interceptor
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ImageUploader from "@/components/ImageUploader/ImageUploader";
 
 const VerificationSteps = () => {
-    const [currentStep, setCurrentStep] = useState(1); // Bước hiện tại (2: Mã OTP)
-    const [otp, setOtp] = useState(""); // Lưu mã OTP
-    const [sdt, setSdt] = useState(""); // Lưu mã OTP
-    const [cccdImages, setCccdImages] = useState([]);
+    const [currentStep, setCurrentStep] = useState(1);
+    const [cccdImages, setCccdImages] = useState({
+        frontCccdUrl: "",
+        backCccdUrl: "",
+    });
+    const [loading, setLoading] = useState(false);
 
-    // Hàm xử lý khi nhấn nút "Xác thực"
-    const handleVerify = () => {
-        if (currentStep < 4) {
-            setCurrentStep(currentStep + 1); // Chuyển sang bước tiếp theo
+    // Hàm xử lý khi ảnh được tải lên thành công
+    const handleImageUpload = (type, uploadedImageUrl) => {
+        setCccdImages((prevImages) => ({
+            ...prevImages,
+            [type]: uploadedImageUrl,
+        }));
+    };
+
+    // Hàm gửi dữ liệu đăng ký
+    const handleVerify = async () => {
+        if (currentStep === 2) {
+            if (!cccdImages.frontCccdUrl || !cccdImages.backCccdUrl) {
+                alert("Vui lòng tải đủ mặt trước và mặt sau của CCCD.");
+                return;
+            }
+
+            setLoading(true);
+            try {
+                const payload = {
+                    frontCccdUrl: cccdImages.frontCccdUrl[0],
+                    backCccdUrl: cccdImages.backCccdUrl[0],
+                };
+                console.log(payload);
+                // Gọi API
+                const response = await axiosClient.post(`/user/register-landlord`, payload);
+                setCurrentStep(3); // Chuyển sang bước tiếp theo
+
+            } catch (error) {
+                console.error("Lỗi khi gửi API:", error);
+                alert("Đã xảy ra lỗi khi gửi thông tin xác thực. Vui lòng thử lại!");
+            } finally {
+                setLoading(false);
+            }
+        } else if (currentStep < 3) {
+            setCurrentStep(currentStep + 1);
         } else {
             console.log("Hoàn thành quy trình!");
         }
@@ -27,9 +61,8 @@ const VerificationSteps = () => {
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                {/* Phần các bước */}
                 <div className="flex justify-center items-center space-x-4 mb-6">
-                    {[1, 2, 3, 4].map((step) => (
+                    {[1, 2, 3].map((step) => (
                         <div
                             key={step}
                             className={
@@ -44,66 +77,67 @@ const VerificationSteps = () => {
                     ))}
                 </div>
 
-
-                {/* Phần nội dung của từng bước */}
+                {/* Nội dung các bước */}
                 {currentStep === 1 && (
-                    <div className="flex flex-col space-y-4">
-                        <label htmlFor="otp" className="text-sm font-medium">
-                            Nhập số điện thoại
-                        </label>
-                        <Input
-                            id="sft"
-                            type="text"
-                            placeholder="Nhập số điện thoại"
-                            value={sdt}
-                            onChange={(e) => setSdt(e.target.value)}
-                            maxLength={11}
-                            className="text-center border-gray-300 focus-visible:ring focus-visible:ring-secondary"
-                        />
+                    <div className="text-center">
+                        <p className="text-base font-medium">
+                            Tài khoản của bạn cần được xác thực. Hãy nhấn nút{" "}
+                            <span className="font-bold text-red-500">"Xác thực"</span> để tiếp tục.
+                        </p>
                     </div>
                 )}
-                {currentStep === 2 && (
-                    <div className="flex flex-col space-y-4">
-                        <label htmlFor="otp" className="text-sm font-medium">
-                            Mã OTP*
-                        </label>
-                        <Input
-                            id="otp"
-                            type="text"
-                            placeholder="Nhập mã OTP"
-                            value={otp}
-                            onChange={(e) => setOtp(e.target.value)}
-                            maxLength={6}
-                            className="text-center border-gray-300 focus-visible:ring focus-visible:ring-secondary"
-                        />
-                    </div>
-                )}
-                {currentStep === 3 && (
-                    <div className="flex flex-col space-y-4 items-center">
-                        <label htmlFor="cccd" className=" text-sm font-medium ">Tải ảnh CCCD (Mặt trước và mặt sau)</label>
-                        <ImageUploader
-                            label="Tải ảnh CCCD"
-                            maxFiles={2}  // Cho phép tải lên 2 ảnh
-                            minFiles={2}  // Bắt buộc tải ít nhất 2 ảnh
-                            onUploadSuccess={(uploadedImages) => setCccdImages(uploadedImages)}  // Lưu ảnh sau khi upload thành công
-                        />
-                    </div>
-                )}
-                {currentStep === 4 && (
-                    <div className="flex flex-col space-y-4 items-center justify-center">
-                        <label className="text-base font-medium ">
-                            Cảm ơn bạn đã gửi hồ sơ, chúng tôi sẽ duyệt hồ sơ của bạn sớm nhất !
-                        </label>
 
+                {currentStep === 2 && (
+                    <div>
+                        <label className="text-base font-medium text-center block mb-4">
+                            Tải ảnh CCCD
+                        </label>
+                        <div className="grid lg:grid-cols-2 gap-4">
+                            {/* Ảnh mặt trước */}
+                            <div className="border-2 border-dashed border-primary/40 rounded-md p-2 flex justify-center items-center">
+                                <ImageUploader
+                                    label="Mặt trước CCCD"
+                                    maxFiles={1}
+                                    onUploadSuccess={(uploadedImageUrl) =>
+                                        handleImageUpload("frontCccdUrl", uploadedImageUrl)
+                                    }
+                                />
+                            </div>
+
+                            {/* Ảnh mặt sau */}
+                            <div className="border-2 border-dashed border-primary/40 rounded-md p-2 flex justify-center items-center">
+                                <ImageUploader
+                                    label="Mặt sau CCCD"
+                                    maxFiles={1}
+                                    onUploadSuccess={(uploadedImageUrl) =>
+                                        handleImageUpload("backCccdUrl", uploadedImageUrl)
+                                    }
+                                />
+                            </div>
+                        </div>
                     </div>
                 )}
-                {/* Button Xác thực */}
+
+                {currentStep === 3 && (
+                    <div className="text-center">
+                        <p className="text-base font-medium">
+                            Cảm ơn bạn đã gửi hồ sơ, chúng tôi sẽ duyệt hồ sơ của bạn sớm nhất!
+                        </p>
+                    </div>
+                )}
+
+                {/* Nút Xác Thực */}
                 <div className="mt-6 text-center">
                     <Button
                         onClick={handleVerify}
+                        disabled={loading}
                         className="w-full hover:bg-secondary bg-gradient-to-l from-secondary text-white font-medium"
                     >
-                        {currentStep < 4 ? "Xác thực" : "Hoàn thành"}
+                        {loading
+                            ? "Đang gửi..."
+                            : currentStep < 3
+                                ? "Xác thực"
+                                : "Hoàn thành"}
                     </Button>
                 </div>
             </CardContent>

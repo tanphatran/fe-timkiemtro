@@ -65,15 +65,10 @@ const Post = () => {
         try {
             const response = await axiosClient.post(`/post/create`, payload);
 
-
-            if (!response.ok) {
-                const error = await response.json();
-                console.error("API Error:", error);
-                alert("Đăng tin thất bại: " + (error.message || "Unknown error"));
-            } else {
-                const data = await response.json();
+            // Không cần `response.ok`, kiểm tra từ `response.data`
+            if (response) {
                 alert("Tin đã được đăng thành công!");
-                console.log("Success:", data);
+                console.log("Success:", response);
             }
         } catch (err) {
             console.error("Network Error:", err);

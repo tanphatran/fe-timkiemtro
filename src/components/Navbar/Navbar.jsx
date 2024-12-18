@@ -6,6 +6,13 @@ import Login from "../login/Login";
 import { FiMenu, FiX } from "react-icons/fi"; // Icons menu và đóng
 import useAuth from "@/hooks/useAuth"; // Import custom hook useAuth
 import useMeStore from "@/zustand/useMeStore";
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { FaUser, FaSignOutAlt } from "react-icons/fa"; // Import icons
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,20 +56,33 @@ const Navbar = () => {
                 {/* Menu lớn - Chỉ hiển thị trên màn hình >= md */}
                 <div className="hidden md:flex items-center gap-5">
                     <Link to="/search" className="hover:underline">
-                        Tìm kiếm
+                        Tìm phòng
                     </Link>
                     {/* Đăng nhập/Đăng ký */}
                     {isLoggedIn ? (
                         <div className="flex items-center gap-2">
-                            <span>Chào, {me || "Người dùng"}!</span> {/* Hiển thị tên người dùng */}
-                            <button onClick={handleLogout} className="hover:underline">
-                                Đăng xuất
-                            </button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="hover:underline">
+                                        Chào, {me || "Người dùng"}!
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-48">
+                                    <DropdownMenuItem onClick={() => window.location.href = "/users/editprofile"}>
+                                        <FaUser className="mr-2 text-gray-500" /> {/* Icon Thông tin cá nhân */}
+                                        Thông tin cá nhân
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={handleLogout}>
+                                        <FaSignOutAlt className="mr-2 text-gray-500" /> {/* Icon Đăng xuất */}
+                                        Đăng xuất
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     ) : (
                         <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
                             <DialogTrigger asChild>
-                                <button className="hover:underline">Đăng nhập/ Đăng ký</button>
+                                <button className="hover:underline">Đăng nhập/Đăng ký</button>
                             </DialogTrigger>
                             <DialogContent isHideClose={true} className="min-w-[700px] p-0">
                                 <DialogHeader>

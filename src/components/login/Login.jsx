@@ -10,7 +10,7 @@ import FormInput from "@/components/forms/FormInput";
 import useMeStore from "@/zustand/useMeStore";
 import axiosClient from "@/apis/axiosClient";
 import { useNavigate } from 'react-router-dom';
-
+import OtpDialog from "./OtpDialog";
 // Định nghĩa schema cho Đăng nhập
 const loginSchema = z.object({
     phone: z.string().min(1, { message: "Bạn chưa nhập số điện thoại." }),
@@ -18,21 +18,30 @@ const loginSchema = z.object({
 });
 
 // Định nghĩa schema cho Đăng ký
-const registerSchema = z.object({
-    fullName: z.string().min(1, { message: "Họ và tên không được để trống." }),
-    phone: z
-        .string()
-        .min(10, { message: "Số điện thoại phải có ít nhất 10 chữ số." })
-        .regex(/^\d+$/, { message: "Số điện thoại chỉ bao gồm chữ số." }),
-    password: z.string().min(6, { message: "Mật khẩu tối thiểu 6 kí tự." }),
-    confirmPassword: z
-        .string()
-        .min(6, { message: "Mật khẩu xác nhận tối thiểu 6 kí tự." })
-        .refine((value, ctx) => value === ctx.parent.password, { message: "Mật khẩu xác nhận không khớp." }),
-});
+const registerSchema = z
+    .object({
+        fullName: z.string().min(1, { message: "Họ và tên không được để trống." }),
+        phone: z
+            .string()
+            .min(10, { message: "Số điện thoại phải có ít nhất 10 chữ số." })
+            .regex(/^\d+$/, { message: "Số điện thoại chỉ bao gồm chữ số." }),
+        password: z.string().min(6, { message: "Mật khẩu tối thiểu 6 kí tự." }),
+        confirmPassword: z.string().min(6, { message: "Mật khẩu xác nhận tối thiểu 6 kí tự." }),
+    })
+    .superRefine((data, ctx) => {
+        if (data.password !== data.confirmPassword) {
+            ctx.addIssue({
+                path: ["confirmPassword"],
+                message: "Mật khẩu xác nhận không khớp.",
+            });
+        }
+    });
+
 
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true); // Quản lý trạng thái Đăng nhập/Đăng ký
+    const [otpOpen, setOtpOpen] = useState(false);
+    const [registerData, setRegisterData] = useState(null);
     const form = useForm({
         resolver: zodResolver(isLogin ? loginSchema : registerSchema),
         defaultValues: isLogin
@@ -73,7 +82,42 @@ const Login = () => {
         }
     };
 
+    const handleRegister = async (data) => {
+        console.log("Dữ liệu gửi đi:", data); // Thêm dòng này để log dữ liệu
 
+        try {
+            const response = await axiosClient.post("/auth/register", {
+                fullName: data.fullName,
+                phoneNumber: data.phone, // Đổi `phone` thành `phoneNumber`
+                password: data.password,
+            });
+
+            if (response.status === "success") {
+                setRegisterData(data);
+                setOtpOpen(true);
+            } else {
+                console.error("Đăng ký thất bại:", response.message);
+            }
+        } catch (error) {
+            console.error("Lỗi đăng ký:", error);
+        }
+    };
+
+    const handleOtpSubmit = async (otp) => {
+        try {
+            const response = await axiosClient.post("/auth/verify-otp", {
+                otp,
+                phoneNumber: registerData.phone,
+                fullName: registerData.fullName,
+                password: registerData.password,
+            });
+
+            setOtpOpen(false);
+            setIsLogin(true);
+        } catch (error) {
+            console.error("Lỗi xác minh OTP:", error);
+        }
+    };
     return (
         <div className="grid grid-cols-10">
             {/* Banner phần trái */}
@@ -88,7 +132,7 @@ const Login = () => {
 
                 {/* Form */}
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)} className="my-4 space-y-4">
+                    <form onSubmit={form.handleSubmit(isLogin ? handleSubmit : handleRegister)} className="my-4 space-y-4">
                         {!isLogin && (
                             <>
                                 {/* Form Đăng ký: Họ và tên */}
@@ -125,6 +169,7 @@ const Login = () => {
                         </Button>
                     </form>
                 </Form>
+                <OtpDialog open={otpOpen} onClose={() => setOtpOpen(false)} onSubmit={handleOtpSubmit} />
 
                 <div className="w-full h-6 flex items-center relative my-4">
                     <div className="w-full h-[1px] bg-stone-200"></div>

@@ -15,6 +15,8 @@ import FavoritePosts from './pages/users/FavoritePosts';
 import VerificationSteps from './pages/users/VerificationSteps';
 import EmployeeManagement from './pages/admin/EmployeeManagement';
 import UserManagement from './pages/admin/UserManagement';
+import EditProfile from './pages/users/EditProfile';
+import FilteredResults from './pages/publics/FilteredResults';
 
 const routes = [
     {
@@ -28,6 +30,8 @@ const routes = [
                     { path: pathnames.publics.home, element: <Home /> },
                     { path: pathnames.publics.search, element: <Search /> },
                     { path: pathnames.publics.roomdetail_id, element: <RoomDetail /> },
+                    { path: pathnames.publics.results, element: <FilteredResults /> },
+
                     {
                         path: pathnames.users.layout,
                         element: <ProfilePage />,
@@ -47,6 +51,10 @@ const routes = [
                             {
                                 path: pathnames.users.verification,
                                 element: <VerificationSteps />,
+                            },
+                            {
+                                path: pathnames.users.editprofile,
+                                element: <EditProfile />,
                             },
 
                         ]
