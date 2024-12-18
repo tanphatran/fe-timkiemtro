@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AiOutlineSearch, AiOutlineReload } from "react-icons/ai";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -9,204 +9,42 @@ import PostDetailsDialog from "@/components/Admin/Posts/PostDetailsDialog";
 import { TfiReload } from "react-icons/tfi";
 import PostReportDialog from "@/components/Admin/Posts/PostReportDialog";
 import PaginationAdmin from "@/components/Admin/PaginationAdmin";
+import axiosClient from "@/apis/axiosClient"; // Import API client
 
 const Dashboard = () => {
     const [activeTab, setActiveTab] = useState("pending");
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedPost, setSelectedPost] = useState(null); // Quản lý trạng thái post được chọn
-    const totalPage = 1;
+    const [selectedPost, setSelectedPost] = useState(null);
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [totalPage, setTotalPage] = useState(1);
 
-    // Dữ liệu mẫu cho từng tab
-    const data = {
-        pending: [
-            {
-                id: "666597c19cf36db69c2ea79d",
-                title: "Nhà trọ cấp thuê Gò Vấp 2",
-                description: "Nhà cho thuê giá rẻ, điện nước giá nhà nước, có chỗ đậu xe riêng. Có nhiều phòng trống. Có thể ở được liền, điện 3k nước 15k q khối.",
-                author: "Nguyễn Kiều Anh",
-                date: "06-12-2024",
-                postImages: [
-                    "https://cloud.mogi.vn/images/2023/11/17/565/a955f0448ece439189b8f6bbda4b917e.jpg",
-                    "https://cloud.mogi.vn/images/2024/11/20/369/a9b7bc00c2e84ecab35f64136834f9a1.jpg",
-                    "https://cloud.mogi.vn/images/2023/11/17/564/bb3a2b701a3845e998f0391de444aae8.jpg",
-                    "https://cloud.mogi.vn/images/2024/05/15/424/58d9e3ab867e40d6b7d09b5fe07a5432.jpg",
-                    "https://cloud.mogi.vn/images/2023/11/17/567/25dd7852e66f45a69690bdabde1485e2.jpg"
-                ],
-                price: 5,
-                area: 20,
-                furnitureStatus: "FULL",
-                numberOfRooms: 2,
-                electricityPrice: 3,
-                waterPrice: 1.5,
-                city: "Hồ Chí Minh",
-                district: "Gò Vấp",
-                ward: "Phường 4",
-                street: "Lê Lợi",
-                houseNumber: "12",
-                licensePcccUrl: "https://www.giayphepvesinhantoanthucpham.com/wp-content/uploads/2022/10/dich-vu-uy-tin-lam-nhanh-giay-phep-ho-kinh-doanh-quan-tan-phu-12097.jpg",
-                licenseBusinessUrl: "https://fahasasg.com.vn/wp-content/uploads/2022/06/GIAY-PHEP-DKKD_001.jpg",
+    const fetchData = async (tab) => {
+        setLoading(true);
+        try {
+            let endpoint = "";
+            if (tab === "pending") {
+                endpoint = "/post/admin/pending";
+            } else if (tab === "approved") {
+                endpoint = "/post/admin/approved";
+            } else if (tab === "rejected") {
+                endpoint = "/post/admin/rejected";
+            }
 
-            },
-            {
-                id: "42459c2ea7c19cf36db6979d",
-                title: "Nhà trọ nhiều phòng tại Bình Thạnh đầy đủ điện nước",
-                description: "Phòng mới, đầy đủ tiện nghi, gần trường đại học và chợ",
-                author: "Nguyễn Hữu Văn",
-                date: "16-11-2024",
-                postImages: [
-                    "https://cloud.mogi.vn/images/2023/11/17/565/a955f0448ece439189b8f6bbda4b917e.jpg",
-                    "https://cloud.mogi.vn/images/2024/11/20/369/a9b7bc00c2e84ecab35f64136834f9a1.jpg",
-                    "https://cloud.mogi.vn/images/2023/11/17/564/bb3a2b701a3845e998f0391de444aae8.jpg",
-                    "https://cloud.mogi.vn/images/2024/05/15/424/58d9e3ab867e40d6b7d09b5fe07a5432.jpg",
-                    "https://cloud.mogi.vn/images/2023/11/17/567/25dd7852e66f45a69690bdabde1485e2.jpg"
-                ],
-                price: 5,
-                area: 20,
-                furnitureStatus: "FULL",
-                numberOfRooms: 2,
-                electricityPrice: 3,
-                waterPrice: 1.5,
-                city: "Hà Nội",
-                district: "Cầu Giấy",
-                ward: "Dịch Vọng",
-                street: "Trần Thái Tông",
-                houseNumber: "12",
-                licensePcccUrl: "https://www.giayphepvesinhantoanthucpham.com/wp-content/uploads/2022/10/dich-vu-uy-tin-lam-nhanh-giay-phep-ho-kinh-doanh-quan-tan-phu-12097.jpg",
-                licenseBusinessUrl: "https://fahasasg.com.vn/wp-content/uploads/2022/06/GIAY-PHEP-DKKD_001.jpg",
+            const response = await axiosClient.getMany(endpoint);
+            setPosts(response.data.content); // Giả sử API trả về dữ liệu trong `data.content`
+            setTotalPage(response.data.totalPages);
 
-            },
-            {
-                id: "69cf3666597c1db69c2ea79d",
-                title: "Nhà trọ dạng studio ngay trường ĐH Luật",
-                description: "Có nhiều phòng trống. Có thể ở được liền, điện 3k nước 15k q khối. Nhà cho thuê giá rẻ, điện nước giá nhà nước, có chỗ đậu xe riêng. ",
-                author: "Trần Văn Thái",
-                date: "26-10-2024",
-                postImages: [
-                    "https://cloud.mogi.vn/images/2023/11/17/565/a955f0448ece439189b8f6bbda4b917e.jpg",
-                    "https://cloud.mogi.vn/images/2024/11/20/369/a9b7bc00c2e84ecab35f64136834f9a1.jpg",
-                    "https://cloud.mogi.vn/images/2023/11/17/564/bb3a2b701a3845e998f0391de444aae8.jpg",
-                    "https://cloud.mogi.vn/images/2024/05/15/424/58d9e3ab867e40d6b7d09b5fe07a5432.jpg",
-                    "https://cloud.mogi.vn/images/2023/11/17/567/25dd7852e66f45a69690bdabde1485e2.jpg"
-                ],
-                price: 5,
-                area: 20,
-                furnitureStatus: "FULL",
-                numberOfRooms: 2,
-                electricityPrice: 3,
-                waterPrice: 1.5,
-                city: "Hà Nội",
-                district: "Cầu Giấy",
-                ward: "Dịch Vọng",
-                street: "Trần Thái Tông",
-                houseNumber: "12",
-                licensePcccUrl: "https://www.giayphepvesinhantoanthucpham.com/wp-content/uploads/2022/10/dich-vu-uy-tin-lam-nhanh-giay-phep-ho-kinh-doanh-quan-tan-phu-12097.jpg",
-                licenseBusinessUrl: "https://fahasasg.com.vn/wp-content/uploads/2022/06/GIAY-PHEP-DKKD_001.jpg",
-
-            },
-            {
-                id: "1db69c2e69cf3666597ca79d",
-                title: "Phòng trọ gần Đại học Kinh tế",
-                description: "gần trường đại học và chợ, phòng mới, đầy đủ tiện nghi ",
-                author: "Phạm Minh Tuấn",
-                date: "04-06-2024",
-                postImages: [
-                    "https://via.placeholder.com/100",
-                    "https://via.placeholder.com/100"
-                ],
-                price: 6.5,
-                area: 25,
-                furnitureStatus: "SEMI",
-                numberOfRooms: 1,
-                electricityPrice: 4,
-                waterPrice: 2,
-                city: "Đà Nẵng",
-                district: "Hải Châu",
-                ward: "Hòa Cường Nam",
-                street: "Lê Thanh Nghị",
-                houseNumber: "45A",
-                licensePcccUrl: "https://via.placeholder.com/100",
-                licenseBusinessUrl: "https://via.placeholder.com/100",
-            },
-        ],
-        approved: [
-            {
-                id: 2,
-                title: "Phòng trọ gần Đại học Kinh tế",
-                description: "Phòng mới, đầy đủ tiện nghi, gần trường đại học và chợ",
-                author: "Phạm Minh Tuấn",
-                date: "04-06-2024",
-                postImages: [
-                    "https://via.placeholder.com/100",
-                    "https://via.placeholder.com/100"
-                ],
-                price: 6.5,
-                area: 25,
-                furnitureStatus: "SEMI",
-                numberOfRooms: 1,
-                electricityPrice: 4,
-                waterPrice: 2,
-                city: "Đà Nẵng",
-                district: "Hải Châu",
-                ward: "Hòa Cường Nam",
-                street: "Lê Thanh Nghị",
-                houseNumber: "45A",
-                licensePcccUrl: "https://via.placeholder.com/100",
-                licenseBusinessUrl: "https://via.placeholder.com/100",
-            },
-        ],
-        rejected: [
-            {
-                id: 3,
-                title: "Phòng trọ nhỏ gọn gần trung tâm TP.HCM",
-                description: "Phòng hơi nhỏ nhưng tiện nghi, thích hợp cho sinh viên",
-                author: "Lê Thị Ngọc Hà",
-                date: "03-06-2024",
-                postImages: [
-                    "https://via.placeholder.com/100",
-                    "https://via.placeholder.com/100"
-                ],
-                price: 3.5,
-                area: 15,
-                furnitureStatus: "BASIC",
-                numberOfRooms: 1,
-                electricityPrice: 5,
-                waterPrice: 3,
-                city: "TP.HCM",
-                district: "Quận 1",
-                ward: "Phạm Ngũ Lão",
-                street: "Đề Thám",
-                houseNumber: "18",
-                licensePcccUrl: "https://via.placeholder.com/100",
-                licenseBusinessUrl: "https://via.placeholder.com/100",
-            },
-        ],
-        reported: [
-            {
-                id: 4,
-                title: "Phòng trọ bị báo cáo ở Cần Thơ",
-                description: "Bị báo cáo do thông tin không chính xác về giá thuê",
-                author: "Vũ Hồng Anh",
-                date: "02-06-2024",
-                postImages: [
-                    "https://via.placeholder.com/100",
-                    "https://via.placeholder.com/100"
-                ],
-                price: 2,
-                area: 10,
-                furnitureStatus: "NONE",
-                numberOfRooms: 1,
-                electricityPrice: 6,
-                waterPrice: 4,
-                city: "Cần Thơ",
-                district: "Ninh Kiều",
-                ward: "Tân An",
-                street: "Nguyễn Trãi",
-                houseNumber: "27",
-                lydo: "Bài viết giả mạo"
-            },
-        ],
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
+    useEffect(() => {
+        fetchData(activeTab, currentPage); // Lấy dữ liệu khi tab hoặc trang thay đổi
+    }, [activeTab, currentPage]);
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
@@ -245,15 +83,21 @@ const Dashboard = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data[activeTab].map((item) => (
-                            <TableRow key={item.id} onClick={() => setSelectedPost(item)} className="cursor-pointer hover:bg-gray-100">
-                                <TableCell>{item.id}</TableCell>
-                                <TableCell className="truncate max-w-[120px]">{item.title}</TableCell>
-                                <TableCell className="truncate max-w-[300px]">{item.description}</TableCell>
-                                <TableCell>{item.author}</TableCell>
-                                <TableCell>{item.date}</TableCell>
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan="5" className="text-center">Đang tải dữ liệu...</TableCell>
                             </TableRow>
-                        ))}
+                        ) : (
+                            posts.map((item) => (
+                                <TableRow key={item.postId} onClick={() => setSelectedPost(item)} className="cursor-pointer hover:bg-gray-100">
+                                    <TableCell>{item.postId}</TableCell>
+                                    <TableCell className="truncate max-w-[120px]">{item.title}</TableCell>
+                                    <TableCell className="truncate max-w-[300px]">{item.description}</TableCell>
+                                    <TableCell>{item.fullName}</TableCell>
+                                    <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </div>
@@ -264,6 +108,7 @@ const Dashboard = () => {
             ) : (
                 selectedPost && <PostDetailsDialog data={selectedPost} onCancel={() => setSelectedPost(null)} />
             )}
+
             {/* Phân trang */}
             <div className="mt-4 flex justify-end items-center gap-4">
                 <PaginationAdmin
@@ -271,7 +116,6 @@ const Dashboard = () => {
                     page={currentPage}
                     onChange={(page) => setCurrentPage(page)}
                 />
-
             </div>
         </div>
     );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { TfiReload } from "react-icons/tfi";
 import {
@@ -14,73 +14,55 @@ import HostInfoDialog from "@/components/Admin/HostInfoDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PaginationAdmin from "@/components/Admin/PaginationAdmin";
+import axiosClient from "@/apis/axiosClient"; // Import axiosClient
 
 const HostManagement = () => {
     const [activeTab, setActiveTab] = useState("pending");
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedHost, setSelectedHost] = useState(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
-
-    const data = {
-        pending: [
-            {
-                id: "666597c19cf36db69c2ea79d",
-                name: "Nguyễn Văn Tín",
-                address: "24 Lò Đúc, Phường Phạm Đình Hổ, Quận Hai Bà Trưng, Hà Nội",
-                date_of_birth: "02-01-2004",
-                date: "09-06-2024",
-                gender: "Nam",
-                id_card: "23012345678",
-            },
-            {
-                id: "5356ed9sfsa6665957ff9abf9",
-                name: "Lâm Hoàng",
-                address: "112/32 Bùi Quang Là, Phường 12, Quận Gò Vấp, TP Hồ Chí Minh",
-                date_of_birth: "21-04-1996",
-                date: "10-06-2024",
-                gender: "Nam",
-                id_card: "2341223512",
-            },
-            {
-                id: "345cf36db69c2ea7797c199d",
-                name: "Duyên Trương",
-                address: "32 Phan Văn Trị, Phường 12, Quận Gò Vấp, TP Hồ Chí Minh",
-                date_of_birth: "05-12-1992",
-                date: "09-06-2024",
-                gender: "Nữ",
-                id_card: "35236127064",
-            },
-            {
-                id: "6957ff9a5356ed66593d4bf9",
-                name: "Hoàng Mỹ An",
-                address: "2 Trần Công Hoan, Xã Đồng Phú, Huyện Chương Mỹ, Hà Nội",
-                date_of_birth: "10-02-1997",
-                date: "10-06-2024",
-                gender: "Nam",
-                id_card: "20112345678",
-            },
-            {
-                id: "597c19cf9c2ea79d36db6666",
-                name: "Lâm Văn Thái",
-                address: "234 Thanh Xuân, Phường 1, Quận Cầu Giấy, Hà Nội",
-                date_of_birth: "31-12-1992",
-                date: "23-06-2024",
-                gender: "Nam",
-                id_card: "12647108763",
-            },
-            {
-                id: "66ed93d4bf9665957ff9a535",
-                name: "Nguyễn Văn Sang",
-                address: "32 Lã Xuân Oai, Phường 2, Quận 9, TP Hồ Chí Minh",
-                date_of_birth: "15-12-2001",
-                date: "14-06-2024",
-                gender: "Nam",
-                id_card: "25671034523",
-            },
-        ],
+    const [users, setUsers] = useState({
+        pending: [],
         approved: [],
         rejected: [],
+    });
+    const [loading, setLoading] = useState(false);
+    const [totalPages, setTotalPages] = useState(1);
+
+    // Hàm gọi API lấy dữ liệu theo tab
+    const fetchData = async (tab) => {
+        setLoading(true);
+        try {
+            let url = "";
+            if (tab === "pending") {
+                url = "/user/admin/pending-approval";
+            } else if (tab === "approved") {
+                url = "/user/admin/approved";
+            } else if (tab === "rejected") {
+                url = "/user/admin/not-registered";
+            }
+
+            // Gọi API để lấy dữ liệu
+            const response = await axiosClient.getMany(url);
+
+            // Cập nhật dữ liệu vào state
+            setUsers((prevState) => ({
+                ...prevState,
+                [tab]: response.data.content, // Dữ liệu trả về từ API
+            }));
+            setTotalPages(response.data.totalPages);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
+        }
     };
+
+    // Sử dụng useEffect để fetch data khi thay đổi tab hoặc trang
+    useEffect(() => {
+        fetchData(activeTab);
+    }, [activeTab, currentPage]);
+
     const handleOpenDialog = (host) => {
         setSelectedHost(host);
         setDialogOpen(true);
@@ -100,6 +82,7 @@ const HostManagement = () => {
         console.log("Từ chối:", selectedHost);
         handleCloseDialog();
     };
+
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
             {/* Tabs */}
@@ -115,10 +98,8 @@ const HostManagement = () => {
                         <TabsTrigger value="rejected" className={activeTab === "rejected" ? "text-primary" : ""}>
                             Hồ sơ bị từ chối
                         </TabsTrigger>
-
                     </TabsList>
                 </Tabs>
-
 
                 {/* Thanh tìm kiếm */}
                 <div className="flex items-center gap-2">
@@ -145,18 +126,24 @@ const HostManagement = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data[activeTab]?.length > 0 ? (
-                            data[activeTab].map((item) => (
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center">
+                                    Đang tải dữ liệu...
+                                </TableCell>
+                            </TableRow>
+                        ) : users[activeTab].length > 0 ? (
+                            users[activeTab].map((item) => (
                                 <TableRow
-                                    key={item.id}
+                                    key={item.userId}
                                     className="hover:bg-gray-50 cursor-pointer"
                                     onClick={() => handleOpenDialog(item)}
                                 >
-                                    <TableCell>{item.id}</TableCell>
-                                    <TableCell>{item.name}</TableCell>
-                                    <TableCell>{item.date_of_birth}</TableCell>
+                                    <TableCell>{item.userId}</TableCell>
+                                    <TableCell>{item.fullName}</TableCell>
+                                    <TableCell>{item.dateOfBirth}</TableCell>
                                     <TableCell>{item.address}</TableCell>
-                                    <TableCell>{item.date}</TableCell>
+                                    <TableCell>{new Date(item.updatedAt).toLocaleDateString()}</TableCell>
                                 </TableRow>
                             ))
                         ) : (
@@ -173,11 +160,13 @@ const HostManagement = () => {
             {/* Phân trang */}
             <div className="mt-4 flex justify-end">
                 <PaginationAdmin
-                    total={1}
+                    total={totalPages}
                     page={currentPage}
                     onChange={(page) => setCurrentPage(page)}
                 />
             </div>
+
+            {/* Dialog */}
             {selectedHost && (
                 <HostInfoDialog
                     isOpen={isDialogOpen}
