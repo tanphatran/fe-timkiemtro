@@ -25,7 +25,7 @@ const SearchFilter = () => {
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
-
+    const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
 
     // Fetch provinces (cities) on component mount
@@ -120,6 +120,9 @@ const SearchFilter = () => {
         if (ward) {
             queryParams.append('ward', ward);
         }
+        if (searchQuery) {
+            queryParams.append('keyword', searchQuery); // Thêm giá trị tìm kiếm vào URL
+        }
         console.log("URL cập nhật:", `/results?${queryParams.toString()}`);
         // Cập nhật URL với các tham số mới và làm mới trang
         navigate(`/results?${queryParams.toString()}`, { replace: true });  // Sử dụng 'replace' để tránh thêm nhiều trang vào lịch sử
@@ -134,6 +137,8 @@ const SearchFilter = () => {
                 <Input
                     placeholder="Tìm kiếm theo từ khóa..."
                     className="w-full"
+                    value={searchQuery} // Liên kết giá trị input với state searchQuery
+                    onChange={(e) => setSearchQuery(e.target.value)} // Cập nhật giá trị khi người dùng nhập
                 />
             </div>
 

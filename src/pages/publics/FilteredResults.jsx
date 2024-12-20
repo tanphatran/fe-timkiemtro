@@ -29,14 +29,16 @@ const FilteredResults = () => {
             const city = queryParams.get("city");
             const district = queryParams.get("district");
             const ward = queryParams.get("ward");
+            const keyword = queryParams.get("keyword");
+            console.log("Keyword từ URL:", keyword);
 
-            return { minPrice, maxPrice, city, district, ward };
+            return { minPrice, maxPrice, city, district, ward, keyword };
         };
 
         const fetchFilteredRooms = async (page) => {
             setLoading(true);
             try {
-                const { minPrice, maxPrice, city, district, ward } = getFilterParams();
+                const { minPrice, maxPrice, city, district, ward, keyword } = getFilterParams();
 
                 const queryParams = {
                     page: page - 1,
@@ -46,6 +48,7 @@ const FilteredResults = () => {
                     city,
                     district,
                     ward,
+                    keyword,
                 };
 
                 const filteredParams = Object.entries(queryParams)

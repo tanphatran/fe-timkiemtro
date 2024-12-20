@@ -4,7 +4,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Pagination } from "@/components/ui/pagination";
 import PostDetailsDialog from "@/components/Admin/Posts/PostDetailsDialog";
 import { TfiReload } from "react-icons/tfi";
 import PostReportDialog from "@/components/Admin/Posts/PostReportDialog";
@@ -16,6 +15,7 @@ const Dashboard = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedPost, setSelectedPost] = useState(null);
     const [posts, setPosts] = useState([]);
+    const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(false);
     const [totalPage, setTotalPage] = useState(1);
 
@@ -29,12 +29,21 @@ const Dashboard = () => {
                 endpoint = "/post/admin/approved";
             } else if (tab === "rejected") {
                 endpoint = "/post/admin/rejected";
+            } else if (tab === "reported") {
+                endpoint = "/reports/admin/all";
             }
 
             const response = await axiosClient.getMany(endpoint, {
                 page: page - 1,
             });
-            setPosts(response.data.content);
+            if (tab === "reported") {
+                setReports(response.data.content);
+
+            } else {
+                setPosts(response.data.content);
+            }
+
+
             setTotalPage(response.data.totalPages);
 
         } catch (error) {
@@ -99,11 +108,22 @@ const Dashboard = () => {
                 <Table className="w-full">
                     <TableHeader>
                         <TableRow className="bg-primary/5 text-black font-bold">
-                            <TableHead className="text-center">#</TableHead>
-                            <TableHead>Tiêu đề</TableHead>
-                            <TableHead>Mô tả</TableHead>
-                            <TableHead>Tác giả</TableHead>
-                            <TableHead>Lần cập nhật cuối</TableHead>
+                            {activeTab === "reported" ? (
+                                <>
+                                    <TableHead className="text-center">ID</TableHead>
+                                    <TableHead>Lý do</TableHead>
+                                    <TableHead>Chi tiết</TableHead>
+                                    <TableHead>Trạng thái</TableHead>
+                                    <TableHead>Ngày tạo</TableHead>
+                                </>
+                            ) : (
+                                <>
+                                    <TableHead className="text-center">#</TableHead>
+                                    <TableHead>Tiêu đề</TableHead>
+                                    <TableHead>Mô tả</TableHead>
+                                    <TableHead>Tác giả</TableHead>
+                                    <TableHead>Lần cập nhật cuối</TableHead></>
+                            )}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -111,6 +131,16 @@ const Dashboard = () => {
                             <TableRow>
                                 <TableCell colSpan="5" className="text-center">Đang tải dữ liệu...</TableCell>
                             </TableRow>
+                        ) : activeTab === "reported" ? (
+                            reports.map((report) => (
+                                <TableRow key={report.reportId} onClick={() => setSelectedPost(report)} className="cursor-pointer hover:bg-gray-100">
+                                    <TableCell>{report.reportId}</TableCell>
+                                    <TableCell className="truncate max-w-[120px]">{report.reason}</TableCell>
+                                    <TableCell className="truncate max-w-[300px]">{report.details}</TableCell>
+                                    <TableCell>{report.status}</TableCell>
+                                    <TableCell>{new Date(report.createdAt).toLocaleDateString()}</TableCell>
+                                </TableRow>
+                            ))
                         ) : (
                             posts.map((item) => (
                                 <TableRow key={item.postId} onClick={() => setSelectedPost(item)} className="cursor-pointer hover:bg-gray-100">
@@ -123,12 +153,18 @@ const Dashboard = () => {
                             ))
                         )}
                     </TableBody>
+
                 </Table>
             </div>
 
             {/* Hiển thị dialog dựa trên tab */}
             {activeTab === "reported" ? (
-                <PostReportDialog data={selectedPost} onCancel={() => setSelectedPost(null)} />
+                <PostReportDialog
+
+                    postId={selectedPost?.reportId}
+                    onCancel={() => setSelectedPost(null)}
+                />
+
             ) : (
                 selectedPost && <PostDetailsDialog
                     postId={selectedPost?.postId}

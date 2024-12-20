@@ -92,7 +92,7 @@ const PostDetailsDialog = ({ postId, onApprove, onReject, onCancel }) => {
                                         <img
                                             src={postDetails.licensePcccUrl}
                                             alt="Chứng nhận PCCC"
-                                            className="w-full h-24 rounded-lg border object-cover shadow"
+                                            className="w-full h-72 rounded-lg border object-cover shadow"
                                         />
                                     </div>
                                 </div>
@@ -102,7 +102,7 @@ const PostDetailsDialog = ({ postId, onApprove, onReject, onCancel }) => {
                                         <img
                                             src={postDetails.licenseBusinessUrl}
                                             alt="Giấy phép kinh doanh"
-                                            className="w-full h-24 rounded-lg border object-cover shadow"
+                                            className="w-full h-72 rounded-lg border object-cover shadow"
                                         />
                                     </div>
                                 </div>

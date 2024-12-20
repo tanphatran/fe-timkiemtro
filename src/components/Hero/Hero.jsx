@@ -52,9 +52,9 @@ const Hero = () => {
                                         <span className="text-base" >{selectedType || "Địa chỉ"}</span>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Nhà trọ">Nhà trọ</SelectItem>
-                                        <SelectItem value="Chung cư mini">Chung cư mini</SelectItem>
-                                        <SelectItem value="Studio">Studio</SelectItem>
+                                        <SelectItem value="Hồ Chí Minh">Nhà trọ</SelectItem>
+                                        <SelectItem value="Hà Nội">Chung cư mini</SelectItem>
+                                        <SelectItem value="Đà Nẵng">Studio</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
