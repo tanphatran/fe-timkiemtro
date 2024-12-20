@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom"; // Import useLocation hook from react-router-dom
+import { useLocation } from "react-router-dom";
 import { RiDashboardLine } from "react-icons/ri";
 import { BsPersonCircle } from "react-icons/bs";
 import { MdOutlinePerson } from "react-icons/md";
 import { GrUserManager } from "react-icons/gr";
 import { FaUserCheck } from "react-icons/fa";
 
-// Giả định rằng các thành phần UI này đã được tạo hoặc tích hợp từ thư viện bên ngoài.
 import {
     Sidebar,
     SidebarContent,
@@ -16,10 +15,13 @@ import {
     SidebarMenu,
     SidebarMenuItem,
     SidebarMenuButton,
-} from "@/components/ui/sidebar"; // Thay đường dẫn này bằng đường dẫn thư viện UI bạn sử dụng.
+} from "@/components/ui/sidebar";
+import useAuth from "@/hooks/useAuth";
 
 const SidebarAdmin = () => {
     const location = useLocation(); // Get current location
+    const { me, clearAuth } = useAuth();
+
     const menuItems = [
         { title: "Quản lý bài viết", icon: <RiDashboardLine size={20} />, url: "/admin/dashboard" },
         { title: "Quản lý người dùng", icon: <MdOutlinePerson size={20} />, url: "/admin/usermana" },
@@ -39,6 +41,10 @@ const SidebarAdmin = () => {
         setActiveIndex(getActiveIndex());
     }, [location]);
 
+    const handleLogout = () => {
+        clearAuth();
+        navigate("/");
+    };
     return (
         <Sidebar className="sidebar bg-gray-100 h-full">
             {/* Header */}
@@ -76,6 +82,14 @@ const SidebarAdmin = () => {
 
             {/* Footer */}
             <SidebarFooter className="sidebar-footer p-4 border-t text-center text-sm text-gray-500">
+                <span>{me}</span>
+                < div className="flex items-center gap-2 justify-center">
+
+                    <button className="hover:underline " onClick={handleLogout}>
+                        Đăng xuất
+                    </button>
+
+                </div>
                 <span>© 2024 Your Company</span>
             </SidebarFooter>
         </Sidebar>

@@ -1,30 +1,33 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import axios from "axios";  // Import axios để gửi API request
-import axiosClient from "@/apis/axiosClient";  // Import axios client đã có interceptor
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 const ImageUploader = ({
     label = "Upload Image",
     maxFiles = 1,
     minFiles = 1,
-    onUploadSuccess // Callback hàm trả về kết quả upload
+    onUploadSuccess,
 }) => {
     const [images, setImages] = useState([]);
-    const [uploading, setUploading] = useState(false);  // Trạng thái uploading
-    const [saved, setSaved] = useState(false);  // Trạng thái đã lưu
-    const [errorMessage, setErrorMessage] = useState(""); // Thông báo lỗi
+    const [uploading, setUploading] = useState(false);
+    const [saved, setSaved] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const { toast } = useToast();
 
     const handleFileChange = async (e) => {
         const selectedFiles = Array.from(e.target.files);
 
-        // Kiểm tra số lượng ảnh
         if (selectedFiles.length + images.length > maxFiles) {
-            alert(`Bạn chỉ có thể tải tối đa ${maxFiles} ảnh.`);
+            toast({
+                title: "Thông báo",
+                description: `Bạn chỉ có thể tải tối đa ${maxFiles} ảnh.`,
+
+            })
             return;
         }
 
-        // Tạo URL tạm thời cho các ảnh mới
         const newImages = selectedFiles.map((file) => ({
             file,
             preview: URL.createObjectURL(file),
@@ -35,16 +38,20 @@ const ImageUploader = ({
 
     const uploadImages = async () => {
         if (images.length < minFiles) {
-            setErrorMessage(`Vui lòng tải lên ít nhất ${minFiles} ảnh.`);
+            toast({
+                title: "Thông báo",
+                description: `Vui lòng tải lên ít nhất ${minFiles} ảnh.`,
+
+            })
             return;
         }
 
-        setUploading(true);  // Bắt đầu upload
-        setErrorMessage("");  // Xóa thông báo lỗi nếu có
+        setUploading(true);
+        setErrorMessage("");
 
         const formData = new FormData();
         images.forEach((image) => {
-            formData.append("files", image.file);  // Thêm ảnh vào formData
+            formData.append("files", image.file);
         });
 
         try {
@@ -54,25 +61,30 @@ const ImageUploader = ({
                     "Content-Type": "multipart/form-data",
                 },
                 withCredentials: true,
-
             });
 
             if (response.data && response.data.status === "success") {
-                alert("Upload thành công!");
+                toast({
+                    description: "Upload thành công!",
+
+                })
                 setSaved(true);
-                const uploadedImages = response.data.data; // Lấy URL ảnh từ API
-                if (onUploadSuccess) onUploadSuccess(uploadedImages); // Gọi callback với URL ảnh
+                const uploadedImages = response.data.data;
+                if (onUploadSuccess) onUploadSuccess(uploadedImages);
             } else {
-                alert("Có lỗi khi tải ảnh lên.");
+                toast({
+                    description: "Có lỗi khi tải ảnh lên.!",
+
+                })
             }
         } catch (error) {
             console.error("Lỗi khi upload ảnh:", error);
-            alert("Có lỗi khi upload ảnh.");
+
+            toast({ description: "Có lỗi khi upload ảnh." });
         } finally {
             setUploading(false);
         }
     };
-
 
     const removeImage = (index) => {
         URL.revokeObjectURL(images[index].preview);
@@ -81,12 +93,13 @@ const ImageUploader = ({
 
     return (
         <div className="grid w-full max-w-md items-center gap-3 p-4">
-            {/* Tiêu đề */}
-            <Label htmlFor="imageUploader" className="text-center text-gray-700 text-sm font-medium">
+            <Label
+                htmlFor="imageUploader"
+                className="text-center text-gray-700 text-sm font-medium"
+            >
                 {label} ({images.length}/{maxFiles})
             </Label>
 
-            {/* Input file */}
             <Input
                 id="imageUploader"
                 type="file"
@@ -94,10 +107,9 @@ const ImageUploader = ({
                 multiple={maxFiles > 1}
                 onChange={handleFileChange}
                 className="text-center"
-                disabled={uploading || saved}  // Disable input khi đang upload hoặc ảnh đã được lưu
+                disabled={uploading || saved}
             />
 
-            {/* Hiển thị hình ảnh nhỏ với dấu "X" trước khi lưu, không có dấu "X" sau khi lưu */}
             <div className="grid grid-cols-3 gap-4 mt-4">
                 {images.map((image, index) => (
                     <div key={index} className="relative">
@@ -119,12 +131,10 @@ const ImageUploader = ({
                 ))}
             </div>
 
-            {/* Hiển thị thông báo lỗi nếu chưa đủ ảnh */}
             {errorMessage && (
                 <div className="text-red-500 text-center mt-2">{errorMessage}</div>
             )}
 
-            {/* Nút Lưu ảnh */}
             <div className="mt-4 text-center">
                 {!uploading && images.length > 0 && !saved && (
                     <button
@@ -137,9 +147,10 @@ const ImageUploader = ({
                 )}
             </div>
 
-            {/* Ẩn nút Lưu khi đã upload xong */}
             {uploading && (
-                <div className="text-center text-sm text-gray-500 mt-2">Đang tải ảnh lên...</div>
+                <div className="text-center text-sm text-gray-500 mt-2">
+                    Đang tải ảnh lên...
+                </div>
             )}
         </div>
     );

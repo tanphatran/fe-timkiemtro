@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { TfiReload } from "react-icons/tfi";
 import {
@@ -13,8 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PaginationAdmin from "@/components/Admin/PaginationAdmin";
 import AddEmployeeDialog from "@/components/Admin/AddEmployeeDialog";
+import { useNavigate } from "react-router-dom"; // Để điều hướng
+import useMeStore from "@/zustand/useMeStore"; // Để lấy thông tin vai trò
 
 const EmployeeManagement = () => {
+    const navigate = useNavigate();
+    const { role } = useMeStore(); // Lấy vai trò người dùng từ store
     const [employees, setEmployees] = useState([
         {
             id: "653437171cfab2859a",
@@ -37,6 +41,14 @@ const EmployeeManagement = () => {
     ]);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    // Kiểm tra vai trò khi trang được tải
+    useEffect(() => {
+        if (role !== "ADMIN") {
+            navigate("/admin"); // Điều hướng ra trang chủ nếu không phải ADMIN
+        }
+    }, [role, navigate]);
 
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
@@ -47,12 +59,12 @@ const EmployeeManagement = () => {
             employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             employee.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const handleAddEmployee = (newEmployee) => {
         console.log("Thêm nhân viên:", newEmployee);
         // Xử lý logic thêm nhân viên vào danh sách
     };
+
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
             {/* Header */}

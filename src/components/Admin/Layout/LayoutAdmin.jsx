@@ -1,14 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import SidebarAdmin from "../Sidebar/SidebarAdmin";
-import { Outlet } from "react-router-dom"; // Dùng Outlet để render route con
-import { AppSidebar } from "@/components/app-sidebar";
+import { Outlet, useNavigate } from "react-router-dom";
+import useMeStore from "@/zustand/useMeStore";
+
 const LayoutAdmin = () => {
+    const navigate = useNavigate();
+    const { role } = useMeStore(); // Lấy vai trò người dùng từ store
+
+    useEffect(() => {
+        // Kiểm tra nếu không phải là ADMIN hoặc MODERATOR thì điều hướng đi nơi khác
+        if (role !== "ADMIN" && role !== "MODERATOR") {
+            navigate("/"); // Điều hướng về trang chủ hoặc trang khác nếu không phải là ADMIN hoặc MODERATOR
+        }
+    }, [role, navigate]); // Thực hiện khi role thay đổi
+
     return (
         <SidebarProvider>
-            <div className="flex h-screen w-screen"> {/* Flex để chia cột */}
+            <div className="flex h-screen w-screen">
                 {/* Sidebar */}
-                <div >
+                <div>
                     <SidebarAdmin />
                 </div>
                 {/* Nội dung chính */}

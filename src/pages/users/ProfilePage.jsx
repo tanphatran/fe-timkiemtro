@@ -13,11 +13,14 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import { Link, Outlet } from "react-router-dom";
 import pathnames from "@/lib/pathnames";
 import axiosClient from "@/apis/axiosClient";
+import useMeStore from "@/zustand/useMeStore";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
     const [activeButton, setActiveButton] = useState(null);
     const [profileData, setProfileData] = useState({});
-
+    const { role } = useMeStore();
+    const navigate = useNavigate();
     // Fetch profile data from API
     useEffect(() => {
         const fetchProfile = async () => {
@@ -43,6 +46,16 @@ const ProfilePage = () => {
         setActiveButton(buttonName);
     };
 
+    const handleButtonClickcreatePosts = () => {
+        // setActiveButton('verification');
+
+        // Nếu người dùng là TENANT và nhấn vào nút tạo bài viết thì chuyển hướng
+        if (role === "TENANT") {
+            navigate("/users/verification");
+        } else {
+            navigate("/users/create-posts");
+        }
+    };
     return (
         <div className="mt-8 container mx-auto py-8 px-4 sm:px-8 lg:px-16">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
@@ -107,15 +120,15 @@ const ProfilePage = () => {
                                     Bài viết yêu thích
                                 </Button>
                             </Link>
-                            <Link to={pathnames.users.createposts}>
-                                <Button
-                                    variant="secondary"
-                                    className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === 'createPosts' ? 'bg-gradient-to-l from-secondary to-primary text-white' : 'hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white'}`}
-                                    onClick={() => handleButtonClick('createPosts')}
-                                >
-                                    Tạo bài viết
-                                </Button>
-                            </Link>
+                            {/* <Link to={pathnames.users.createposts}> */}
+                            <Button
+                                variant="secondary"
+                                className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === 'createPosts' ? 'bg-gradient-to-l from-secondary to-primary text-white' : 'hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white'}`}
+                                onClick={() => handleButtonClickcreatePosts()}
+                            >
+                                Tạo bài viết
+                            </Button>
+                            {/* </Link> */}
                         </CardContent>
                         <CardContent>
                             <p className="flex items-center text-sm text-gray-600">

@@ -19,7 +19,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(false);
     const [totalPage, setTotalPage] = useState(1);
 
-    const fetchData = async (tab) => {
+    const fetchData = async (tab, page) => {
         setLoading(true);
         try {
             let endpoint = "";
@@ -31,8 +31,10 @@ const Dashboard = () => {
                 endpoint = "/post/admin/rejected";
             }
 
-            const response = await axiosClient.getMany(endpoint);
-            setPosts(response.data.content); // Giả sử API trả về dữ liệu trong `data.content`
+            const response = await axiosClient.getMany(endpoint, {
+                page: page - 1,
+            });
+            setPosts(response.data.content);
             setTotalPage(response.data.totalPages);
 
         } catch (error) {
@@ -41,7 +43,29 @@ const Dashboard = () => {
             setLoading(false);
         }
     };
+    const handleApprove = async (postId) => {
+        try {
+            await axiosClient.put(`/post/admin/approve/${postId}`);
+            alert("Bài viết đã được duyệt.");
+            setSelectedPost(null);
+            fetchData(activeTab, currentPage);
+        } catch (err) {
+            console.error("Lỗi khi duyệt bài viết:", err);
+            alert("Lỗi khi duyệt bài viết.");
+        }
+    };
 
+    const handleReject = async (postId) => {
+        try {
+            await axiosClient.put(`/post/admin/reject/${postId}`);
+            alert("Bài viết đã bị từ chối.");
+            setSelectedPost(null);
+            fetchData(activeTab, currentPage);
+        } catch (err) {
+            console.error("Lỗi khi từ chối bài viết:", err);
+            alert("Lỗi khi từ chối bài viết.");
+        }
+    };
     useEffect(() => {
         fetchData(activeTab, currentPage); // Lấy dữ liệu khi tab hoặc trang thay đổi
     }, [activeTab, currentPage]);
@@ -106,7 +130,13 @@ const Dashboard = () => {
             {activeTab === "reported" ? (
                 <PostReportDialog data={selectedPost} onCancel={() => setSelectedPost(null)} />
             ) : (
-                selectedPost && <PostDetailsDialog data={selectedPost} onCancel={() => setSelectedPost(null)} />
+                selectedPost && <PostDetailsDialog
+                    postId={selectedPost?.postId}
+                    onApprove={() => handleApprove(selectedPost?.postId)} // Truyền hàm xử lý
+                    onReject={() => handleReject(selectedPost?.postId)}   // Truyền hàm xử lý
+                    onCancel={() => setSelectedPost(null)}
+                />
+
             )}
 
             {/* Phân trang */}

@@ -73,14 +73,28 @@ const HostManagement = () => {
         setSelectedHost(null);
     };
 
-    const handleApprove = () => {
-        console.log("Duyệt:", selectedHost);
-        handleCloseDialog();
+    const handleApprove = async (userId) => {
+        try {
+            await axiosClient.put(`/user/admin/approve-landlord/${userId}`);
+            //     alert("Bài viết đã được duyệt.");
+            handleCloseDialog();
+            fetchData(activeTab, currentPage);
+        } catch (err) {
+            console.error("Lỗi khi duyệt bài viết:", err);
+            //       alert("Lỗi khi duyệt bài viết.");
+        }
     };
 
-    const handleReject = () => {
-        console.log("Từ chối:", selectedHost);
-        handleCloseDialog();
+    const handleReject = async (userId) => {
+        try {
+            await axiosClient.put(`/user/admin/reject-landlord/${userId}`);
+            alert("Bài viết đã bị từ chối.");
+            handleCloseDialog();
+            fetchData(activeTab, currentPage);
+        } catch (err) {
+            console.error("Lỗi khi từ chối bài viết:", err);
+            alert("Lỗi khi từ chối bài viết.");
+        }
     };
 
     return (
@@ -171,9 +185,9 @@ const HostManagement = () => {
                 <HostInfoDialog
                     isOpen={isDialogOpen}
                     onClose={handleCloseDialog}
-                    hostData={selectedHost}
-                    onApprove={handleApprove}
-                    onReject={handleReject}
+                    hostId={selectedHost.userId}
+                    onApprove={() => handleApprove(selectedHost.userId)}
+                    onReject={() => handleReject(selectedHost.userId)}
                 />
             )}
         </div>

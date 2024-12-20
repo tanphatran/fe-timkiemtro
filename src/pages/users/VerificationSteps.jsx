@@ -1,17 +1,46 @@
-import React, { useState } from "react";
-import axiosClient from "@/apis/axiosClient";  // Import axios client đã có interceptor
+import React, { useEffect, useState } from "react";
+import axiosClient from "@/apis/axiosClient"; // Import axios client đã có interceptor
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ImageUploader from "@/components/ImageUploader/ImageUploader";
 
 const VerificationSteps = () => {
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(1); // Mặc định là bước 1
+    const [verificationStatus, setVerificationStatus] = useState(null); // Trạng thái xác minh
     const [cccdImages, setCccdImages] = useState({
         frontCccdUrl: "",
         backCccdUrl: "",
     });
     const [loading, setLoading] = useState(false);
+
+    // Gọi API để kiểm tra trạng thái xác minh
+    useEffect(() => {
+        const checkVerificationStatus = async () => {
+            try {
+                setLoading(true);
+                const response = await axiosClient.getOne("/user/landlord-status");
+                const status = response.data;
+
+                setVerificationStatus(status);
+
+                // Cập nhật bước dựa trên trạng thái
+                if (status === "NOT_REGISTERED") {
+                    setCurrentStep(1);
+                } else if (status === "PENDING_APPROVAL") {
+                    setCurrentStep(3);
+                } else if (status === "APPROVED") {
+                    setCurrentStep(3);
+                }
+            } catch (error) {
+                console.error("Lỗi khi kiểm tra trạng thái xác minh:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        checkVerificationStatus();
+    }, []);
 
     // Hàm xử lý khi ảnh được tải lên thành công
     const handleImageUpload = (type, uploadedImageUrl) => {
@@ -35,11 +64,9 @@ const VerificationSteps = () => {
                     frontCccdUrl: cccdImages.frontCccdUrl[0],
                     backCccdUrl: cccdImages.backCccdUrl[0],
                 };
-                console.log(payload);
-                // Gọi API
-                const response = await axiosClient.post(`/user/register-landlord`, payload);
-                setCurrentStep(3); // Chuyển sang bước tiếp theo
-
+                // Gọi API để gửi ảnh CCCD
+                await axiosClient.post(`/user/register-landlord`, payload);
+                setCurrentStep(3);
             } catch (error) {
                 console.error("Lỗi khi gửi API:", error);
                 alert("Đã xảy ra lỗi khi gửi thông tin xác thực. Vui lòng thử lại!");
@@ -78,7 +105,7 @@ const VerificationSteps = () => {
                 </div>
 
                 {/* Nội dung các bước */}
-                {currentStep === 1 && (
+                {currentStep === 1 && verificationStatus === "NOT_REGISTERED" && (
                     <div className="text-center">
                         <p className="text-base font-medium">
                             Tài khoản của bạn cần được xác thực. Hãy nhấn nút{" "}
@@ -93,7 +120,6 @@ const VerificationSteps = () => {
                             Tải ảnh CCCD
                         </label>
                         <div className="grid lg:grid-cols-2 gap-4">
-                            {/* Ảnh mặt trước */}
                             <div className="border-2 border-dashed border-primary/40 rounded-md p-2 flex justify-center items-center">
                                 <ImageUploader
                                     label="Mặt trước CCCD"
@@ -103,8 +129,6 @@ const VerificationSteps = () => {
                                     }
                                 />
                             </div>
-
-                            {/* Ảnh mặt sau */}
                             <div className="border-2 border-dashed border-primary/40 rounded-md p-2 flex justify-center items-center">
                                 <ImageUploader
                                     label="Mặt sau CCCD"
@@ -120,9 +144,16 @@ const VerificationSteps = () => {
 
                 {currentStep === 3 && (
                     <div className="text-center">
-                        <p className="text-base font-medium">
-                            Cảm ơn bạn đã gửi hồ sơ, chúng tôi sẽ duyệt hồ sơ của bạn sớm nhất!
-                        </p>
+                        {verificationStatus === "PENDING_APPROVAL" && (
+                            <p className="text-base font-medium">
+                                Cảm ơn bạn đã gửi hồ sơ, chúng tôi sẽ duyệt hồ sơ của bạn sớm nhất!
+                            </p>
+                        )}
+                        {verificationStatus === "APPROVED" && (
+                            <p className="text-base font-medium">
+                                Bạn đã được phê duyệt, bạn có thể đăng bài ngay bây giờ.
+                            </p>
+                        )}
                     </div>
                 )}
 

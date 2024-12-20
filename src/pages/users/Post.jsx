@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import AddressModal from "@/components/Address/AddressModal" // Import AddressModal
+import AddressModal from "@/components/Address/AddressModal";
 import ImageUploader from "@/components/ImageUploader/ImageUploader";
-import axiosClient from "@/apis/axiosClient";  // Import axios client đã có interceptor
+import axiosClient from "@/apis/axiosClient";
+import { useToast } from "@/hooks/use-toast";
 
 const Post = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false); // state to control modal
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const { toast } = useToast();
+
     const [address, setAddress] = useState({
         province: '',
         district: '',
@@ -41,6 +44,15 @@ const Post = () => {
     };
 
     const handleSubmit = async () => {
+        if (!formData.title || !formData.description || !formData.price || !formData.area || !formData.depositAmount || !formData.numberOfRooms || !formData.electricityPrice || !formData.waterPrice || formData.images.length === 0) {
+            toast({
+                title: "Thông báo",
+                description: "Vui lòng điền đầy đủ thông tin!",
+
+            })
+            return;
+        }
+
         const payload = {
             postImages: formData.images,
             title: formData.title || "Untitled",
@@ -67,17 +79,24 @@ const Post = () => {
 
             // Không cần `response.ok`, kiểm tra từ `response.data`
             if (response) {
-                alert("Tin đã được đăng thành công!");
-                console.log("Success:", response);
+                toast({
+                    description: "Tin đã được gửi để được phê duyệt!",
+
+                })
+
             }
         } catch (err) {
             console.error("Network Error:", err);
-            alert("Có lỗi xảy ra khi kết nối đến server. Vui lòng thử lại.");
+            toast({
+                description: "Có lỗi xảy ra khi kết nối đến server. Vui lòng thử lại.",
+
+            })
         }
     };
 
 
     return (
+
         <div className="border-2 border-dashed border-primary/10 mb-4  mx-auto p-6 bg-white shadow-md rounded-md">
             <h1 className="text-lg font-semibold mb-4 ">Đăng tin phòng trọ</h1>
             <div className="grid my-8 lg:grid-cols-10 gap-4">

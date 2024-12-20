@@ -3,8 +3,8 @@ import Logo from "../../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import Login from "../login/Login";
-import { FiMenu, FiX } from "react-icons/fi"; // Icons menu và đóng
-import useAuth from "@/hooks/useAuth"; // Import custom hook useAuth
+import { FiMenu, FiX } from "react-icons/fi";
+import useAuth from "@/hooks/useAuth";
 import useMeStore from "@/zustand/useMeStore";
 import {
     DropdownMenu,
@@ -16,7 +16,7 @@ import { FaUser, FaSignOutAlt } from "react-icons/fa"; // Import icons
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const navigate = useNavigate(); // Khởi tạo useNavigate
+    const navigate = useNavigate();
     const { isLoggedIn, me, clearAuth } = useAuth();
     const { role } = useMeStore();
     const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false); // Thêm trạng thái cho dialog

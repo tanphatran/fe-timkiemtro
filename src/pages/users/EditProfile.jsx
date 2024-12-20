@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"; // Assuming you have a Button c
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"; // For avatar image
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // For cards
 import { FaCamera } from "react-icons/fa";
-import axios from "axios";
+import axios from "axios";  // Import axios để gửi API request
+import { Alert } from "@/components/ui/alert"; // Assuming you have an Alert component from ShadCN UI
 
 const EditProfile = () => {
     const [profileData, setProfileData] = useState({
@@ -18,7 +19,7 @@ const EditProfile = () => {
     });
 
     const [loading, setLoading] = useState(false);
-    const [imageFile, setImageFile] = useState(null); // New state for image file
+    const [alert, setAlert] = useState({ message: "", type: "" });
 
     // Fetch profile data from API using axiosClient
     useEffect(() => {
@@ -28,10 +29,10 @@ const EditProfile = () => {
                 if (response.status === "success") {
                     setProfileData(response.data);
                 } else {
-                    console.error("Không thể tải dữ liệu người dùng");
+                    setAlert({ message: "Không thể tải dữ liệu người dùng", type: "error" });
                 }
             } catch (error) {
-                console.error("Lỗi khi tải thông tin cá nhân", error);
+                setAlert({ message: "Lỗi khi tải thông tin cá nhân", type: "error" });
             }
         };
 
@@ -39,39 +40,37 @@ const EditProfile = () => {
     }, []);
 
     // Handle image upload
-
-    // Upload image to the server
     const handleImageChange = async (e) => {
-        const file = e.target.files[0]; // Lấy file ảnh từ input
+        const file = e.target.files[0];
         if (!file) return;
 
         const formData = new FormData();
-        formData.append("file", file); // Thêm file vào FormData
+        formData.append("file", file);
 
-        setLoading(true); // Bắt đầu trạng thái loading
+        setLoading(true);
         try {
-            // Gửi file ảnh đến API upload
-            const response = await axios.post("http://localhost:8080/api/post/upload", formData, {
+            const baseURL = import.meta.env.VITE_API_URL;
+            const response = await axios.post(`${baseURL}/user/profile-picture`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
-
+                withCredentials: true,
             });
 
-            // Kiểm tra response thành công
             if (response.data.status === "success") {
-                const uploadedImageUrl = response.data.data[0]; // API trả về link ảnh
+                const uploadedImageUrl = response.data.data;
                 setProfileData((prevData) => ({
                     ...prevData,
-                    profilePicture: uploadedImageUrl, // Cập nhật URL ảnh đại diện
+                    profilePicture: uploadedImageUrl,
                 }));
+                setAlert({ message: response.data.message, type: "success" });
             } else {
-                console.error("Lỗi khi tải ảnh lên:", response.data.message);
+                setAlert({ message: "Không thể tải ảnh lên. Vui lòng thử lại.", type: "error" });
             }
         } catch (error) {
-            console.error("Lỗi khi tải ảnh lên:", error);
+            setAlert({ message: "Đã xảy ra lỗi khi tải ảnh lên.", type: "error" });
         } finally {
-            setLoading(false); // Kết thúc trạng thái loading
+            setLoading(false);
         }
     };
 
@@ -80,26 +79,15 @@ const EditProfile = () => {
         e.preventDefault();
         setLoading(true);
 
-        let updatedProfileData = { ...profileData };
-
-        // Upload the image if a new image is selected
-        if (imageFile) {
-            const imageUrl = await uploadImage();
-            if (imageUrl) {
-                updatedProfileData.profilePicture = imageUrl;
-            }
-        }
-
         try {
-            const response = await axiosClient.put("user/update", updatedProfileData); // Use PUT here
+            const response = await axiosClient.put("user/update", profileData);
             if (response.status === "success") {
-                alert("Cập nhật thông tin thành công!");
-                setProfileData(updatedProfileData); // Update profile data with the new picture
+                setAlert({ message: "Cập nhật thông tin thành công!", type: "success" });
             } else {
-                alert("Cập nhật thông tin thất bại!");
+                setAlert({ message: "Cập nhật thông tin thất bại!", type: "error" });
             }
         } catch (error) {
-            console.error("Lỗi khi cập nhật thông tin", error);
+            setAlert({ message: "Lỗi khi cập nhật thông tin", type: "error" });
         } finally {
             setLoading(false);
         }
@@ -112,6 +100,11 @@ const EditProfile = () => {
                     <CardTitle className="text-center text-xl font-bold">Chỉnh sửa thông tin cá nhân</CardTitle>
                 </CardHeader>
                 <CardContent>
+                    {alert.message && (
+                        <Alert className={`mb-4`} variant={alert.type}>
+                            {alert.message}
+                        </Alert>
+                    )}
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="relative w-32 h-32 mx-auto">
                             {/* Avatar */}
@@ -124,7 +117,7 @@ const EditProfile = () => {
                             <label
                                 htmlFor="image-upload"
                                 className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-lg cursor-pointer flex items-center justify-center"
-                                style={{ width: "40px", height: "40px" }} // Set kích thước icon camera
+                                style={{ width: "40px", height: "40px" }}
                             >
                                 {loading ? (
                                     <div className="animate-spin border-2 border-gray-300 border-t-primary rounded-full w-6 h-6"></div>
@@ -140,9 +133,6 @@ const EditProfile = () => {
                                 onChange={handleImageChange}
                             />
                         </div>
-
-
-
 
                         <div>
                             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
