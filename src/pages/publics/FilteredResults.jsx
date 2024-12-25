@@ -30,15 +30,17 @@ const FilteredResults = () => {
             const district = queryParams.get("district");
             const ward = queryParams.get("ward");
             const keyword = queryParams.get("keyword");
-            console.log("Keyword từ URL:", keyword);
+            const minArea = queryParams.get("minArea");
+            const maxArea = queryParams.get("maxArea");
+            console.log(minArea);
 
-            return { minPrice, maxPrice, city, district, ward, keyword };
+            return { minPrice, maxPrice, city, district, ward, keyword, minArea, maxArea };
         };
 
         const fetchFilteredRooms = async (page) => {
             setLoading(true);
             try {
-                const { minPrice, maxPrice, city, district, ward, keyword } = getFilterParams();
+                const { minPrice, maxPrice, city, district, ward, keyword, minArea, maxArea } = getFilterParams();
 
                 const queryParams = {
                     page: page - 1,
@@ -49,6 +51,8 @@ const FilteredResults = () => {
                     district,
                     ward,
                     keyword,
+                    minArea,
+                    maxArea,
                 };
 
                 const filteredParams = Object.entries(queryParams)

@@ -75,6 +75,33 @@ const Dashboard = () => {
             alert("Lỗi khi từ chối bài viết.");
         }
     };
+    const handleApproveReport = async (postId) => {
+        try {
+            const response = await axiosClient.put(`/reports/admin/approve/${postId}`, {
+                reason: selectedPost?.reason, // Passing reason as request body
+            });
+            alert(response.data.message); // Show success message
+            onApprove(); // Close the dialog
+            onRefresh(); // Trigger data refresh
+        } catch (err) {
+            console.error("Lỗi khi duyệt báo cáo:", err);
+            alert("Lỗi khi duyệt báo cáo.");
+        }
+    };
+
+    const handleRejectReport = async (postId) => {
+        try {
+            const response = await axiosClient.put(`/reports/admin/reject/${postId}`, {
+                reason: selectedPost?.reason, // Passing reason as request body
+            });
+            alert(response.data.message); // Show success message
+            onReject(); // Close the dialog
+            onRefresh(); // Trigger data refresh
+        } catch (err) {
+            console.error("Lỗi khi từ chối báo cáo:", err);
+            alert("Lỗi khi từ chối báo cáo.");
+        }
+    };
     useEffect(() => {
         fetchData(activeTab, currentPage); // Lấy dữ liệu khi tab hoặc trang thay đổi
     }, [activeTab, currentPage]);
@@ -160,10 +187,12 @@ const Dashboard = () => {
             {/* Hiển thị dialog dựa trên tab */}
             {activeTab === "reported" ? (
                 <PostReportDialog
-
                     postId={selectedPost?.reportId}
-                    onCancel={() => setSelectedPost(null)}
+                    onApprove={handleApproveReport} // Truyền hàm xử lý duyệt báo cáo
+                    onReject={handleRejectReport}   // Truyền hàm xử lý từ chối báo cáo
+                    onCancel={() => setSelectedPost(null)} // Hủy việc chọn bài
                 />
+
 
             ) : (
                 selectedPost && <PostDetailsDialog

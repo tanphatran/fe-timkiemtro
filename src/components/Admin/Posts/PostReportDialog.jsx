@@ -30,33 +30,7 @@ const PostReportDialog = ({ postId, onApprove, onReject, onCancel, onRefresh }) 
         fetchReportDetails();
     }, [postId]);
 
-    const handleApprove = async () => {
-        try {
-            const response = await axiosClient.put(`/reports/admin/approve/${postId}`, {
-                reason: reportDetails?.reason, // Passing reason as request body
-            });
-            alert(response.data.message); // Show success message
-            onApprove(); // Close the dialog
-            onRefresh(); // Trigger data refresh
-        } catch (err) {
-            console.error("Lỗi khi duyệt báo cáo:", err);
-            alert("Lỗi khi duyệt báo cáo.");
-        }
-    };
 
-    const handleReject = async () => {
-        try {
-            const response = await axiosClient.put(`/reports/admin/reject/${postId}`, {
-                reason: reportDetails?.reason, // Passing reason as request body
-            });
-            alert(response.data.message); // Show success message
-            onReject(); // Close the dialog
-            onRefresh(); // Trigger data refresh
-        } catch (err) {
-            console.error("Lỗi khi từ chối báo cáo:", err);
-            alert("Lỗi khi từ chối báo cáo.");
-        }
-    };
 
     if (!postId) return null;
 
@@ -147,10 +121,10 @@ const PostReportDialog = ({ postId, onApprove, onReject, onCancel, onRefresh }) 
 
                         {/* Nút hành động */}
                         <div className="mt-3 flex justify-end gap-3">
-                            <Button variant="default" onClick={handleApprove} className="bg-primary text-white">
+                            <Button variant="default" onClick={onApprove} className="bg-primary text-white">
                                 Duyệt bài
                             </Button>
-                            <Button variant="outline" onClick={handleReject} className="text-red-600 border-red-600">
+                            <Button variant="outline" onClick={onReject} className="text-red-600 border-red-600">
                                 Từ chối
                             </Button>
                             <Button variant="ghost" onClick={onCancel} className="border border-black text-black">
