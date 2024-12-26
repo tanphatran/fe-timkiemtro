@@ -7,6 +7,7 @@ import { MdLocalPhone } from "react-icons/md";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import ReportRoom from "@/components/Rooms/ReportRoom";
 import axiosClient from "@/apis/axiosClient";
+import RoomMap from "@/components/Map/RoomMap";
 
 const RoomDetail = () => {
     const { id } = useParams(); // Lấy id từ URL
@@ -140,6 +141,13 @@ const RoomDetail = () => {
 
                                 </TableBody>
                             </Table>
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-lg mb-4">Vị trí phòng trọ</h3>
+                            <RoomMap
+                                roomLocation={`${room.houseNumber}, ${room.street}, ${room.ward}, ${room.district}, ${room.city}`}
+
+                            />
                         </div>
 
                         <div className="flex justify-end mb-3">
