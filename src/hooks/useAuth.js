@@ -19,9 +19,9 @@ const useAuth = () => {
                     token,
                 });
 
-                console.log("Response data 1:", response.data.data.valid);
+                console.log("Response data 1:", token);
 
-                if (response.data.data.valid) {
+                if (token) {
                     setIsLoggedIn(true);
 
 

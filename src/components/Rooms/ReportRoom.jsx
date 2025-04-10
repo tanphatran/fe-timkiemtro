@@ -12,12 +12,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CiWarning } from "react-icons/ci";
-import axiosClient from "@/apis/axiosClient"; // Import axiosClient đã được cấu hình
+import axiosClient from "@/apis/axiosClient";
+import { useToast } from "@/hooks/use-toast";
 
 const ReportRoom = ({ roomId }) => {
     const [selectedReasons, setSelectedReasons] = useState([]);
     const [details, setDetails] = useState("");
-    const [isDialogOpen, setIsDialogOpen] = useState(false); // Trạng thái mở/đóng dialog
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const { toast } = useToast();
 
     const handleCheckboxChange = (reason) => {
         setSelectedReasons((prev) =>
@@ -29,7 +31,9 @@ const ReportRoom = ({ roomId }) => {
 
     const handleSubmit = async () => {
         if (selectedReasons.length === 0 && !details.trim()) {
-            alert("Vui lòng chọn ít nhất một lý do hoặc nhập ý kiến phản hồi.");
+            toast({
+                description: "Vui lòng chọn ít nhất một lý do hoặc nhập ý kiến phản hồi.",
+            });
             return;
         }
 
@@ -42,14 +46,14 @@ const ReportRoom = ({ roomId }) => {
             const response = await axiosClient.post(`/reports/create/${roomId}`, payload);
 
             if (response.status === "success") {
-                alert(response.message);
-                setIsDialogOpen(false); // Đóng dialog sau khi gửi thành công
+                toast({ description: response.message });
+                setIsDialogOpen(false);
             } else {
-                alert("Đã có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.");
+                toast({ description: "Đã có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại." });
             }
         } catch (error) {
             console.error("Error submitting report:", error);
-            alert("Đã có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.");
+            toast({ description: "Đã có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại." });
         }
     };
 
@@ -113,7 +117,7 @@ const ReportRoom = ({ roomId }) => {
                     <Button
                         className="text-base"
                         variant="secondary"
-                        onClick={() => setIsDialogOpen(false)} // Đóng dialog khi bấm hủy
+                        onClick={() => setIsDialogOpen(false)}
                     >
                         Bỏ qua
                     </Button>

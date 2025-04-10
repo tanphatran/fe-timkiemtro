@@ -49,7 +49,7 @@ const Login = () => {
             : { fullName: "", phone: "", password: "", confirmPassword: "" },
     });
     // Trước khi sử dụng setToken và setMe, bạn phải lấy chúng từ useMeStore
-    const { setToken, setMe, role, setRole } = useMeStore();
+    const { setRefreshToken, setToken, setMe, role, setRole } = useMeStore();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -61,19 +61,17 @@ const Login = () => {
 
     const handleSubmit = async (data) => {
         try {
-            // Gọi API đăng nhập
             const response = await axiosClient.post("/auth/login", {
                 phoneNumber: data.phone,
                 password: data.password,
             });
 
             if (response.status === "success") {
-                // Lưu token và thông tin người dùng vào zustand
                 setToken(response.data.accessToken);
+                setRefreshToken(response.data.refreshToken); // Lưu refreshToken
                 setMe(response.data.fullName);
-                setRole(response.data.role);
-                console.log(response.data.accessToken)
-
+                setRole(response.data.userType);
+                console.log("Đăng nhập thành công!");
             } else {
                 console.error("Đăng nhập thất bại", response.message);
             }
@@ -81,6 +79,7 @@ const Login = () => {
             console.error("Lỗi khi đăng nhập:", error);
         }
     };
+
 
     const handleRegister = async (data) => {
         console.log("Dữ liệu gửi đi:", data); // Thêm dòng này để log dữ liệu

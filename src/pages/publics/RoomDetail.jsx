@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Images from "@/components/Rooms/Images.jsx";
 import { GrLocation } from "react-icons/gr";
 import { AiFillMessage, AiFillHeart, AiOutlineHeart } from "react-icons/ai";
@@ -8,6 +8,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import ReportRoom from "@/components/Rooms/ReportRoom";
 import axiosClient from "@/apis/axiosClient";
 import RoomMap from "@/components/Map/RoomMap";
+import RelatedPosts from "@/components/Rooms/RelatedPosts";
 
 const RoomDetail = () => {
     const { id } = useParams(); // Lấy id từ URL
@@ -17,6 +18,19 @@ const RoomDetail = () => {
     const [loading, setLoading] = useState(true); // Trạng thái loading
     const [error, setError] = useState(null); // Lỗi khi gọi API
     const [isRevealed, setIsRevealed] = useState(false);
+    const navigate = useNavigate();
+
+    const handleSendMessage = () => {
+        if (userData) {
+            navigate("/users/chat", {
+                state: {
+                    userId: userData.id,
+                    userName: userData.fullName,
+                    userAvatar: userData.profilePicture
+                }
+            });
+        }
+    };
     const handleFavorite = async () => {
         try {
             if (liked) {
@@ -149,7 +163,7 @@ const RoomDetail = () => {
 
                             />
                         </div>
-
+                        <RelatedPosts currentPostId={id} />
                         <div className="flex justify-end mb-3">
                             <ReportRoom roomId={id} />
                         </div>
@@ -190,10 +204,14 @@ const RoomDetail = () => {
                                 </button>
                             </div>
                             <div className="mb-4">
-                                <button className="flex items-center justify-center w-full px-4 py-2 text-gray-700 bg-white border border-primary/50 rounded-lg hover:bg-gray-100">
+                                <button
+                                    onClick={handleSendMessage}
+                                    className="flex items-center justify-center w-full px-4 py-2 text-gray-700 bg-white border border-primary/50 rounded-lg hover:bg-gray-100"
+                                >
                                     <AiFillMessage className="text-primary hover:text-primary-dark size-6 mr-3" />
                                     <span> Gửi tin nhắn</span>
                                 </button>
+
                             </div>
                         </div>
 

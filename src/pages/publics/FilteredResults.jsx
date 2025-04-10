@@ -11,6 +11,10 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 import SearchFilter from "@/components/Searchs/SearchFilter";
+import { Button } from "@/components/ui/button";
+import NotificationDialog from "@/components/Notification/NotificationDialog";
+import useAuth from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const FilteredResults = () => {
     const [rooms, setRooms] = useState([]); // Dữ liệu phòng
@@ -18,7 +22,10 @@ const FilteredResults = () => {
     const [totalPages, setTotalPages] = useState(1); // Tổng số trang
     const [loading, setLoading] = useState(false); // Trạng thái loading
     const location = useLocation();
-
+    const [noResults, setNoResults] = useState(false); // Thêm state kiểm tra kết quả
+    const [openDialog, setOpenDialog] = useState(false);
+    const { isLoggedIn } = useAuth();
+    const { toast } = useToast();
     // Lấy tham số từ URL
     useEffect(() => {
         // Lấy các tham số lọc từ URL
@@ -32,13 +39,15 @@ const FilteredResults = () => {
             const keyword = queryParams.get("keyword");
             const minArea = queryParams.get("minArea");
             const maxArea = queryParams.get("maxArea");
-            console.log(minArea);
 
             return { minPrice, maxPrice, city, district, ward, keyword, minArea, maxArea };
         };
 
         const fetchFilteredRooms = async (page) => {
             setLoading(true);
+            setNoResults(false); // Reset lại khi bắt đầu fetch
+            setRooms([]); // Xóa danh sách cũ
+
             try {
                 const { minPrice, maxPrice, city, district, ward, keyword, minArea, maxArea } = getFilterParams();
 
@@ -61,6 +70,13 @@ const FilteredResults = () => {
                     .join("&");
 
                 const response = await axiosClient.getOne(`/post/filter?${filteredParams}`);
+                console.log("API Response:", response.data); // Debug dữ liệu trả về
+
+                if (!response.data || response.data.status === "error" || !response.data.content || response.data.content.length === 0) {
+                    console.warn("Không tìm thấy phòng phù hợp.");
+                    setNoResults(true);
+                    return;
+                }
 
                 const formattedRooms = response.data.content.map((room) => ({
                     id: room.postUuid,
@@ -80,16 +96,36 @@ const FilteredResults = () => {
 
                 setRooms(formattedRooms);
                 setTotalPages(Math.ceil(response.data.totalElements / 9));
+                setNoResults(false);
             } catch (error) {
-                console.error("Lỗi khi lấy dữ liệu phòng:", error.message);
-                setRooms([]);
+                console.error("Lỗi khi lấy dữ liệu phòng:", error);
+
+                if (error.response?.status === 400) {
+                    console.warn("Không tìm thấy phòng phù hợp. (Lỗi 400)");
+                    setNoResults(true);
+                } else {
+                    console.error("Lỗi khác:", error.message);
+                }
             } finally {
                 setLoading(false);
             }
         };
 
+
+
         fetchFilteredRooms(currentPage);
     }, [location.search, currentPage]);  // Gọi lại khi tham số URL thay đổi
+
+    const handleOpenDialog = () => {
+        if (!isLoggedIn) {
+            toast({
+                description: "Vui lòng đăng nhập để đăng ký nhận thông báo!",
+                variant: "destructive",
+            });
+            return;
+        }
+        setOpenDialog(true);
+    };
 
 
     // Xử lý thay đổi trang
@@ -105,13 +141,26 @@ const FilteredResults = () => {
                 <div className="w-full max-w-screen-xl mx-auto">
 
                     {/* Danh sách phòng */}
-                    <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                    <div className="w-full flex justify-center items-center mt-4">
                         {loading ? (
                             <p className="text-center w-full">Đang tải dữ liệu...</p>
+                        ) : noResults ? (
+                            <div className="flex flex-col items-center text-center w-full max-w-md">
+                                <p className="text-lg font-semibold text-gray-600">
+                                    Không tìm thấy phòng phù hợp.
+                                </p>
+                                <Button onClick={handleOpenDialog} className="bg-primary text-white mt-2">
+                                    Đăng ký tìm phòng
+                                </Button>
+                                <NotificationDialog open={openDialog} onOpenChange={setOpenDialog} />
+                            </div>
                         ) : (
-                            rooms.map((room) => <RoomCard key={room.id} room={room} />)
+                            <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                {rooms.map((room) => <RoomCard key={room.id} room={room} />)}
+                            </div>
                         )}
                     </div>
+
 
                     {/* Phân trang */}
                     <Pagination className="mt-6 mb-4">

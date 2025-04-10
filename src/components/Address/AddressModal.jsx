@@ -75,7 +75,7 @@ const AddressModal = ({ isOpen, onClose, address, onAddressChange, onSave }) => 
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="min-w-[700px] p-0">
+            <DialogContent className="min-w-[700px] p-0 max-w-lg">
                 <DialogHeader>
                     <DialogTitle className="mt-4 ml-4">Địa chỉ</DialogTitle>
                     <div className="grid grid-cols-1 gap-4 p-4">

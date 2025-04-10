@@ -17,6 +17,10 @@ import EmployeeManagement from './pages/admin/EmployeeManagement';
 import UserManagement from './pages/admin/UserManagement';
 import EditProfile from './pages/users/EditProfile';
 import FilteredResults from './pages/publics/FilteredResults';
+import ChatApp from './pages/users/ChatApp';
+import ChangePassword from './pages/users/ChangePassword';
+import LandlordList from './pages/publics/LandlordList';
+import LandlordProfile from './pages/publics/LandlordProfile';
 
 const routes = [
     {
@@ -31,7 +35,12 @@ const routes = [
                     { path: pathnames.publics.search, element: <Search /> },
                     { path: pathnames.publics.roomdetail_id, element: <RoomDetail /> },
                     { path: pathnames.publics.results, element: <FilteredResults /> },
-
+                    { path: pathnames.publics.landlord, element: <LandlordList /> },
+                    { path: pathnames.publics.landlord_id, element: <LandlordProfile /> },
+                    {
+                        path: pathnames.users.chatapp,
+                        element: <ChatApp />,
+                    },
                     {
                         path: pathnames.users.layout,
                         element: <ProfilePage />,
@@ -56,6 +65,11 @@ const routes = [
                                 path: pathnames.users.editprofile,
                                 element: <EditProfile />,
                             },
+                            {
+                                path: pathnames.users.changepassword,
+                                element: <ChangePassword />,
+                            },
+
 
                         ]
                     },

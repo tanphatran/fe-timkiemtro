@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Logo from "../../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import Login from "../login/Login";
 import { FiMenu, FiX } from "react-icons/fi";
+import { SiHomeadvisor } from "react-icons/si";
 import useAuth from "@/hooks/useAuth";
 import useMeStore from "@/zustand/useMeStore";
 import {
@@ -13,18 +14,31 @@ import {
     DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { FaUser, FaSignOutAlt } from "react-icons/fa"; // Import icons
+import axiosClient from "@/apis/axiosClient";
+import SearchInfoDialog from "../Notification/SearchInfoDialog ";
+import NotificationBell from "./NotificationBell";
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();
-    const { isLoggedIn, me, clearAuth } = useAuth();
+    const { token, isLoggedIn, me, clearAuth } = useAuth();
     const { role } = useMeStore();
     const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false); // Thêm trạng thái cho dialog
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    const handleLogout = () => {
-        clearAuth(); // Đăng xuất
-        navigate("/"); // Chuyển hướng về trang chủ
+    const handleLogout = async () => {
+        try {
+            await axiosClient.post("/auth/logout");
+            clearAuth();
+            navigate("/");
+        } catch (error) {
+            console.error("Lỗi khi đăng xuất:", error.response?.data || error.message);
+        }
     };
+
+    useEffect(() => {
+        console.log("User info updated:", me);
+    }, [me]);
 
     const handlePostNavigation = () => {
         if (!isLoggedIn) {
@@ -58,9 +72,15 @@ const Navbar = () => {
                     <Link to="/search" className="hover:underline">
                         Tìm phòng
                     </Link>
+
+                    <Link to="/landlord" className="hover:underline">
+                        Chủ trọ
+                    </Link>
+
                     {/* Đăng nhập/Đăng ký */}
                     {isLoggedIn ? (
                         <div className="flex items-center gap-2">
+                            <NotificationBell />
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className="hover:underline">
@@ -71,6 +91,10 @@ const Navbar = () => {
                                     <DropdownMenuItem onClick={() => window.location.href = "/users/editprofile"}>
                                         <FaUser className="mr-2 text-gray-500" /> {/* Icon Thông tin cá nhân */}
                                         Thông tin cá nhân
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+                                        <SiHomeadvisor className="mr-2 text-gray-500" />
+                                        Yêu cầu tìm phòng
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={handleLogout}>
                                         <FaSignOutAlt className="mr-2 text-gray-500" /> {/* Icon Đăng xuất */}
@@ -148,6 +172,8 @@ const Navbar = () => {
                     </button>
                 </div>
             )}
+            <SearchInfoDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+
         </div>
     );
 };

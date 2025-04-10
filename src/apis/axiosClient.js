@@ -6,26 +6,26 @@ const baseURL = import.meta.env.VITE_API_URL;
 function createApiClient() {
     const client = axios.create({
         baseURL,
-        withCredentials: true,
+        //   withCredentials: true,
         headers: {
             "Content-Type": "application/json",
         },
     });
 
     // Interceptor để thêm token vào tất cả các request
-    // client.interceptors.request.use(
-    //     (config) => {
-    //         const token = useMeStore.getState().token;
-    //         console.log("Token trong request:", token); // Log để kiểm tra token
-    //         if (token) {
-    //             config.headers.Authorization = `Bearer ${token}`;
-    //         } else {
-    //             console.warn("Không có token để gửi trong header Authorization");
-    //         }
-    //         return config;
-    //     },
-    //     (error) => Promise.reject(error)
-    // );
+    client.interceptors.request.use(
+        (config) => {
+            const token = useMeStore.getState().token;
+            console.log("Token trong request:", token); // Log để kiểm tra token
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            } else {
+                console.warn("Không có token để gửi trong header Authorization");
+            }
+            return config;
+        },
+        (error) => Promise.reject(error)
+    );
 
 
     return {

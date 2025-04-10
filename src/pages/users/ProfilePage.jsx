@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useLocation, Link, Outlet, useNavigate } from "react-router-dom";
 import {
     Avatar,
     AvatarImage,
@@ -10,26 +10,48 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BiTimeFive } from "react-icons/bi";
 import { AiOutlineCheckCircle } from "react-icons/ai";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { Link, Outlet } from "react-router-dom";
 import pathnames from "@/lib/pathnames";
 import axiosClient from "@/apis/axiosClient";
 import useMeStore from "@/zustand/useMeStore";
-import { useNavigate } from "react-router-dom";
+import useActiveButtonStore from "@/zustand/useActiveButtonStore";
 
 const ProfilePage = () => {
-    const [activeButton, setActiveButton] = useState(null);
+    const location = useLocation();
+    const { activeButton, setActiveButton } = useActiveButtonStore();
     const [profileData, setProfileData] = useState({});
     const { role } = useMeStore();
     const navigate = useNavigate();
+
+    // Tự động cập nhật trạng thái active theo pathname
+    useEffect(() => {
+        const { pathname } = location;
+        if (pathname.includes("editprofile")) {
+            setActiveButton("editProfile");
+        } else if (pathname.includes("changepassword")) {
+            setActiveButton("changepassword");
+        } else if (pathname.includes("postmana")) {
+            setActiveButton("postManagement");
+        } else if (pathname.includes("verification")) {
+            setActiveButton("verification");
+        } else if (pathname.includes("favorite-posts")) {
+            setActiveButton("favoriteposts");
+        } else if (pathname.includes("create-posts")) {
+            setActiveButton("createPosts");
+        } else {
+            setActiveButton(null);
+        }
+    }, [location.pathname, setActiveButton]);
+    useEffect(() => {
+        console.log("Current pathname:", location.pathname);
+    }, [location.pathname]);
+
     // Fetch profile data from API
     useEffect(() => {
         const fetchProfile = async () => {
             try {
                 const response = await axiosClient.getOne("/user/profile");
-                console.log("Response data:", response.data); // Kiểm tra chính xác cấu trúc của dữ liệu
-
-                setProfileData(response.data);  // Cập nhật dữ liệu cá nhân
-
+                console.log("Response data:", response.data);
+                setProfileData(response.data);
             } catch (error) {
                 console.error("Lỗi khi lấy thông tin cá nhân:", error);
             }
@@ -38,24 +60,15 @@ const ProfilePage = () => {
         fetchProfile();
     }, []);
 
-
-
-
-    // Hàm để thay đổi trạng thái active của nút
-    const handleButtonClick = (buttonName) => {
-        setActiveButton(buttonName);
-    };
-
+    // Handler riêng cho nút tạo bài viết
     const handleButtonClickcreatePosts = () => {
-        // setActiveButton('verification');
-
-        // Nếu người dùng là TENANT và nhấn vào nút tạo bài viết thì chuyển hướng
         if (role === "TENANT") {
             navigate("/users/verification");
         } else {
             navigate("/users/create-posts");
         }
     };
+
     return (
         <div className="mt-8 container mx-auto py-8 px-4 sm:px-8 lg:px-16">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
@@ -70,7 +83,10 @@ const ProfilePage = () => {
                                 />
                                 <AvatarFallback>
                                     {profileData?.fullName
-                                        ? profileData.fullName.split(" ").map((word) => word[0]).join("")
+                                        ? profileData.fullName
+                                            .split(" ")
+                                            .map((word) => word[0])
+                                            .join("")
                                         : "NA"}
                                 </AvatarFallback>
                             </Avatar>
@@ -87,17 +103,32 @@ const ProfilePage = () => {
                             <Link to={pathnames.users.editprofile}>
                                 <Button
                                     variant="secondary"
-                                    className={`w-full bg-white text-gray border border-secondary/50 ${activeButton === 'editProfile' ? 'bg-gradient-to-l from-secondary to-primary text-white' : 'hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white'}`}
-                                    onClick={() => handleButtonClick('editProfile')}
+                                    className={`w-full bg-white text-gray border border-secondary/50 ${activeButton === "editProfile"
+                                        ? "bg-gradient-to-l from-secondary to-primary text-white"
+                                        : "hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white"
+                                        }`}
                                 >
                                     Chỉnh sửa trang cá nhân
+                                </Button>
+                            </Link>
+                            <Link to={pathnames.users.changepassword}>
+                                <Button
+                                    variant="secondary"
+                                    className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === "changepassword"
+                                        ? "bg-gradient-to-l from-secondary to-primary text-white"
+                                        : "hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white"
+                                        }`}
+                                >
+                                    Đổi mật khẩu
                                 </Button>
                             </Link>
                             <Link to={pathnames.users.postmana}>
                                 <Button
                                     variant="secondary"
-                                    className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === 'postManagement' ? 'bg-gradient-to-l from-secondary to-primary text-white' : 'hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white'}`}
-                                    onClick={() => handleButtonClick('postManagement')}
+                                    className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === "postManagement"
+                                        ? "bg-gradient-to-l from-secondary to-primary text-white"
+                                        : "hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white"
+                                        }`}
                                 >
                                     Quản lý bài viết
                                 </Button>
@@ -105,8 +136,10 @@ const ProfilePage = () => {
                             <Link to={pathnames.users.verification}>
                                 <Button
                                     variant="secondary"
-                                    className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === 'verification' ? 'bg-gradient-to-l from-secondary to-primary text-white' : 'hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white'}`}
-                                    onClick={() => handleButtonClick('verification')}
+                                    className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === "verification"
+                                        ? "bg-gradient-to-l from-secondary to-primary text-white"
+                                        : "hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white"
+                                        }`}
                                 >
                                     Xác thực tài khoản
                                 </Button>
@@ -114,21 +147,24 @@ const ProfilePage = () => {
                             <Link to={pathnames.users.favoriteposts}>
                                 <Button
                                     variant="secondary"
-                                    className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === 'favoritePosts' ? 'bg-gradient-to-l from-secondary to-primary text-white' : 'hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white'}`}
-                                    onClick={() => handleButtonClick('favoritePosts')}
+                                    className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === "favoriteposts"
+                                        ? "bg-gradient-to-l from-secondary to-primary text-white"
+                                        : "hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white"
+                                        }`}
                                 >
                                     Bài viết yêu thích
                                 </Button>
                             </Link>
-                            {/* <Link to={pathnames.users.createposts}> */}
                             <Button
                                 variant="secondary"
-                                className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === 'createPosts' ? 'bg-gradient-to-l from-secondary to-primary text-white' : 'hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white'}`}
-                                onClick={() => handleButtonClickcreatePosts()}
+                                className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === "createPosts"
+                                    ? "bg-gradient-to-l from-secondary to-primary text-white"
+                                    : "hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white"
+                                    }`}
+                                onClick={handleButtonClickcreatePosts}
                             >
                                 Tạo bài viết
                             </Button>
-                            {/* </Link> */}
                         </CardContent>
                         <CardContent>
                             <p className="flex items-center text-sm text-gray-600">
@@ -137,20 +173,26 @@ const ProfilePage = () => {
                                 <span className="ml-1 font-bold">
                                     {profileData?.createdAt
                                         ? new Date(profileData.createdAt).toLocaleDateString("vi-VN", {
-                                            day: "2-digit", // Lấy ngày theo định dạng 2 chữ số
-                                            month: "2-digit", // Lấy tháng theo định dạng 2 chữ số
-                                            year: "numeric", // Lấy năm đầy đủ
+                                            day: "2-digit",
+                                            month: "2-digit",
+                                            year: "numeric",
                                         })
                                         : "N/A"}
                                 </span>
                             </p>
 
                             <p className="flex items-center text-sm text-gray-600">
-                                <AiOutlineCheckCircle className={`mr-2 text-base align-middle ${profileData?.isLandlordActivated === "APPROVED" ? "text-green-500" : "text-gray-600"}`}
+                                <AiOutlineCheckCircle
+                                    className={`mr-2 text-base align-middle ${profileData?.isLandlordActivated === "APPROVED"
+                                        ? "text-green-500"
+                                        : "text-gray-600"
+                                        }`}
                                 />
                                 Đã xác thực:
                                 <span className="ml-1">
-                                    {profileData?.isLandlordActivated === "APPROVED" ? "CCCD" : "Chưa xác thực"}
+                                    {profileData?.isLandlordActivated === "APPROVED"
+                                        ? "CCCD"
+                                        : "Chưa xác thực"}
                                 </span>
                             </p>
                             <p className="flex items-center text-sm text-gray-600">
@@ -161,7 +203,7 @@ const ProfilePage = () => {
                     </Card>
                 </div>
 
-                {/* Content (Sẽ được thay bằng các Component khác thông qua <Outlet>) */}
+                {/* Content (các Component con sẽ được render qua <Outlet>) */}
                 <div className="lg:col-span-3">
                     <Outlet />
                 </div>

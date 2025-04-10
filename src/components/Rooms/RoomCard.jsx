@@ -8,11 +8,17 @@ import { Link } from "react-router-dom";
 import pathnames from '@/lib/pathnames'
 import { GrLocation } from "react-icons/gr";
 import axiosClient from "@/apis/axiosClient";
+import useAuth from "@/hooks/useAuth";
 
 const RoomCard = ({ room }) => {
     const [liked, setLiked] = useState(false); // Trạng thái thích
+    const { isLoggedIn } = useAuth();
     const checkFavoriteStatus = async () => {
         try {
+            if (!isLoggedIn) {
+                setLiked(false);
+                return;
+            }
             const response = await axiosClient.getOne(`/favorite-posts/check-favorite/${room.id}`);
             // Nếu bài viết đã được yêu thích, cập nhật trạng thái liked
 
@@ -24,6 +30,9 @@ const RoomCard = ({ room }) => {
     };
     const handleFavorite = async () => {
         try {
+            if (!isLoggedIn) {
+                return;
+            }
             if (liked) {
                 // Gọi API xóa bài viết yêu thích
                 const response = await axiosClient.delete(`/favorite-posts/remove/${room.id}`);
@@ -44,7 +53,7 @@ const RoomCard = ({ room }) => {
     };
     useEffect(() => {
         checkFavoriteStatus();
-    }, [room.id]);
+    }, [isLoggedIn, room.id]);
 
     return (
         <div className="border rounded-md hover:shadow-lg transform hover:scale-[1.03] ease-in-out">

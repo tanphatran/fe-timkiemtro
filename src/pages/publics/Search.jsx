@@ -18,6 +18,8 @@ const Search = () => {
     const [rooms, setRooms] = useState([]); // Dữ liệu phòng
     const [totalPages, setTotalPages] = useState(1); // Tổng số trang
     const [loading, setLoading] = useState(false); // Trạng thái loading
+    const [noResults, setNoResults] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
 
     // Hàm gọi API
     const fetchRooms = async (page) => {
@@ -54,6 +56,8 @@ const Search = () => {
 
             setRooms(formattedRooms);
             setTotalPages(totalPages);
+            setNoResults(content.length === 0);
+
         } catch (error) {
             console.error("Error fetching rooms:", error.message);
         } finally {
@@ -95,6 +99,16 @@ const Search = () => {
                     <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                         {loading ? (
                             <p className="text-center w-full">Đang tải dữ liệu...</p>
+                        ) : noResults ? (
+                            <div className="text-center w-full">
+                                <p className="text-lg font-semibold text-gray-600">
+                                    Không tìm thấy phòng phù hợp.
+                                </p>
+                                <Button className="mt-4 bg-primary text-white" onClick={() => setOpenDialog(true)}>
+                                    Đăng ký nhận thông báo khi có phòng
+                                </Button>
+                                <NotificationDialog open={openDialog} onOpenChange={setOpenDialog} />
+                            </div>
                         ) : (
                             rooms.map((room) => <RoomCard key={room.id} room={room} />)
                         )}
