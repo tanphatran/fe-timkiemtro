@@ -13,10 +13,13 @@ import {
   ConversationHeader,
 } from "@chatscope/chat-ui-kit-react";
 import axiosClient from "@/apis/axiosClient";
+import useWebSocket from "@/hooks/useWebSocket";
 
 export default function ChatApp() {
   const location = useLocation();
-  const { userId = 1, userName, userAvatar } = location.state || {}; // 👈 default là 1
+  const { userId = 1, userName, userAvatar } = location.state || {};
+  const { messages: realtimeMessages, sendMessage: sendWSMessage } = useWebSocket(userId);
+
   const conversationName = userName || "Người cho thuê";
   const conversationAvatar = userAvatar || "https://via.placeholder.com/40";
 
@@ -82,6 +85,27 @@ export default function ChatApp() {
     fetchMessages();
   }, [selectedConversation, userId]);
 
+  useEffect(() => {
+    if (!realtimeMessages.length) return;
+
+    realtimeMessages.forEach((msg) => {
+      const partnerId = msg.senderId;
+
+      const formattedMsg = {
+        text: msg.content,
+        sender: "them",
+        time: msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : "",
+        messageId: msg.messageId || Date.now(),
+      };
+
+      setConversationMessages((prev) => ({
+        ...prev,
+        [partnerId]: [...(prev[partnerId] || []), formattedMsg],
+      }));
+    });
+  }, [realtimeMessages]);
+
+
   const messages = selectedConversation
     ? conversationMessages[selectedConversation.id] || []
     : [];
@@ -89,16 +113,29 @@ export default function ChatApp() {
   // Gửi tin nhắn (chỉ local demo)
   const sendMessage = (text) => {
     if (text.trim() && selectedConversation) {
-      const newMessage = {
+      const msg = {
+        senderId: userId,
+        recipientId: selectedConversation.id,
+        content: text,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Gửi qua WebSocket
+      sendWSMessage(msg);
+
+      // Update UI local ngay lập tức
+      const localMsg = {
         text,
         sender: "me",
         time: new Date().toLocaleTimeString(),
+        messageId: Date.now(),
       };
+
       setConversationMessages((prev) => ({
         ...prev,
         [selectedConversation.id]: [
           ...(prev[selectedConversation.id] || []),
-          newMessage,
+          localMsg,
         ],
       }));
 
@@ -106,6 +143,7 @@ export default function ChatApp() {
       setTimeout(() => setIsTyping(false), 2000);
     }
   };
+
 
   return (
     <div className="h-[93vh] mt-14 flex justify-center items-center">

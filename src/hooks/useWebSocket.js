@@ -36,7 +36,7 @@ export default function useWebSocket(userId) {
     const sendMessage = (messageData) => {
         if (clientRef.current && clientRef.current.connected) {
             clientRef.current.publish({
-                destination: "/app/chat",
+                destination: "/chat",
                 body: JSON.stringify(messageData),
             });
         }
