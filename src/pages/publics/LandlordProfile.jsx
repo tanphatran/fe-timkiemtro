@@ -24,7 +24,7 @@ const LandlordProfile = () => {
         const fetchRooms = async () => {
             try {
                 const result = await axiosClient.getOne(`/post/user/${id}`); // Sửa lỗi thiếu dấu backtick
-                const content = result.data || []; // Đảm bảo lấy dữ liệu từ `content`
+                const content = result.data.content || []; // Đảm bảo lấy dữ liệu từ `content`
 
                 // Format dữ liệu trước khi set state
                 const formattedRooms = content.map((room) => ({

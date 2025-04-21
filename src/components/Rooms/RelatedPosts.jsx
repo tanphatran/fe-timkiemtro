@@ -12,7 +12,7 @@ const RelatedPosts = ({ currentPostId }) => {
     useEffect(() => {
         const fetchRelatedRooms = async () => {
             try {
-                const response = await axiosClient.get(`/post/${currentPostId}/similar`);
+                const response = await axiosClient.getOne(`/post/${currentPostId}/similar`);
                 setRelatedRooms(response.data || []);
             } catch (error) {
                 console.error("Lỗi khi lấy bài viết liên quan:", error);
