@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
@@ -11,104 +11,84 @@ import {
   MessageInput,
   Avatar,
   ConversationHeader,
-  TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
+import axiosClient from "@/apis/axiosClient";
 
 export default function ChatApp() {
   const location = useLocation();
-  const { userId, userName, userAvatar } = location.state || {};
-  // Nếu không có thông tin từ state, sử dụng giá trị mặc định
+  const { userId = 1, userName, userAvatar } = location.state || {}; // 👈 default là 1
   const conversationName = userName || "Người cho thuê";
   const conversationAvatar = userAvatar || "https://via.placeholder.com/40";
 
-  // Danh sách các cuộc trò chuyện
-  const conversationList = [
-    {
-      id: 1,
-      name: conversationName,
-      info: "Cuộc hội thoại mới",
-      avatar: conversationAvatar,
-    },
-    {
-      id: 2,
-      name: "Lilly",
-      info: "Always on holidays",
-      avatar: "https://via.placeholder.com/40",
-    },
-    {
-      id: 3,
-      name: "Joe",
-      info: "Sleeping",
-      avatar: "https://via.placeholder.com/40",
-    },
-    {
-      id: 4,
-      name: "Emily",
-      info: "Are you there?",
-      avatar: "https://via.placeholder.com/40",
-    },
-  ];
+  const [conversationList, setConversationList] = useState([]);
+  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [conversationMessages, setConversationMessages] = useState({});
+  const [isTyping, setIsTyping] = useState(false);
 
-  // State lưu cuộc trò chuyện hiện tại được chọn
-  const [selectedConversation, setSelectedConversation] = useState(conversationList[0]);
+  // Lấy danh sách các cuộc trò chuyện
+  useEffect(() => {
+    const fetchConversations = async () => {
+      try {
+        const data = await axiosClient.getMany("/groupchat");
+        if (data.status === "success") {
+          const conversations = data.data.map((item) => ({
+            id: item.recipientId,
+            name: item.fullName,
+            info: item.messageStatus,
+            avatar: item.profilePicture,
+          }));
+          setConversationList(conversations);
+          if (conversations.length > 0) {
+            setSelectedConversation(conversations[0]);
+          }
+        }
+      } catch (error) {
+        console.error("Lỗi khi gọi API groupchat:", error.message);
+      }
+    };
 
-  // State lưu tin nhắn của từng cuộc trò chuyện (key là id của conversation)
-  const [conversationMessages, setConversationMessages] = useState({
-    1: [
-      {
-        text: `Chào ${conversationList[0].name}, tôi muốn trao đổi về phòng trọ.`,
-        sender: "me",
-        time: "10:00 AM",
-      },
-      {
-        text: `Xin chào! Cảm ơn bạn đã liên hệ. Tôi sẵn sàng trao đổi.`,
-        sender: "other",
-        time: "10:01 AM",
-      },
-    ],
-    2: [
-      {
-        text: "Chào Lilly, tôi có thắc mắc về phòng trọ.",
-        sender: "me",
-        time: "10:05 AM",
-      },
-      {
-        text: "Hi, bạn cần biết gì thêm?",
-        sender: "other",
-        time: "10:06 AM",
-      },
-    ],
-    3: [
-      {
-        text: "Chào Joe, tôi muốn hỏi về thông tin phòng.",
-        sender: "me",
-        time: "10:07 AM",
-      },
-      {
-        text: "Được, bạn hỏi đi.",
-        sender: "other",
-        time: "10:08 AM",
-      },
-    ],
-    4: [
-      {
-        text: "Chào Emily, tôi cần trao đổi về phòng.",
-        sender: "me",
-        time: "10:09 AM",
-      },
-      {
-        text: "Xin chào, tôi có thể giúp gì?",
-        sender: "other",
-        time: "10:10 AM",
-      },
-    ],
-  });
+    fetchConversations();
+  }, []);
 
-  // Lấy tin nhắn của cuộc trò chuyện hiện tại
-  const messages = conversationMessages[selectedConversation.id] || [];
+  // Lấy tin nhắn cho cuộc trò chuyện đang chọn
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (!selectedConversation) return;
 
+      try {
+        const res = await axiosClient.getOne(`/messages/${selectedConversation.id}`);
+        if (res.status === "success") {
+          const fetchedMessages = res.data
+            .map((msg) => ({
+              text: msg.content,
+              sender: msg.senderId === userId ? "me" : "them",
+              time: msg.timestamp
+                ? new Date(msg.timestamp).toLocaleTimeString()
+                : "",
+              messageId: msg.messageId,
+            }))
+            .sort((a, b) => a.messageId - b.messageId); // sắp xếp theo thứ tự
+
+          setConversationMessages((prev) => ({
+            ...prev,
+            [selectedConversation.id]: fetchedMessages,
+          }));
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy tin nhắn:", error.message);
+      }
+    };
+
+    fetchMessages();
+  }, [selectedConversation, userId]);
+
+  const messages = selectedConversation
+    ? conversationMessages[selectedConversation.id] || []
+    : [];
+
+  // Gửi tin nhắn (chỉ local demo)
   const sendMessage = (text) => {
-    if (text.trim()) {
+    if (text.trim() && selectedConversation) {
       const newMessage = {
         text,
         sender: "me",
@@ -116,8 +96,14 @@ export default function ChatApp() {
       };
       setConversationMessages((prev) => ({
         ...prev,
-        [selectedConversation.id]: [...(prev[selectedConversation.id] || []), newMessage],
+        [selectedConversation.id]: [
+          ...(prev[selectedConversation.id] || []),
+          newMessage,
+        ],
       }));
+
+      setIsTyping(true);
+      setTimeout(() => setIsTyping(false), 2000);
     }
   };
 
@@ -132,7 +118,7 @@ export default function ChatApp() {
                 key={conv.id}
                 name={conv.name}
                 info={conv.info}
-                active={selectedConversation.id === conv.id}
+                active={selectedConversation?.id === conv.id}
                 onClick={() => setSelectedConversation(conv)}
               >
                 <Avatar src={conv.avatar} />
@@ -143,37 +129,50 @@ export default function ChatApp() {
 
         {/* Khung chat chính */}
         <div className="flex flex-col flex-grow border-l">
-          {/* Header hiển thị thông tin cuộc trò chuyện */}
-          <ConversationHeader>
-            <ConversationHeader.Content
-              userName={selectedConversation.name}
-              info="Cuộc hội thoại"
-            />
-          </ConversationHeader>
-
-          {/* Danh sách tin nhắn - Có thể cuộn */}
-          <div className="flex-grow overflow-y-auto p-4">
-            <MessageList>
-              {messages.map((msg, index) => (
-                <Message
-                  key={index}
-                  model={{
-                    message: msg.text,
-                    sentTime: msg.time,
-                    sender: msg.sender === "me" ? "You" : selectedConversation.name,
-                    direction: msg.sender === "me" ? "outgoing" : "incoming",
-                    position: "normal",
-                  }}
+          {selectedConversation && (
+            <>
+              <ConversationHeader>
+                <ConversationHeader.Content
+                  userName={selectedConversation.name}
+                  info="Cuộc hội thoại"
                 />
-              ))}
-              <TypingIndicator content={`${selectedConversation.name} is typing...`} />
-            </MessageList>
-          </div>
+              </ConversationHeader>
 
-          {/* Khung nhập tin nhắn */}
-          <div className="border-t p-2 bg-white">
-            <MessageInput placeholder="Type message here" onSend={sendMessage} attachButton={false} />
-          </div>
+              <div className="flex-grow overflow-y-auto p-4">
+                <MessageList>
+                  {messages.map((msg, index) => (
+                    <Message
+                      key={index}
+                      model={{
+                        message: msg.text,
+                        sentTime: msg.time,
+                        sender:
+                          msg.sender === "me"
+                            ? "Bạn"
+                            : selectedConversation.name,
+                        direction: msg.sender === "me" ? "outgoing" : "incoming",
+                        position: "normal",
+                      }}
+                    />
+                  ))}
+                </MessageList>
+
+                {isTyping && (
+                  <div className="mt-2 text-sm text-gray-500 italic">
+                    {`${selectedConversation.name} đang nhập...`}
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t p-2 bg-white">
+                <MessageInput
+                  placeholder="Type message here"
+                  onSend={sendMessage}
+                  attachButton={false}
+                />
+              </div>
+            </>
+          )}
         </div>
       </MainContainer>
     </div>
