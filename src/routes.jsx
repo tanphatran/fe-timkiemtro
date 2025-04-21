@@ -21,6 +21,7 @@ import ChatApp from './pages/users/ChatApp';
 import ChangePassword from './pages/users/ChangePassword';
 import LandlordList from './pages/publics/LandlordList';
 import LandlordProfile from './pages/publics/LandlordProfile';
+import ResetPassword from './pages/publics/ResetPassword';
 
 const routes = [
     {
@@ -37,6 +38,8 @@ const routes = [
                     { path: pathnames.publics.results, element: <FilteredResults /> },
                     { path: pathnames.publics.landlord, element: <LandlordList /> },
                     { path: pathnames.publics.landlord_id, element: <LandlordProfile /> },
+                    { path: pathnames.publics.resetpassword, element: <ResetPassword /> },
+
                     {
                         path: pathnames.users.chatapp,
                         element: <ChatApp />,

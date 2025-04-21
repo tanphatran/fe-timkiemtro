@@ -8,7 +8,8 @@ const pathnames = {
         post: "/post",
         results: "/results",
         landlord: "/landlord",
-        landlord_id: "/landlord/:id"
+        landlord_id: "/landlord/:id",
+        resetpassword: "/reset-password",
 
     },
     users: {

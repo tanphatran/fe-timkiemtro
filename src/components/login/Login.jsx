@@ -11,10 +11,11 @@ import useMeStore from "@/zustand/useMeStore";
 import axiosClient from "@/apis/axiosClient";
 import { useNavigate } from 'react-router-dom';
 import OtpDialog from "./OtpDialog";
+import ForgotPasswordDialog from "./ForgotPasswordDialog";
 // Định nghĩa schema cho Đăng nhập
 const loginSchema = z.object({
     phone: z.string().min(1, { message: "Bạn chưa nhập số điện thoại." }),
-    password: z.string().min(6, { message: "Mật khẩu tối thiểu 6 kí tự." }),
+    password: z.string(),
 });
 
 // Định nghĩa schema cho Đăng ký
@@ -41,6 +42,7 @@ const registerSchema = z
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true); // Quản lý trạng thái Đăng nhập/Đăng ký
     const [otpOpen, setOtpOpen] = useState(false);
+    const [forgotOpen, setForgotOpen] = useState(false);
     const [registerData, setRegisterData] = useState(null);
     const form = useForm({
         resolver: zodResolver(isLogin ? loginSchema : registerSchema),
@@ -168,6 +170,17 @@ const Login = () => {
                         </Button>
                     </form>
                 </Form>
+                {/* Quên mật khẩu */}
+                {isLogin && (
+                    <p className="text-right text-sm mt-2">
+                        <span
+                            className="text-red-500 font-bold cursor-pointer hover:underline"
+                            onClick={() => setForgotOpen(true)}
+                        >
+                            Quên mật khẩu?
+                        </span>
+                    </p>
+                )}
                 <OtpDialog open={otpOpen} onClose={() => setOtpOpen(false)} onSubmit={handleOtpSubmit} />
 
                 <div className="w-full h-6 flex items-center relative my-4">
@@ -206,7 +219,11 @@ const Login = () => {
                         </>
                     )}
                 </p>
+
+
             </div>
+            <ForgotPasswordDialog open={forgotOpen} onClose={() => setForgotOpen(false)} />
+
         </div>
     );
 };

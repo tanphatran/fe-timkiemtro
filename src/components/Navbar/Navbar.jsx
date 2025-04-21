@@ -3,7 +3,7 @@ import Logo from "../../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import Login from "../login/Login";
-import { FiMenu, FiX } from "react-icons/fi";
+import { FiMenu, FiMessageSquare, FiX } from "react-icons/fi";
 import { SiHomeadvisor } from "react-icons/si";
 import useAuth from "@/hooks/useAuth";
 import useMeStore from "@/zustand/useMeStore";
@@ -17,6 +17,7 @@ import { FaUser, FaSignOutAlt } from "react-icons/fa"; // Import icons
 import axiosClient from "@/apis/axiosClient";
 import SearchInfoDialog from "../Notification/SearchInfoDialog ";
 import NotificationBell from "./NotificationBell";
+import { BsChatDots } from "react-icons/bs";
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -91,6 +92,10 @@ const Navbar = () => {
                                     <DropdownMenuItem onClick={() => window.location.href = "/users/editprofile"}>
                                         <FaUser className="mr-2 text-gray-500" /> {/* Icon Thông tin cá nhân */}
                                         Thông tin cá nhân
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => window.location.href = "/users/chat"}>
+                                        <BsChatDots className="mr-2 text-gray-500" /> {/* Icon Thông tin cá nhân */}
+                                        Tin Nhắn
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
                                         <SiHomeadvisor className="mr-2 text-gray-500" />
