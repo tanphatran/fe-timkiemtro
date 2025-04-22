@@ -1,5 +1,5 @@
 import React from 'react'
-import NatureVid from "../../assets/video/main.mov";
+import NatureVid from "../../assets/video/main.mp4";
 import Hero from "../../components/Hero/Hero";
 import Rooms from '../../components/Rooms/Rooms';
 
