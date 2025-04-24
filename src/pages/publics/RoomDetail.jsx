@@ -11,12 +11,12 @@ import RoomMap from "@/components/Map/RoomMap";
 import RelatedPosts from "@/components/Rooms/RelatedPosts";
 
 const RoomDetail = () => {
-    const { id } = useParams(); // Lấy id từ URL
-    const [room, setRoom] = useState(null); // Dữ liệu phòng
-    const [userData, setUserData] = useState(null); // Dữ liệu người dùng
-    const [liked, setLiked] = useState(false); // Trạng thái thích
-    const [loading, setLoading] = useState(true); // Trạng thái loading
-    const [error, setError] = useState(null); // Lỗi khi gọi API
+    const { id } = useParams();
+    const [room, setRoom] = useState(null);
+    const [userData, setUserData] = useState(null);
+    const [liked, setLiked] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [isRevealed, setIsRevealed] = useState(false);
     const navigate = useNavigate();
 
@@ -29,6 +29,8 @@ const RoomDetail = () => {
                     userAvatar: userData.profilePicture
                 }
             });
+            window.scrollTo(0, 0);
+
         }
     };
     const handleFavorite = async () => {
