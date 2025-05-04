@@ -117,9 +117,8 @@ export default function ChatApp() {
         senderId: userId,
         recipientId: selectedConversation.id,
         content: text,
-        timestamp: new Date().toISOString(),
       };
-
+      console.log("📤 Tin nhắn chuẩn bị gửi qua WebSocket:", msg);
       // Gửi qua WebSocket
       sendWSMessage(msg);
 
