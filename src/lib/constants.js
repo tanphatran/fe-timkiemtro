@@ -1,0 +1,45 @@
+export const postPackages = [
+    {
+        title: "Gói Tiết Kiệm",
+        price: "100.000đ",
+        posts: 5,
+        features: [
+            "Đăng tối đa 5 tin bất động sản",
+            "Tin hiển thị trong 7 ngày kể từ ngày đăng",
+            "Không giới hạn số lượt người xem tin",
+            "Có thể chỉnh sửa nội dung tin sau khi đăng",
+            "Hệ thống thông báo khi tin sắp hết hạn",
+            "Quản lý tin dễ dàng qua bảng điều khiển cá nhân",
+            "Hỗ trợ kỹ thuật qua email trong giờ hành chính",
+        ],
+    },
+    {
+        title: "Gói Phổ Biến",
+        price: "300.000đ",
+        posts: 20,
+        features: [
+            "Đăng tối đa 20 tin với vị trí ưu tiên trong danh sách",
+            "Mỗi tin được hiển thị liên tục trong 15 ngày",
+            "Không giới hạn lượt truy cập và xem tin",
+            "Báo cáo hiệu suất hàng ngày: lượt xem, lượt tương tác",
+            "Cho phép ghim 1 tin ở đầu danh sách trong 3 ngày",
+            "Ưu tiên hỗ trợ qua email và chat trực tuyến",
+            "Tự động gia hạn tin với thông báo nhắc nhở",
+        ],
+    },
+    {
+        title: "Gói Chuyên Nghiệp",
+        price: "700.000đ",
+        posts: 50,
+        features: [
+            "Đăng tối đa 50 tin, lý tưởng cho chủ trọ hoặc môi giới",
+            "Tin hiển thị liên tục trong 30 ngày",
+            "Không giới hạn lượt xem và tiếp cận người dùng",
+            "Báo cáo chi tiết hiệu suất: lượt xem, nguồn truy cập, thiết bị người dùng",
+            "Ưu đãi nâng cấp 5 tin thành tin nổi bật miễn phí mỗi tháng",
+            "Hỗ trợ chuyên viên riêng qua điện thoại và chat",
+            "Ghim tin ở đầu danh sách lên đến 7 ngày",
+            "Tích hợp tính năng phân tích hành vi người xem để tối ưu nội dung tin",
+        ],
+    },
+];

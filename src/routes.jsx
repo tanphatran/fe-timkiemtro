@@ -22,6 +22,7 @@ import ChangePassword from './pages/users/ChangePassword';
 import LandlordList from './pages/publics/LandlordList';
 import LandlordProfile from './pages/publics/LandlordProfile';
 import ResetPassword from './pages/publics/ResetPassword';
+import PostPackage from './pages/users/PostPackage';
 
 const routes = [
     {
@@ -45,6 +46,10 @@ const routes = [
                         element: <ChatApp />,
                     },
                     {
+                        path: pathnames.users.postpackage,
+                        element: <PostPackage />,
+                    },
+                    {
                         path: pathnames.users.layout,
                         element: <ProfilePage />,
                         children: [
@@ -52,6 +57,7 @@ const routes = [
                                 path: pathnames.users.postmana,
                                 element: <PostManagement />,
                             },
+
                             {
                                 path: pathnames.users.createposts,
                                 element: <Post />,

@@ -22,6 +22,7 @@ const pathnames = {
         editprofile: "/users/editprofile",
         chatapp: "/users/chat",
         changepassword: "/users/changepassword",
+        postpackage: "/users/postpackage",
     },
     admin: {
         layout: "/admin",
