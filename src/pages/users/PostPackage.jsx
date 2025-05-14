@@ -2,9 +2,55 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { postPackages } from "@/lib/constants";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import axiosClient from "@/apis/axiosClient";
 
 export default function PostPackage() {
-    const [selectedIndex, setSelectedIndex] = useState(1); // mặc định chọn gói thứ 2
+    const [selectedIndex, setSelectedIndex] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const { toast } = useToast();
+
+    const handleConfirmBuy = async () => {
+        const selectedPackage = postPackages[selectedIndex];
+        const amount = selectedPackage.amount;
+
+        try {
+            setLoading(true);
+            const res = await axiosClient.post("/v1/payment/vn-pay", { amount });
+
+            if (res?.data?.paymentUrl) {
+                window.location.href = res.data.paymentUrl;
+            } else {
+                toast({
+                    title: "Không thể lấy liên kết thanh toán",
+                    description: "Vui lòng thử lại sau.",
+                    variant: "destructive",
+                });
+            }
+        } catch (error) {
+            console.error("Lỗi khi gọi API thanh toán:", error);
+            toast({
+                title: "Thanh toán thất bại",
+                description: "Đã xảy ra lỗi. Vui lòng thử lại.",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+            setConfirmOpen(false);
+        }
+    };
 
     return (
         <div className="py-10 px-4 max-w-6xl mx-auto text-center mt-14">
@@ -42,15 +88,33 @@ export default function PostPackage() {
                                         </li>
                                     ))}
                                 </ul>
-                                <Button
-                                    className={`w-full text-white transition-all duration-300 
-                                        ${isSelected
-                                            ? "bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary"
-                                            : "bg-gray-300 hover:bg-gray-400"
-                                        }`}
-                                >
-                                    {isSelected ? "Mua ngay" : "Chọn gói"}
-                                </Button>
+                                <AlertDialog open={isSelected && confirmOpen} onOpenChange={setConfirmOpen}>
+                                    <AlertDialogTrigger asChild>
+                                        <Button
+                                            disabled={!isSelected || loading}
+                                            className={`w-full text-white transition-all duration-300 
+                                                ${isSelected
+                                                    ? "bg-primary hover:bg-primary/90"
+                                                    : "bg-gray-300 hover:bg-gray-400"
+                                                }`}
+                                        >
+                                            {loading ? "Đang xử lý..." : isSelected ? "Mua ngay" : "Chọn gói"}
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Xác nhận thanh toán</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                Bạn có chắc chắn muốn mua gói <strong>{pkg.title}</strong> với giá{" "}
+                                                <strong>{pkg.price}</strong>?
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Huỷ</AlertDialogCancel>
+                                            <AlertDialogAction onClick={handleConfirmBuy}>Xác nhận</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
                             </CardContent>
                         </Card>
                     );

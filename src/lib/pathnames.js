@@ -25,6 +25,8 @@ const pathnames = {
         chatapp: "/users/chat",
         changepassword: "/users/changepassword",
         postpackage: "/users/postpackage",
+        paymentresult: "/users/payment-result",
+
     },
     admin: {
         layout: "/admin",

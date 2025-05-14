@@ -2,6 +2,7 @@ export const postPackages = [
     {
         title: "Gói Tiết Kiệm",
         price: "100.000đ",
+        amount: 100000,
         posts: 5,
         features: [
             "Đăng tối đa 5 tin bất động sản",
@@ -16,6 +17,7 @@ export const postPackages = [
     {
         title: "Gói Phổ Biến",
         price: "300.000đ",
+        amount: 300000,
         posts: 20,
         features: [
             "Đăng tối đa 20 tin với vị trí ưu tiên trong danh sách",
@@ -30,6 +32,7 @@ export const postPackages = [
     {
         title: "Gói Chuyên Nghiệp",
         price: "700.000đ",
+        amount: 700000,
         posts: 50,
         features: [
             "Đăng tối đa 50 tin, lý tưởng cho chủ trọ hoặc môi giới",

@@ -25,6 +25,7 @@ import ResetPassword from './pages/publics/ResetPassword';
 import PostPackage from './pages/users/PostPackage';
 import MainLayout from './pages/admin-dashboard/components/layout/MainLayout';
 import DashboardPage from './pages/admin-dashboard/components/pages/DashboardPage';
+import PaymentResult from './pages/users/PaymentResult';
 
 const routes = [
     {
@@ -50,6 +51,10 @@ const routes = [
                     {
                         path: pathnames.users.postpackage,
                         element: <PostPackage />,
+                    },
+                    {
+                        path: pathnames.users.paymentresult,
+                        element: <PaymentResult />,
                     },
                     {
                         path: pathnames.users.layout,
