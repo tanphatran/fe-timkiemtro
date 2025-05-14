@@ -23,6 +23,8 @@ import LandlordList from './pages/publics/LandlordList';
 import LandlordProfile from './pages/publics/LandlordProfile';
 import ResetPassword from './pages/publics/ResetPassword';
 import PostPackage from './pages/users/PostPackage';
+import MainLayout from './pages/admin-dashboard/components/layout/MainLayout';
+import DashboardPage from './pages/admin-dashboard/components/pages/DashboardPage';
 
 const routes = [
     {
@@ -83,6 +85,16 @@ const routes = [
                         ]
                     },
                 ],
+            },
+            {
+                path: pathnames.publics.admintest, element: < MainLayout />,
+                children: [
+                    {
+                        path: pathnames.publics.dashboard,
+                        element: <DashboardPage />,
+                    },
+
+                ]
             },
 
             {
