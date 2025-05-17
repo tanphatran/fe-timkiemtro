@@ -96,39 +96,30 @@ const routes = [
                 ],
             },
             {
-                path: pathnames.ad.layout, element: < MainLayout />,
+                path: pathnames.admin.layout, element: < MainLayout />,
                 children: [
                     {
-                        path: pathnames.ad.dashboard,
+                        path: pathnames.admin.dashboard,
                         element: <DashboardPage />,
                     },
                     {
-                        path: pathnames.ad.post,
+                        path: pathnames.admin.post,
                         element: <Dashboard />,
                     },
                     {
-                        path: pathnames.ad.hostmanagenment,
+                        path: pathnames.admin.hostmanagenment,
                         element: <HostManagement />,
                     },
                     {
-                        path: pathnames.ad.employeemana,
+                        path: pathnames.admin.employeemana,
                         element: <EmployeeManagement />,
                     },
                     {
-                        path: pathnames.ad.usermana,
+                        path: pathnames.admin.usermana,
                         element: <UserManagement />,
                     },
                 ]
             },
-
-            {
-                path: pathnames.admin.layout,
-                element: <LayoutAdmin />,
-                children: [
-
-
-                ]
-            }
         ]
     }
 ];

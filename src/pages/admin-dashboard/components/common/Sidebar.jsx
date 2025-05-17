@@ -17,16 +17,16 @@ import LogoutIcon from '@mui/icons-material/Logout';
 // Định nghĩa ánh xạ menuPathMap
 const menuPathMap = {
     inbox: "/chatapp",
-    overview: "/ad/dashboard",
+    overview: "/admin/dashboard",
     notification: "/notifications",
 
-    post: "/ad/post",
+    post: "/admin/post",
     carloan: "/car-loans",
     insurance: "/insurance",
 
-    user: "/ad/usermana",
-    landlord: "/ad/hostmanagenment",
-    staff: "/ad/employeemana"
+    user: "/admin/usermana",
+    landlord: "/admin/hostmanagenment",
+    staff: "/admin/employeemana"
 };
 
 // Định nghĩa các menu

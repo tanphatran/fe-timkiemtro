@@ -57,7 +57,7 @@ const Login = () => {
     useEffect(() => {
         console.log("Role updated:", role);
         if (role === "ADMIN") {
-            navigate("/ad/dashboard");
+            navigate("/admin/dashboard");
         }
     }, [role, navigate]);
 

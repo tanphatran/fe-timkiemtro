@@ -26,15 +26,9 @@ const pathnames = {
         history: "/users/history",
 
     },
+
     admin: {
         layout: "/admin",
-        dashboard: "dashboard",
-        hostmanagenment: "hostmanagenment",
-        employeemana: "employeemana",
-        usermana: "usermana",
-    },
-    ad: {
-        layout: "/ad",
         dashboard: "dashboard",
         post: "post",
         hostmanagenment: "hostmanagenment",

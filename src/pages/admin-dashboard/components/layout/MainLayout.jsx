@@ -1,11 +1,22 @@
 import { Box } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Sidebar from '../common/Sidebar';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
+import useMeStore from '@/zustand/useMeStore';
 
 const sidebarWidth = 350;
 
 const MainLayout = () => {
+    const navigate = useNavigate();
+    const { role } = useMeStore(); // Lấy vai trò người dùng từ store
+
+    useEffect(() => {
+        // Kiểm tra nếu không phải là ADMIN hoặc MODERATOR thì điều hướng đi nơi khác
+        if (role !== "ADMIN" && role !== "MODERATOR") {
+            navigate("/"); // Điều hướng về trang chủ hoặc trang khác nếu không phải là ADMIN hoặc MODERATOR
+        }
+    }, [role, navigate]); // Thực hiện khi role thay đổi
+
     return (
         <Box display="flex">
             {/* sidebar */}
