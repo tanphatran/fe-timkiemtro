@@ -92,13 +92,28 @@ const routes = [
                 ],
             },
             {
-                path: pathnames.publics.admintest, element: < MainLayout />,
+                path: pathnames.ad.layout, element: < MainLayout />,
                 children: [
                     {
-                        path: pathnames.publics.dashboard,
+                        path: pathnames.ad.dashboard,
                         element: <DashboardPage />,
                     },
-
+                    {
+                        path: pathnames.ad.post,
+                        element: <Dashboard />,
+                    },
+                    {
+                        path: pathnames.ad.hostmanagenment,
+                        element: <HostManagement />,
+                    },
+                    {
+                        path: pathnames.ad.employeemana,
+                        element: <EmployeeManagement />,
+                    },
+                    {
+                        path: pathnames.ad.usermana,
+                        element: <UserManagement />,
+                    },
                 ]
             },
 
@@ -106,22 +121,8 @@ const routes = [
                 path: pathnames.admin.layout,
                 element: <LayoutAdmin />,
                 children: [
-                    {
-                        path: pathnames.admin.dashboard,
-                        element: <Dashboard />,
-                    },
-                    {
-                        path: pathnames.admin.hostmanagenment,
-                        element: <HostManagement />,
-                    },
-                    {
-                        path: pathnames.admin.employeemana,
-                        element: <EmployeeManagement />,
-                    },
-                    {
-                        path: pathnames.admin.usermana,
-                        element: <UserManagement />,
-                    },
+
+
                 ]
             }
         ]

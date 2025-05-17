@@ -1,87 +1,81 @@
-import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
+import React from 'react';
+import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Typography, colors } from '@mui/material';
+import { useNavigate, useLocation } from 'react-router-dom';
 import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined';
-import DirectionsCarFilledOutlinedIcon from '@mui/icons-material/DirectionsCarFilledOutlined';
 import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
-import OtherHousesOutlinedIcon from '@mui/icons-material/OtherHousesOutlined';
-import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
-import SportsMotorsportsOutlinedIcon from '@mui/icons-material/SportsMotorsportsOutlined';
-import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
-import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Typography, colors } from '@mui/material';
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import HomeWorkOutlinedIcon from '@mui/icons-material/HomeWorkOutlined';
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+
 import Logo from "@/assets/logo.png";
 import Animate from "./Animate";
+import useAuth from "@/hooks/useAuth";
+import LogoutIcon from '@mui/icons-material/Logout';
 
+// Định nghĩa ánh xạ menuPathMap
+const menuPathMap = {
+    inbox: "/chatapp",
+    overview: "/ad/dashboard",
+    notification: "/notifications",
+
+    post: "/ad/post",
+    carloan: "/car-loans",
+    insurance: "/insurance",
+
+    user: "/ad/usermana",
+    landlord: "/ad/hostmanagenment",
+    staff: "/ad/employeemana"
+};
+
+// Định nghĩa các menu
 const menus = [
-    {
-        title: "Inbox",
-        icon: <MailOutlinedIcon />,
-        state: "inbox"
-    },
-    {
-        title: "Overview",
-        icon: <DashboardCustomizeOutlinedIcon />,
-        state: "overview"
-    },
-    {
-        title: "Notification",
-        icon: <NotificationsOutlinedIcon />,
-        state: "notification"
-    }
+    { title: "Inbox", icon: <MailOutlinedIcon />, state: "inbox" },
+    { title: "Tổng quan", icon: <DashboardCustomizeOutlinedIcon />, state: "overview" },
+    { title: "Thông báo", icon: <NotificationsOutlinedIcon />, state: "notification" }
 ];
 
 const serviceMenus = [
-    {
-        title: "Mortage",
-        icon: <OtherHousesOutlinedIcon />,
-        state: "mortage"
-    },
-    {
-        title: "Car loans",
-        icon: <DirectionsCarFilledOutlinedIcon />,
-        state: "carloan"
-    },
-    {
-        title: "Insurance",
-        icon: <SportsMotorsportsOutlinedIcon />,
-        state: "insurance"
-    }
+    { title: "Quản lý bài đăng", icon: <ArticleOutlinedIcon />, state: "post" },
 ];
 
 const investmentMenus = [
-    {
-        title: "Stocks reade",
-        icon: <SwapHorizOutlinedIcon />,
-        state: "stocktrade"
-    },
-    {
-        title: "Finance advice",
-        icon: <ChatBubbleOutlineOutlinedIcon />,
-        state: "financeadvice"
-    },
-    {
-        title: "Savings accounts",
-        icon: <SavingsOutlinedIcon />,
-        state: "savingaccount"
-    }
+    { title: "Người dùng", icon: <PersonOutlineOutlinedIcon />, state: "user" },
+    { title: "Chủ trọ", icon: <HomeWorkOutlinedIcon />, state: "landlord" },
+    { title: "Nhân viên", icon: <BadgeOutlinedIcon />, state: "staff" }
 ];
 
+
 const Sidebar = ({ sidebarWidth }) => {
-    const activeState = "overview";
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { clearAuth } = useAuth();
 
-    // const container = window !== undefined ? () => window.document.body : undefined;
-
+    // Xác định menu đang active
+    const activeState = Object.keys(menuPathMap).find(
+        (key) => menuPathMap[key] === location.pathname
+    );
+    const handleLogout = () => {
+        clearAuth();
+        navigate("/");
+    };
     const MenuItem = (props) => {
+        const path = menuPathMap[props.item.state] || "/"; // Fallback nếu không có route tương ứng
         return (
             <ListItem key={props.index} disableGutters disablePadding sx={{ py: 0.5 }}>
-                <ListItemButton sx={{
-                    borderRadius: "10px",
-                    bgcolor: props.isActive ? "#0287a8" : "",
-                    color: props.isActive ? colors.common.white : "",
-                    "&:hover": {
+                <ListItemButton
+                    onClick={() => navigate(path)} // Điều hướng tới path
+                    sx={{
+                        borderRadius: "10px",
                         bgcolor: props.isActive ? "#0287a8" : "",
                         color: props.isActive ? colors.common.white : "",
-                    }
-                }}>
+                        "&:hover": {
+                            bgcolor: props.isActive ? "#0287a8" : "",
+                            color: props.isActive ? colors.common.white : "",
+                        }
+                    }}
+                >
                     <ListItemIcon sx={{
                         minWidth: "40px",
                         color: props.isActive ? colors.common.white : ""
@@ -117,7 +111,6 @@ const Sidebar = ({ sidebarWidth }) => {
                     <img src={Logo} alt="logo" height={60} />
                 </Animate>
             </Box>
-            {/* logo */}
 
             <Animate sx={{ flexGrow: 1 }}>
                 <Paper
@@ -141,13 +134,12 @@ const Sidebar = ({ sidebarWidth }) => {
                             />
                         ))}
                     </List>
-                    {/* menu group 1 */}
 
                     {/* menu group 2 */}
                     <List>
                         <ListItem>
                             <Typography fontWeight={600} mt={1} color={colors.grey[600]}>
-                                Services
+                                Bài đăng
                             </Typography>
                         </ListItem>
                         {serviceMenus.map((item, index) => (
@@ -158,13 +150,12 @@ const Sidebar = ({ sidebarWidth }) => {
                             />
                         ))}
                     </List>
-                    {/* menu group 2 */}
 
                     {/* menu group 3 */}
                     <List>
                         <ListItem>
                             <Typography fontWeight={600} mt={1} color={colors.grey[600]}>
-                                Investments
+                                Quản Lý Tài Khoản
                             </Typography>
                         </ListItem>
                         {investmentMenus.map((item, index) => (
@@ -175,7 +166,31 @@ const Sidebar = ({ sidebarWidth }) => {
                             />
                         ))}
                     </List>
-                    {/* menu group 3 */}
+                    <List sx={{ mt: 2 }}>
+                        <ListItem disableGutters disablePadding>
+                            <ListItemButton
+                                onClick={handleLogout}
+                                sx={{
+                                    borderRadius: "10px",
+                                    color: colors.grey[800],
+                                    "&:hover": {
+                                        bgcolor: "#f44336", // đỏ nhạt
+                                        color: colors.common.white
+                                    }
+                                }}
+                            >
+                                <ListItemIcon sx={{ minWidth: "40px", color: "inherit" }}>
+                                    <LogoutIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={
+                                    <Typography fontWeight={600}>
+                                        Đăng xuất
+                                    </Typography>
+                                } />
+                            </ListItemButton>
+                        </ListItem>
+                    </List>
+
                 </Paper>
             </Animate>
         </Box>
@@ -189,12 +204,12 @@ const Sidebar = ({ sidebarWidth }) => {
                 flexShrink: { md: 0 }
             }}
         >
-            {/* large screen */}
             <Drawer
                 variant="permanent"
                 sx={{
                     display: { xs: "none", sm: "none", md: "block" },
                     "& .MuiDrawer-paper": {
+                        zIndex: 1,
                         boxSizing: "border-box",
                         width: sidebarWidth,
                         borderWidth: 0,
@@ -208,7 +223,6 @@ const Sidebar = ({ sidebarWidth }) => {
             >
                 {drawer}
             </Drawer>
-            {/* large screen */}
         </Box>
     );
 };

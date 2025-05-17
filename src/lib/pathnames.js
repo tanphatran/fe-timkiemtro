@@ -10,9 +10,6 @@ const pathnames = {
         landlord: "/landlord",
         landlord_id: "/landlord/:id",
         resetpassword: "/reset-password",
-        admintest: "/ad",
-        dashboard: "/ad/dashboard",
-
     },
     users: {
         layout: "/users",
@@ -31,6 +28,14 @@ const pathnames = {
     admin: {
         layout: "/admin",
         dashboard: "dashboard",
+        hostmanagenment: "hostmanagenment",
+        employeemana: "employeemana",
+        usermana: "usermana",
+    },
+    ad: {
+        layout: "/ad",
+        dashboard: "dashboard",
+        post: "post",
         hostmanagenment: "hostmanagenment",
         employeemana: "employeemana",
         usermana: "usermana",
