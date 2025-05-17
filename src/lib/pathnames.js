@@ -23,6 +23,7 @@ const pathnames = {
         changepassword: "/users/changepassword",
         postpackage: "/users/postpackage",
         paymentresult: "/users/payment-result",
+        history: "/users/history",
 
     },
     admin: {

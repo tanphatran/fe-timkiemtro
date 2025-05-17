@@ -26,6 +26,7 @@ import PostPackage from './pages/users/PostPackage';
 import MainLayout from './pages/admin-dashboard/components/layout/MainLayout';
 import DashboardPage from './pages/admin-dashboard/components/pages/DashboardPage';
 import PaymentResult from './pages/users/PaymentResult';
+import TransactionHistory from './pages/users/TransactionHistory';
 
 const routes = [
     {
@@ -64,7 +65,10 @@ const routes = [
                                 path: pathnames.users.postmana,
                                 element: <PostManagement />,
                             },
-
+                            {
+                                path: pathnames.users.history,
+                                element: <TransactionHistory />,
+                            },
                             {
                                 path: pathnames.users.createposts,
                                 element: <Post />,
