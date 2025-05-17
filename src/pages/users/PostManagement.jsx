@@ -8,7 +8,7 @@ import EditPostDialog from "./EditPostDialog";
 const PostManagement = () => {
     const [status, setStatus] = useState("approved");  // Mặc định là "approved"
     const [activePage, setActivePage] = useState(1);
-    const postsPerPage = 2;
+    const postsPerPage = 4;
     const [editingPost, setEditingPost] = useState(null);
     const [posts, setPosts] = useState([]);
     const [postCounts, setPostCounts] = useState({
