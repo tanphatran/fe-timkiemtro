@@ -29,6 +29,14 @@ function createApiClient() {
 
 
     return {
+        get: async (endpoint, config = {}) => {
+            try {
+                const response = await client.get(endpoint, config);
+                return response.data;
+            } catch (error) {
+                throw new Error(`GET request to ${endpoint} failed: ${error}`);
+            }
+        },
         getOne: async (endpoint, params = {}) => {
             try {
                 const response = await client.get(endpoint, { params });
