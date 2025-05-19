@@ -36,11 +36,15 @@ export default function useWebSocket(userId) {
     const sendMessage = (messageData) => {
         if (clientRef.current && clientRef.current.connected) {
             clientRef.current.publish({
-                destination: "/chat",
+                destination: "/app/chat",
                 body: JSON.stringify(messageData),
             });
+            console.log("📤 Tin nhắn đã gửi:", messageData);  // Log tin nhắn gửi đi
+        } else {
+            console.error("WebSocket chưa kết nối hoặc không khả dụng.");
         }
     };
+
 
     return { messages, sendMessage };
 }

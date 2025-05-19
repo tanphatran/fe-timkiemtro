@@ -22,6 +22,13 @@ import ChangePassword from './pages/users/ChangePassword';
 import LandlordList from './pages/publics/LandlordList';
 import LandlordProfile from './pages/publics/LandlordProfile';
 import ResetPassword from './pages/publics/ResetPassword';
+import PostPackage from './pages/users/PostPackage';
+import MainLayout from './pages/admin-dashboard/components/layout/MainLayout';
+import DashboardPage from './pages/admin-dashboard/components/pages/DashboardPage';
+import PaymentResult from './pages/users/PaymentResult';
+import TransactionHistory from './pages/users/TransactionHistory';
+import ChatLayout from './pages/users/ChatApp/ChatLayout ';
+import ChatRoom from './pages/users/ChatApp/ChatRoom ';
 
 const routes = [
     {
@@ -41,8 +48,27 @@ const routes = [
                     { path: pathnames.publics.resetpassword, element: <ResetPassword /> },
 
                     {
+                        path: pathnames.users.chatlayout,
+                        element: <ChatLayout />,
+                        children: [
+
+                            {
+                                path: ":id",
+                                element: <ChatRoom />,
+                            },
+                        ]
+                    },
+                    {
                         path: pathnames.users.chatapp,
                         element: <ChatApp />,
+                    },
+                    {
+                        path: pathnames.users.postpackage,
+                        element: <PostPackage />,
+                    },
+                    {
+                        path: pathnames.users.paymentresult,
+                        element: <PaymentResult />,
                     },
                     {
                         path: pathnames.users.layout,
@@ -51,6 +77,10 @@ const routes = [
                             {
                                 path: pathnames.users.postmana,
                                 element: <PostManagement />,
+                            },
+                            {
+                                path: pathnames.users.history,
+                                element: <TransactionHistory />,
                             },
                             {
                                 path: pathnames.users.createposts,
@@ -78,13 +108,15 @@ const routes = [
                     },
                 ],
             },
-
             {
-                path: pathnames.admin.layout,
-                element: <LayoutAdmin />,
+                path: pathnames.admin.layout, element: < MainLayout />,
                 children: [
                     {
                         path: pathnames.admin.dashboard,
+                        element: <DashboardPage />,
+                    },
+                    {
+                        path: pathnames.admin.post,
                         element: <Dashboard />,
                     },
                     {
@@ -100,7 +132,7 @@ const routes = [
                         element: <UserManagement />,
                     },
                 ]
-            }
+            },
         ]
     }
 ];

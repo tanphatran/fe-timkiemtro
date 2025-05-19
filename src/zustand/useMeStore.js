@@ -2,9 +2,10 @@ import { create } from "zustand"; // Thêm dòng này
 
 const useMeStore = create((set) => ({
     token: localStorage.getItem("token") || null,
-    refreshToken: localStorage.getItem("refreshToken") || null, // Thêm refreshToken
+    refreshToken: localStorage.getItem("refreshToken") || null,
     me: JSON.parse(localStorage.getItem("me")) || null,
     role: localStorage.getItem("role") || null,
+    id: localStorage.getItem("id") || null,
 
     setToken: (token) => {
         localStorage.setItem("token", token);
@@ -22,12 +23,18 @@ const useMeStore = create((set) => ({
         localStorage.setItem("role", role);
         set(() => ({ role }));
     },
+    setId: (id) => {
+        localStorage.setItem("id", id);
+        set(() => ({ id }));
+    },
     clearAuth: () => {
         localStorage.removeItem("token");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("me");
         localStorage.removeItem("role");
-        set(() => ({ token: null, refreshToken: null, me: null, role: null }));
+        localStorage.removeItem("id");
+
+        set(() => ({ token: null, refreshToken: null, me: null, role: null, id: null }));
     },
 }));
 

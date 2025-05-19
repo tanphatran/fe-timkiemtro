@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import BannerLogin from "../../assets/banner-login.jpg"; // Đường dẫn banner
+import BannerLogin from "../../assets/banner-login.jpg";
 import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form } from "../ui/form"; // Form và FormInput giả sử đã tạo trước đó
+import { Form } from "../ui/form";
 import { Button } from "../ui/button";
 import FormInput from "@/components/forms/FormInput";
 import useMeStore from "@/zustand/useMeStore";
@@ -40,7 +40,7 @@ const registerSchema = z
 
 
 const Login = () => {
-    const [isLogin, setIsLogin] = useState(true); // Quản lý trạng thái Đăng nhập/Đăng ký
+    const [isLogin, setIsLogin] = useState(true);
     const [otpOpen, setOtpOpen] = useState(false);
     const [forgotOpen, setForgotOpen] = useState(false);
     const [registerData, setRegisterData] = useState(null);
@@ -50,14 +50,13 @@ const Login = () => {
             ? { phone: "", password: "" }
             : { fullName: "", phone: "", password: "", confirmPassword: "" },
     });
-    // Trước khi sử dụng setToken và setMe, bạn phải lấy chúng từ useMeStore
-    const { setRefreshToken, setToken, setMe, role, setRole } = useMeStore();
+    const { setRefreshToken, setToken, setMe, role, setRole, setId } = useMeStore();
     const navigate = useNavigate();
 
     useEffect(() => {
         console.log("Role updated:", role);
         if (role === "ADMIN") {
-            navigate("/admin");
+            navigate("/admin/dashboard");
         }
     }, [role, navigate]);
 
@@ -70,10 +69,10 @@ const Login = () => {
 
             if (response.status === "success") {
                 setToken(response.data.accessToken);
-                setRefreshToken(response.data.refreshToken); // Lưu refreshToken
+                setRefreshToken(response.data.refreshToken);
                 setMe(response.data.fullName);
                 setRole(response.data.userType);
-                console.log("Đăng nhập thành công!");
+                setId(response.data.userId);
             } else {
                 console.error("Đăng nhập thất bại", response.message);
             }
@@ -84,12 +83,12 @@ const Login = () => {
 
 
     const handleRegister = async (data) => {
-        console.log("Dữ liệu gửi đi:", data); // Thêm dòng này để log dữ liệu
+        console.log("Dữ liệu gửi đi:", data);
 
         try {
             const response = await axiosClient.post("/auth/register", {
                 fullName: data.fullName,
-                phoneNumber: data.phone, // Đổi `phone` thành `phoneNumber`
+                phoneNumber: data.phone,
                 password: data.password,
             });
 

@@ -37,6 +37,8 @@ const ProfilePage = () => {
             setActiveButton("favoriteposts");
         } else if (pathname.includes("create-posts")) {
             setActiveButton("createPosts");
+        } else if (pathname.includes("history")) {
+            setActiveButton("history");
         } else {
             setActiveButton(null);
         }
@@ -153,6 +155,17 @@ const ProfilePage = () => {
                                         }`}
                                 >
                                     Bài viết yêu thích
+                                </Button>
+                            </Link>
+                            <Link to={pathnames.users.history}>
+                                <Button
+                                    variant="secondary"
+                                    className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === "history"
+                                        ? "bg-gradient-to-l from-secondary to-primary text-white"
+                                        : "hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white"
+                                        }`}
+                                >
+                                    Lịch sử giao dịch
                                 </Button>
                             </Link>
                             <Button

@@ -9,6 +9,7 @@ import ReportRoom from "@/components/Rooms/ReportRoom";
 import axiosClient from "@/apis/axiosClient";
 import RoomMap from "@/components/Map/RoomMap";
 import RelatedPosts from "@/components/Rooms/RelatedPosts";
+import useChatStore from "@/zustand/useChatStore";
 
 const RoomDetail = () => {
     const { id } = useParams();
@@ -22,15 +23,16 @@ const RoomDetail = () => {
 
     const handleSendMessage = () => {
         if (userData) {
-            navigate("/users/chat", {
-                state: {
-                    userId: userData.id,
-                    userName: userData.fullName,
-                    userAvatar: userData.profilePicture
-                }
-            });
-            window.scrollTo(0, 0);
+            useChatStore.getState().setPartner(
+                userData.userId,
+                userData.fullName,
+                userData.profilePicture,
+                "Hãy bắt đầu cuộc trò chuyện"
+            );
 
+            // 👉 Điều hướng đến trang chat
+            navigate(`/users/chat/${userData.userId}`);
+            window.scrollTo(0, 0);
         }
     };
     const handleFavorite = async () => {

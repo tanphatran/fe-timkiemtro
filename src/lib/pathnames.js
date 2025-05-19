@@ -10,22 +10,29 @@ const pathnames = {
         landlord: "/landlord",
         landlord_id: "/landlord/:id",
         resetpassword: "/reset-password",
-
     },
     users: {
         layout: "/users",
+        chatlayout: "/users/chat",
         favoriteposts: "favorite-posts",
         profilepage: "/users/profile-page",
         postmana: "/users/postmana",
         createposts: "/users/create-posts",
         verification: "/users/verification",
         editprofile: "/users/editprofile",
-        chatapp: "/users/chat",
+        chatapp: "/users/chatapp",
+        chatpage: "/users/chat/:id",
         changepassword: "/users/changepassword",
+        postpackage: "/users/postpackage",
+        paymentresult: "/users/payment-result",
+        history: "/users/history",
+
     },
+
     admin: {
         layout: "/admin",
         dashboard: "dashboard",
+        post: "post",
         hostmanagenment: "hostmanagenment",
         employeemana: "employeemana",
         usermana: "usermana",

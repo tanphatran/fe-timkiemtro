@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
   MainContainer,
@@ -14,14 +13,13 @@ import {
 } from "@chatscope/chat-ui-kit-react";
 import axiosClient from "@/apis/axiosClient";
 import useWebSocket from "@/hooks/useWebSocket";
+import useMeStore from "@/zustand/useMeStore";
+import { useNavigate } from "react-router-dom";
 
 export default function ChatApp() {
-  const location = useLocation();
-  const { userId = 1, userName, userAvatar } = location.state || {};
+  const { id: userId } = useMeStore();
   const { messages: realtimeMessages, sendMessage: sendWSMessage } = useWebSocket(userId);
-
-  const conversationName = userName || "Người cho thuê";
-  const conversationAvatar = userAvatar || "https://via.placeholder.com/40";
+  const navigate = useNavigate();
 
   const [conversationList, setConversationList] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
@@ -56,7 +54,7 @@ export default function ChatApp() {
   // Lấy tin nhắn cho cuộc trò chuyện đang chọn
   useEffect(() => {
     const fetchMessages = async () => {
-      if (!selectedConversation) return;
+      if (!selectedConversation || !userId) return;
 
       try {
         const res = await axiosClient.getOne(`/messages/${selectedConversation.id}`);
@@ -64,7 +62,7 @@ export default function ChatApp() {
           const fetchedMessages = res.data
             .map((msg) => ({
               text: msg.content,
-              sender: msg.senderId === userId ? "me" : "them",
+              sender: String(msg.senderId) === String(userId) ? "me" : "them",
               time: msg.timestamp
                 ? new Date(msg.timestamp).toLocaleTimeString()
                 : "",
@@ -84,6 +82,10 @@ export default function ChatApp() {
 
     fetchMessages();
   }, [selectedConversation, userId]);
+
+  useEffect(() => {
+    console.log("userId từ Zustand:", userId);
+  }, [userId]);
 
   useEffect(() => {
     if (!realtimeMessages.length) return;
@@ -117,9 +119,8 @@ export default function ChatApp() {
         senderId: userId,
         recipientId: selectedConversation.id,
         content: text,
-        timestamp: new Date().toISOString(),
       };
-
+      console.log("📤 Tin nhắn chuẩn bị gửi qua WebSocket:", msg);
       // Gửi qua WebSocket
       sendWSMessage(msg);
 
@@ -157,7 +158,7 @@ export default function ChatApp() {
                 name={conv.name}
                 info={conv.info}
                 active={selectedConversation?.id === conv.id}
-                onClick={() => setSelectedConversation(conv)}
+                onClick={() => navigate(`/users/chat/${conv.id}`)}
               >
                 <Avatar src={conv.avatar} />
               </Conversation>
