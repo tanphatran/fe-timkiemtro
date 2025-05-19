@@ -11,8 +11,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import useChatStore from "@/zustand/useChatStore";
 
 export default function ChatList() {
-    const conversationList = useChatStore((state) => state.conversationList); // ✅ lấy từ zustand
+    const conversationList = useChatStore((state) => state.conversationList);
     const setConversationList = useChatStore((state) => state.setConversationList);
+    const partner = useChatStore((state) => state.partner); // 👈 lấy partner tạm thời
+
     const navigate = useNavigate();
     const location = useLocation();
     const currentChatId = location.pathname.split("/").pop();
@@ -28,7 +30,7 @@ export default function ChatList() {
                         info: item.messageStatus,
                         avatar: item.profilePicture,
                     }));
-                    setConversationList(conversations); // ✅ lưu vào zustand
+                    setConversationList(conversations);
                 }
             } catch (error) {
                 console.error("Lỗi khi gọi API groupchat:", error.message);
@@ -38,9 +40,14 @@ export default function ChatList() {
         fetchConversations();
     }, []);
 
+    // 👇 Kiểm tra nếu partner không nằm trong conversationList
+    const isPartnerInList = partner &&
+        !conversationList.some((conv) => String(conv.id) === String(partner.id));
+
     return (
         <Sidebar position="left" className="w-1/4 h-full">
             <ConversationList>
+                {/* Hiển thị danh sách từ API */}
                 {conversationList.map((conv) => (
                     <Conversation
                         key={conv.id}
@@ -52,6 +59,19 @@ export default function ChatList() {
                         <Avatar src={conv.avatar} />
                     </Conversation>
                 ))}
+
+                {/* 👇 Nếu người nhận chưa có trong list thì thêm ô tạm */}
+                {isPartnerInList && (
+                    <Conversation
+                        key={partner.id}
+                        name={partner.name}
+                        info={partner.info}
+                        active={String(partner.id) === String(currentChatId)}
+                        onClick={() => navigate(`/users/chat/${partner.id}`)}
+                    >
+                        <Avatar src={partner.avatar} />
+                    </Conversation>
+                )}
             </ConversationList>
         </Sidebar>
     );

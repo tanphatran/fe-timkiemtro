@@ -9,7 +9,7 @@ import {
 import axiosClient from "@/apis/axiosClient";
 import useWebSocket from "@/hooks/useWebSocket";
 import useMeStore from "@/zustand/useMeStore";
-import useChatStore from "@/zustand/useChatStore"; // ✅ Thêm dòng này
+import useChatStore from "@/zustand/useChatStore";
 import { useParams } from "react-router-dom";
 
 export default function ChatRoom() {
@@ -17,8 +17,8 @@ export default function ChatRoom() {
     const { id: partnerId } = useParams();
     const { messages: realtimeMessages, sendMessage: sendWSMessage } = useWebSocket(userId);
 
-    const conversationList = useChatStore((state) => state.conversationList); // ✅ Lấy từ Zustand
-    const partner = conversationList.find((c) => String(c.id) === String(partnerId)); // ✅ Tìm người chat
+    const conversationList = useChatStore((state) => state.conversationList);
+    const partner = conversationList.find((c) => String(c.id) === String(partnerId));
     const partnerName = partner?.name || "Người dùng";
 
     const [messages, setMessages] = useState([]);
@@ -118,7 +118,7 @@ export default function ChatRoom() {
 
             <div className="border-t p-2 bg-white">
                 <MessageInput
-                    placeholder="Type message here"
+                    placeholder="Nhập tin nhắn vào đây"
                     onSend={sendMessage}
                     attachButton={false}
                 />
