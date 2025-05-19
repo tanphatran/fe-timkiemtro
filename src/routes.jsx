@@ -27,6 +27,8 @@ import MainLayout from './pages/admin-dashboard/components/layout/MainLayout';
 import DashboardPage from './pages/admin-dashboard/components/pages/DashboardPage';
 import PaymentResult from './pages/users/PaymentResult';
 import TransactionHistory from './pages/users/TransactionHistory';
+import ChatLayout from './pages/users/ChatApp/ChatLayout ';
+import ChatRoom from './pages/users/ChatApp/ChatRoom ';
 
 const routes = [
     {
@@ -45,6 +47,17 @@ const routes = [
                     { path: pathnames.publics.landlord_id, element: <LandlordProfile /> },
                     { path: pathnames.publics.resetpassword, element: <ResetPassword /> },
 
+                    {
+                        path: pathnames.users.chatlayout,
+                        element: <ChatLayout />,
+                        children: [
+
+                            {
+                                path: ":id",
+                                element: <ChatRoom />,
+                            },
+                        ]
+                    },
                     {
                         path: pathnames.users.chatapp,
                         element: <ChatApp />,

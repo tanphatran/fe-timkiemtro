@@ -3,7 +3,7 @@ import axios from "axios";
 import useMeStore from "@/zustand/useMeStore";
 
 const useAuth = () => {
-    const { token, refreshToken, setToken, setRefreshToken, clearAuth, setMe, setRole, me } = useMeStore();
+    const { token, refreshToken, setToken, setRefreshToken, clearAuth, setMe, setRole, me, id } = useMeStore();
     const [isLoggedIn, setIsLoggedIn] = useState(!!token);
 
     const refreshAccessToken = async () => {
@@ -83,7 +83,7 @@ const useAuth = () => {
         checkLoginStatus();
     }, [token, refreshToken, me]);
 
-    return { token, refreshToken, me, isLoggedIn, clearAuth, refreshAccessToken };
+    return { token, refreshToken, me, isLoggedIn, clearAuth, refreshAccessToken, id };
 };
 
 export default useAuth;
