@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 const Post = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { toast } = useToast();
+    const [postCount, setPostCount] = useState(null);
 
     const [address, setAddress] = useState({
         province: '',
@@ -42,9 +43,22 @@ const Post = () => {
     const handleSaveAddress = (newAddress) => {
         setAddress(newAddress);
     };
+    useEffect(() => {
+        const fetchPostCount = async () => {
+            try {
+                const response = await axiosClient.getOne("/user/post-count");
+                if (response.data?.postCount !== undefined) {
+                    setPostCount(response.data.postCount);
+                }
+            } catch (err) {
+                console.error("Lỗi khi lấy số lượng bài đăng:", err);
+            }
+        };
 
+        fetchPostCount();
+    }, []);
     const handleSubmit = async () => {
-        if (!formData.title || !formData.description || !formData.price || !formData.area || !formData.depositAmount || !formData.numberOfRooms || !formData.electricityPrice || !formData.waterPrice || formData.images.length === 0) {
+        if (!formData.title || !formData.description || !formData.furnitureStatus || !formData.price || !formData.area || !formData.depositAmount || !formData.numberOfRooms || !formData.electricityPrice || !formData.waterPrice || formData.images.length === 0) {
             toast({
                 title: "Thông báo",
                 description: "Vui lòng điền đầy đủ thông tin!",
@@ -81,8 +95,10 @@ const Post = () => {
             if (response) {
                 toast({
                     description: "Tin đã được gửi để được phê duyệt!",
-
                 })
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
 
             }
         } catch (err) {
@@ -98,7 +114,17 @@ const Post = () => {
     return (
 
         <div className="border-2 border-dashed border-primary/10 mb-4  mx-auto p-6 bg-white shadow-md rounded-md">
-            <h1 className="text-lg font-semibold mb-4 ">Đăng tin phòng trọ</h1>
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-lg font-semibold">Đăng tin phòng trọ</h1>
+                <div className="text-sm text-gray-600 text-right">
+                    <div>
+                        Lượt đăng còn lại: <span className="font-semibold text-primary">{postCount !== null ? postCount : "..."}</span>
+                    </div>
+                    <a href="/users/postpackage" className="font-semibold text-primary hover:underline">
+                        + Thêm lượt đăng
+                    </a>
+                </div>
+            </div>
             <div className="grid my-8 lg:grid-cols-10 gap-4">
                 {/* Cột chính */}
                 <div className="col-span-3">
@@ -210,6 +236,7 @@ const Post = () => {
                                 Diện tích
                             </label>
                             <Input placeholder="Nhập diện tích"
+                                type="number"
                                 value={formData.area}
                                 onChange={(e) => setFormData({ ...formData, area: e.target.value })}
                             />
@@ -219,6 +246,7 @@ const Post = () => {
                                 Giá thuê
                             </label>
                             <Input placeholder="Nhập giá thuê"
+                                type="number"
                                 value={formData.price}
                                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                             />
@@ -228,6 +256,7 @@ const Post = () => {
                                 Số tiền cọc
                             </label>
                             <Input placeholder="Nhập số tiền cọc"
+                                type="number"
                                 value={formData.depositAmount}
                                 onChange={(e) => setFormData({ ...formData, depositAmount: e.target.value })}
                             />
@@ -239,6 +268,7 @@ const Post = () => {
                                 Số lượng phòng
                             </label>
                             <Input placeholder="Nhập số lượng phòng trọ"
+                                type="number"
                                 value={formData.numberOfRooms}
                                 onChange={(e) => setFormData({ ...formData, numberOfRooms: e.target.value })}
                             />
@@ -248,6 +278,7 @@ const Post = () => {
                                 Giá điện
                             </label>
                             <Input placeholder="Nhập giá điện"
+                                type="number"
                                 value={formData.electricityPrice}
                                 onChange={(e) => setFormData({ ...formData, electricityPrice: e.target.value })}
                             />
@@ -257,6 +288,7 @@ const Post = () => {
                                 Giá nước
                             </label>
                             <Input placeholder="Nhập giá nước"
+                                type="number"
                                 value={formData.waterPrice}
                                 onChange={(e) => setFormData({ ...formData, waterPrice: e.target.value })}
                             />
