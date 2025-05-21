@@ -86,7 +86,7 @@ const NotificationBell = () => {
             setNotifications(prev =>
                 prev.map(notif =>
                     notif.id === notificationId
-                        ? { ...notif, isRead: true }
+                        ? { ...notif, read: true }
                         : notif
                 )
             );
@@ -101,7 +101,7 @@ const NotificationBell = () => {
         try {
             await notificationApi.markAllAsRead();
             setNotifications(prev =>
-                prev.map(notif => ({ ...notif, isRead: true }))
+                prev.map(notif => ({ ...notif, read: true }))
             );
             setUnreadCount(0);
         } catch (error) {
@@ -141,7 +141,7 @@ const NotificationBell = () => {
                         notifications.map((notif) => (
                             <div
                                 key={notif.id}
-                                className={`p-2 border-b hover:bg-gray-50 cursor-pointer ${!notif.isRead ? 'bg-blue-50' : ''
+                                className={`p-2 border-b hover:bg-gray-50 cursor-pointer ${!notif.read ? 'bg-blue-50' : ''
                                     }`}
                                 onClick={() => handleMarkAsRead(notif.id)}
                             >

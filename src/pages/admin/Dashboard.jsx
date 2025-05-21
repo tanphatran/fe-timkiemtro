@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AiOutlineSearch, AiOutlineReload } from "react-icons/ai";
+import { AiOutlineSearch } from "react-icons/ai";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +8,12 @@ import PostDetailsDialog from "@/components/Admin/Posts/PostDetailsDialog";
 import { TfiReload } from "react-icons/tfi";
 import PostReportDialog from "@/components/Admin/Posts/PostReportDialog";
 import PaginationAdmin from "@/components/Admin/PaginationAdmin";
-import axiosClient from "@/apis/axiosClient"; // Import API client
+import axiosClient from "@/apis/axiosClient";
+import { useToast } from "@/hooks/use-toast"; // 👈 Thêm dòng này
 
 const Dashboard = () => {
+    const { toast } = useToast(); // 👈 Khởi tạo toast
+
     const [activeTab, setActiveTab] = useState("pending");
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedPost, setSelectedPost] = useState(null);
@@ -23,87 +26,101 @@ const Dashboard = () => {
         setLoading(true);
         try {
             let endpoint = "";
-            if (tab === "pending") {
-                endpoint = "/post/admin/pending";
-            } else if (tab === "approved") {
-                endpoint = "/post/admin/approved";
-            } else if (tab === "rejected") {
-                endpoint = "/post/admin/rejected";
-            } else if (tab === "reported") {
-                endpoint = "/reports/admin/all";
-            }
+            if (tab === "pending") endpoint = "/post/admin/pending";
+            else if (tab === "approved") endpoint = "/post/admin/approved";
+            else if (tab === "rejected") endpoint = "/post/admin/rejected";
+            else if (tab === "reported") endpoint = "/reports/admin/all";
 
-            const response = await axiosClient.getMany(endpoint, {
-                page: page - 1,
-            });
-            if (tab === "reported") {
-                setReports(response.data.content);
+            const response = await axiosClient.getMany(endpoint, { page: page - 1 });
 
-            } else {
-                setPosts(response.data.content);
-            }
-
+            if (tab === "reported") setReports(response.data.content);
+            else setPosts(response.data.content);
 
             setTotalPage(response.data.totalPages);
-
         } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu:", error);
+            toast({
+                title: "Lỗi",
+                description: "Không thể tải dữ liệu, vui lòng thử lại.",
+            });
         } finally {
             setLoading(false);
         }
     };
+
     const handleApprove = async (postId) => {
         try {
             await axiosClient.put(`/post/admin/approve/${postId}`);
-            alert("Bài viết đã được duyệt.");
+            toast({
+                title: "Thành công",
+                description: "Bài viết đã được duyệt.",
+            });
             setSelectedPost(null);
             fetchData(activeTab, currentPage);
         } catch (err) {
-            console.error("Lỗi khi duyệt bài viết:", err);
-            alert("Lỗi khi duyệt bài viết.");
+            toast({
+                title: "Lỗi",
+                description: "Không thể duyệt bài viết.",
+            });
         }
     };
 
     const handleReject = async (postId) => {
         try {
             await axiosClient.put(`/post/admin/reject/${postId}`);
-            alert("Bài viết đã bị từ chối.");
+            toast({
+                title: "Thành công",
+                description: "Bài viết đã bị từ chối.",
+            });
             setSelectedPost(null);
             fetchData(activeTab, currentPage);
         } catch (err) {
-            console.error("Lỗi khi từ chối bài viết:", err);
-            alert("Lỗi khi từ chối bài viết.");
+            toast({
+                title: "Lỗi",
+                description: "Không thể từ chối bài viết.",
+            });
         }
     };
+
     const handleApproveReport = async (postId) => {
         try {
             const response = await axiosClient.put(`/reports/admin/approve/${postId}`, {
-                reason: selectedPost?.reason, // Passing reason as request body
+                reason: selectedPost?.reason,
             });
-            alert(response.data.message); // Show success message
-            onApprove(); // Close the dialog
-            onRefresh(); // Trigger data refresh
+            toast({
+                title: "Thành công",
+                description: response.data.message || "Đã duyệt báo cáo.",
+            });
+            setSelectedPost(null);
+            fetchData(activeTab, currentPage);
         } catch (err) {
-            console.error("Lỗi khi duyệt báo cáo:", err);
-            alert("Lỗi khi duyệt báo cáo.");
+            toast({
+                title: "Lỗi",
+                description: "Không thể duyệt báo cáo.",
+            });
         }
     };
 
     const handleRejectReport = async (postId) => {
         try {
             const response = await axiosClient.put(`/reports/admin/reject/${postId}`, {
-                reason: selectedPost?.reason, // Passing reason as request body
+                reason: selectedPost?.reason,
             });
-            alert(response.data.message); // Show success message
-            onReject(); // Close the dialog
-            onRefresh(); // Trigger data refresh
+            toast({
+                title: "Thành công",
+                description: response.data.message || "Đã từ chối báo cáo.",
+            });
+            setSelectedPost(null);
+            fetchData(activeTab, currentPage);
         } catch (err) {
-            console.error("Lỗi khi từ chối báo cáo:", err);
-            alert("Lỗi khi từ chối báo cáo.");
+            toast({
+                title: "Lỗi",
+                description: "Không thể từ chối báo cáo.",
+            });
         }
     };
+
     useEffect(() => {
-        fetchData(activeTab, currentPage); // Lấy dữ liệu khi tab hoặc trang thay đổi
+        fetchData(activeTab, currentPage);
     }, [activeTab, currentPage]);
 
     return (
@@ -124,8 +141,8 @@ const Dashboard = () => {
                         <AiOutlineSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
                         <Input placeholder="Tìm kiếm..." className="pl-10 w-full border-primary/20" />
                     </div>
-                    <Button variant="ghost">
-                        <TfiReload size={25} className=" text-primary " />
+                    <Button variant="ghost" onClick={() => fetchData(activeTab, currentPage)}>
+                        <TfiReload size={25} className="text-primary" />
                     </Button>
                 </div>
             </div>
@@ -149,7 +166,8 @@ const Dashboard = () => {
                                     <TableHead>Tiêu đề</TableHead>
                                     <TableHead>Mô tả</TableHead>
                                     <TableHead>Tác giả</TableHead>
-                                    <TableHead>Lần cập nhật cuối</TableHead></>
+                                    <TableHead>Lần cập nhật cuối</TableHead>
+                                </>
                             )}
                         </TableRow>
                     </TableHeader>
@@ -180,28 +198,24 @@ const Dashboard = () => {
                             ))
                         )}
                     </TableBody>
-
                 </Table>
             </div>
 
-            {/* Hiển thị dialog dựa trên tab */}
+            {/* Dialog */}
             {activeTab === "reported" ? (
                 <PostReportDialog
                     postId={selectedPost?.reportId}
-                    onApprove={handleApproveReport} // Truyền hàm xử lý duyệt báo cáo
-                    onReject={handleRejectReport}   // Truyền hàm xử lý từ chối báo cáo
-                    onCancel={() => setSelectedPost(null)} // Hủy việc chọn bài
+                    onApprove={handleApproveReport}
+                    onReject={handleRejectReport}
+                    onCancel={() => setSelectedPost(null)}
                 />
-
-
             ) : (
                 selectedPost && <PostDetailsDialog
                     postId={selectedPost?.postId}
-                    onApprove={() => handleApprove(selectedPost?.postId)} // Truyền hàm xử lý
-                    onReject={() => handleReject(selectedPost?.postId)}   // Truyền hàm xử lý
+                    onApprove={() => handleApprove(selectedPost?.postId)}
+                    onReject={() => handleReject(selectedPost?.postId)}
                     onCancel={() => setSelectedPost(null)}
                 />
-
             )}
 
             {/* Phân trang */}
