@@ -74,12 +74,30 @@ const Login = () => {
                 setRole(response.data.userType);
                 setId(response.data.userId);
             } else {
-                console.error("Đăng nhập thất bại", response.message);
+                // Trường hợp login không thành công
+                form.setError("phone", {
+                    type: "manual",
+                    message: "Số điện thoại hoặc mật khẩu không đúng.",
+                });
+                form.setError("password", {
+                    type: "manual",
+                    message: " ",
+                }); // chỉ để tránh đỏ ô mà không ghi đè thông báo nếu đã có
             }
         } catch (error) {
+            // Gọi API lỗi (VD: 401 hoặc lỗi khác)
+            form.setError("phone", {
+                type: "manual",
+                message: "Số điện thoại hoặc mật khẩu không đúng.",
+            });
+            form.setError("password", {
+                type: "manual",
+                message: " ",
+            });
             console.error("Lỗi khi đăng nhập:", error);
         }
     };
+
 
 
     const handleRegister = async (data) => {
