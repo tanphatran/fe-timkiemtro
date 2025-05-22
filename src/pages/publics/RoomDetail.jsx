@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Images from "@/components/Rooms/Images.jsx";
 import { GrLocation } from "react-icons/gr";
-import { AiFillMessage, AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { AiFillMessage, AiFillHeart, AiOutlineHeart, AiOutlineCheckCircle } from "react-icons/ai";
 import { MdLocalPhone } from "react-icons/md";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import ReportRoom from "@/components/Rooms/ReportRoom";
@@ -10,6 +10,7 @@ import axiosClient from "@/apis/axiosClient";
 import RoomMap from "@/components/Map/RoomMap";
 import RelatedPosts from "@/components/Rooms/RelatedPosts";
 import useChatStore from "@/zustand/useChatStore";
+import { Badge } from "@/components/ui/badge";
 
 const RoomDetail = () => {
     const { id } = useParams();
@@ -112,6 +113,21 @@ const RoomDetail = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 mt-8">
                     {/* Cột chính */}
                     <div className="lg:col-span-7">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                            {room.licenseBusinessUrl && (
+                                <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
+                                    <AiOutlineCheckCircle className="mr-1 text-green-600" size={16} />
+                                    Giấy phép kinh doanh
+                                </Badge>
+                            )}
+                            {room.licensePcccUrl && (
+                                <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
+                                    <AiOutlineCheckCircle className="mr-1 text-green-600" size={16} />
+                                    Giấy PCCC
+                                </Badge>
+                            )}
+                        </div>
+
                         <h1 className="font-bold text-2xl line-clamp-2">{room.title}</h1>
                         <h1 className="font-bold text-xl">{room.price.toLocaleString()} VND/tháng</h1>
                         <span className="flex items-center gap-3 mt-2">

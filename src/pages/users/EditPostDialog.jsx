@@ -166,17 +166,6 @@ const EditPostDialog = ({ postId, onSaveSuccess }) => {
                         />
                     </div>
 
-
-                    {/* Video */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Video</label>
-                        <Input
-                            value={formData.videoUrl}
-                            onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-                            placeholder="URL video"
-                        />
-                    </div>
-
                     {/* Địa chỉ */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
@@ -275,23 +264,30 @@ const EditPostDialog = ({ postId, onSaveSuccess }) => {
                         />
                     </div>
 
-                    {/* Giấy phép PCCC và kinh doanh */}
+                    {/* Giấy phép PCCC */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Giấy phép PCCC</label>
-                        <Input
-                            value={formData.licensePcccUrl}
-                            onChange={(e) => setFormData({ ...formData, licensePcccUrl: e.target.value })}
-                            placeholder="URL giấy phép PCCC"
-                        />
+                        {formData.licensePcccUrl && (
+                            <img
+                                src={formData.licensePcccUrl}
+                                alt="Giấy phép PCCC"
+                                className="mt-2 rounded border w-full max-w-xs object-contain"
+                            />
+                        )}
                     </div>
+
+                    {/* Giấy phép kinh doanh */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Giấy phép kinh doanh</label>
-                        <Input
-                            value={formData.licenseBusinessUrl}
-                            onChange={(e) => setFormData({ ...formData, licenseBusinessUrl: e.target.value })}
-                            placeholder="URL giấy phép kinh doanh"
-                        />
+                        {formData.licenseBusinessUrl && (
+                            <img
+                                src={formData.licenseBusinessUrl}
+                                alt="Giấy phép kinh doanh"
+                                className="mt-2 rounded border w-full max-w-xs object-contain"
+                            />
+                        )}
                     </div>
+
                 </div>
 
                 <DialogFooter>
