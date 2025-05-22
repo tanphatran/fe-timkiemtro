@@ -113,7 +113,7 @@ const PostDetailsDialog = ({ postId, onApprove, onReject, onCancel }) => {
 
                         {/* Nút hành động */}
                         <div className="mt-3 flex justify-end gap-3">
-                            {postDetails.status !== "APPROVED" && postDetails.status !== "REJECTED" && (
+                            {postDetails.status !== "LOCKED" && postDetails.status !== "APPROVED" && postDetails.status !== "REJECTED" && (
                                 <>
                                     <Button variant="default" onClick={onApprove} className="bg-gradient-to-r from-primary to-secondary text-white">
                                         Duyệt

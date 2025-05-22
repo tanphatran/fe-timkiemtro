@@ -7,11 +7,19 @@ import AddressModal from "@/components/Address/AddressModal";
 import ImageUploader from "@/components/ImageUploader/ImageUploader";
 import axiosClient from "@/apis/axiosClient";
 import { useToast } from "@/hooks/use-toast";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog";
 
 const Post = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { toast } = useToast();
     const [postCount, setPostCount] = useState(null);
+    const [isLimitDialogOpen, setIsLimitDialogOpen] = useState(false);
 
     const [address, setAddress] = useState({
         province: '',
@@ -58,12 +66,16 @@ const Post = () => {
         fetchPostCount();
     }, []);
     const handleSubmit = async () => {
+        if (postCount <= 0) {
+            setIsLimitDialogOpen(true);
+            return;
+        }
+
         if (!formData.title || !formData.description || !formData.furnitureStatus || !formData.price || !formData.area || !formData.depositAmount || !formData.numberOfRooms || !formData.electricityPrice || !formData.waterPrice || formData.images.length === 0) {
             toast({
                 title: "Thông báo",
                 description: "Vui lòng điền đầy đủ thông tin!",
-
-            })
+            });
             return;
         }
 
@@ -86,27 +98,22 @@ const Post = () => {
             licensePcccUrl: formData.licensePcccUrl || "",
             licenseBusinessUrl: formData.licenseBusinessUrl || ""
         };
-        console.log("Payload:", payload); // Log payload để kiểm tra trước khi gửi
 
         try {
             const response = await axiosClient.post(`/post/create`, payload);
-
-            // Không cần `response.ok`, kiểm tra từ `response.data`
             if (response) {
                 toast({
                     description: "Tin đã được gửi để được phê duyệt!",
-                })
+                });
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
-
             }
         } catch (err) {
             console.error("Network Error:", err);
             toast({
                 description: "Có lỗi xảy ra khi kết nối đến server. Vui lòng thử lại.",
-
-            })
+            });
         }
     };
 
@@ -330,6 +337,28 @@ const Post = () => {
                 onAddressChange={handleAddressChange}
                 onSave={handleSaveAddress}
             />
+            {/* Dialog cảnh báo vượt giới hạn */}
+            <Dialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Bạn đã hết lượt đăng bài</DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-muted-foreground">
+                        Vui lòng mua thêm lượt để tiếp tục đăng tin mới.
+                    </p>
+                    <DialogFooter className="mt-4">
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsLimitDialogOpen(false)}
+                        >
+                            Đóng
+                        </Button>
+                        <a href="/users/postpackage">
+                            <Button>Thêm lượt đăng</Button>
+                        </a>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

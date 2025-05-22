@@ -30,6 +30,7 @@ const Dashboard = () => {
             else if (tab === "approved") endpoint = "/post/admin/approved";
             else if (tab === "rejected") endpoint = "/post/admin/rejected";
             else if (tab === "reported") endpoint = "/reports/admin/all";
+            else if (tab === "locked") endpoint = "/post/admin/locked";
 
             const response = await axiosClient.getMany(endpoint, { page: page - 1 });
 
@@ -133,6 +134,7 @@ const Dashboard = () => {
                         <TabsTrigger value="approved">Đã duyệt</TabsTrigger>
                         <TabsTrigger value="rejected">Không được duyệt</TabsTrigger>
                         <TabsTrigger value="reported">Bị báo cáo</TabsTrigger>
+                        <TabsTrigger value="locked">Bị khóa</TabsTrigger>
                     </TabsList>
                 </Tabs>
 
@@ -205,8 +207,8 @@ const Dashboard = () => {
             {activeTab === "reported" ? (
                 <PostReportDialog
                     postId={selectedPost?.reportId}
-                    onApprove={handleApproveReport}
-                    onReject={handleRejectReport}
+                    onApprove={() => handleApproveReport(selectedPost?.reportId)}
+                    onReject={() => handleRejectReport(selectedPost?.reportId)}
                     onCancel={() => setSelectedPost(null)}
                 />
             ) : (

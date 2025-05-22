@@ -6,31 +6,35 @@ import axiosClient from "@/apis/axiosClient"; // Axios client đã cấu hình
 
 const PostReportDialog = ({ postId, onApprove, onReject, onCancel, onRefresh }) => {
     const [reportDetails, setReportDetails] = useState(null);
+    const [reportInfo, setReportInfo] = useState(null); // Thêm state cho thông tin báo cáo
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Fetch report details từ API
     useEffect(() => {
         if (!postId) return;
 
-        const fetchReportDetails = async () => {
+        const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await axiosClient.getOne(`/reports/admin/detail/${postId}`);
-                setReportDetails(response.data);
+                // Lấy thông tin bài viết
+                const postRes = await axiosClient.getOne(`/post/admin/detail/${postId}`);
+                setReportDetails(postRes.data);
+
+                // Lấy thông tin báo cáo
+                const reportRes = await axiosClient.getOne(`/reports/admin/detail/${postId}`);
+                setReportInfo(reportRes.data);
+
                 setError(null);
             } catch (err) {
-                console.error("Error fetching report details:", err);
-                setError("Không thể tải thông tin chi tiết báo cáo.");
+                console.error("Error fetching details:", err);
+                setError("Không thể tải thông tin chi tiết.");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchReportDetails();
+        fetchData();
     }, [postId]);
-
-
 
     if (!postId) return null;
 
@@ -45,15 +49,13 @@ const PostReportDialog = ({ postId, onApprove, onReject, onCancel, onRefresh }) 
                     <p>Đang tải...</p>
                 ) : error ? (
                     <p className="text-red-500">{error}</p>
-                ) : reportDetails ? (
+                ) : reportDetails && reportInfo ? (
                     <>
-                        {/* Báo cáo tiêu đề và mô tả */}
                         <p><strong>{reportDetails.title}</strong></p>
                         <DialogDescription className="text-sm">{reportDetails.description}</DialogDescription>
 
                         <Separator className="my-2" />
 
-                        {/* Nội dung chi tiết */}
                         <div className="space-y-2">
                             <div className="grid grid-cols-2 gap-2">
                                 <p><strong>Giá thuê:</strong> {reportDetails.price} VNĐ/tháng</p>
@@ -69,14 +71,17 @@ const PostReportDialog = ({ postId, onApprove, onReject, onCancel, onRefresh }) 
 
                             <Separator className="my-2" />
 
-                            {/* Lý do và chi tiết báo cáo */}
-                            <p><strong>Lý do báo cáo:</strong> {reportDetails.reason}</p>
-                            <p><strong>Chi tiết báo cáo:</strong> {reportDetails.details}</p>
+                            {/* Thông tin báo cáo */}
+                            <p><strong>Lý do báo cáo:</strong> {reportInfo.reason}</p>
+                            <p><strong>Chi tiết báo cáo:</strong> {reportInfo.details}</p>
+                            <p className="text-sm text-muted-foreground">
+                                <strong>Ngày báo cáo:</strong>{" "}
+                                {new Date(reportInfo.createdAt).toLocaleString("vi-VN")}
+                            </p>
                         </div>
 
                         <Separator className="my-4" />
 
-                        {/* Hình ảnh */}
                         <div>
                             <strong>Hình ảnh:</strong>
                             <div className="mt-2 flex gap-2 overflow-x-auto">
@@ -93,7 +98,6 @@ const PostReportDialog = ({ postId, onApprove, onReject, onCancel, onRefresh }) 
 
                         <Separator className="my-4" />
 
-                        {/* Chứng nhận */}
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <strong>Chứng nhận đủ PCCC:</strong>
@@ -119,7 +123,6 @@ const PostReportDialog = ({ postId, onApprove, onReject, onCancel, onRefresh }) 
 
                         <Separator className="my-4" />
 
-                        {/* Nút hành động */}
                         <div className="mt-3 flex justify-end gap-3">
                             <Button variant="default" onClick={onApprove} className="bg-primary text-white">
                                 Duyệt bài
