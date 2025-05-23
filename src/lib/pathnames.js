@@ -10,6 +10,7 @@ const pathnames = {
         landlord: "/landlord",
         landlord_id: "/landlord/:id",
         resetpassword: "/reset-password",
+        registerVerify: "/register",
     },
     users: {
         layout: "/users",

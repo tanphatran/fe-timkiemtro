@@ -9,19 +9,30 @@ import { Button } from "../ui/button";
 import FormInput from "@/components/forms/FormInput";
 import useMeStore from "@/zustand/useMeStore";
 import axiosClient from "@/apis/axiosClient";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import OtpDialog from "./OtpDialog";
 import ForgotPasswordDialog from "./ForgotPasswordDialog";
-// Định nghĩa schema cho Đăng nhập
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+
+// Schema đăng nhập
 const loginSchema = z.object({
     phone: z.string().min(1, { message: "Bạn chưa nhập số điện thoại." }),
     password: z.string(),
 });
 
-// Định nghĩa schema cho Đăng ký
+// Schema đăng ký
 const registerSchema = z
     .object({
         fullName: z.string().min(1, { message: "Họ và tên không được để trống." }),
+        email: z.string().email({ message: "Email không hợp lệ." }),
         phone: z
             .string()
             .min(10, { message: "Số điện thoại phải có ít nhất 10 chữ số." })
@@ -38,23 +49,24 @@ const registerSchema = z
         }
     });
 
-
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [otpOpen, setOtpOpen] = useState(false);
     const [forgotOpen, setForgotOpen] = useState(false);
+    const [successDialogOpen, setSuccessDialogOpen] = useState(false);
     const [registerData, setRegisterData] = useState(null);
+
     const form = useForm({
         resolver: zodResolver(isLogin ? loginSchema : registerSchema),
         defaultValues: isLogin
             ? { phone: "", password: "" }
-            : { fullName: "", phone: "", password: "", confirmPassword: "" },
+            : { fullName: "", email: "", phone: "", password: "", confirmPassword: "" },
     });
+
     const { setRefreshToken, setToken, setMe, role, setRole, setId } = useMeStore();
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log("Role updated:", role);
         if (role === "ADMIN") {
             navigate("/admin/dashboard");
         }
@@ -74,7 +86,6 @@ const Login = () => {
                 setRole(response.data.userType);
                 setId(response.data.userId);
             } else {
-                // Trường hợp login không thành công
                 form.setError("phone", {
                     type: "manual",
                     message: "Số điện thoại hoặc mật khẩu không đúng.",
@@ -82,10 +93,9 @@ const Login = () => {
                 form.setError("password", {
                     type: "manual",
                     message: " ",
-                }); // chỉ để tránh đỏ ô mà không ghi đè thông báo nếu đã có
+                });
             }
         } catch (error) {
-            // Gọi API lỗi (VD: 401 hoặc lỗi khác)
             form.setError("phone", {
                 type: "manual",
                 message: "Số điện thoại hoặc mật khẩu không đúng.",
@@ -98,96 +108,78 @@ const Login = () => {
         }
     };
 
-
-
     const handleRegister = async (data) => {
-        console.log("Dữ liệu gửi đi:", data);
-
         try {
             const response = await axiosClient.post("/auth/register", {
                 fullName: data.fullName,
+                email: data.email,
                 phoneNumber: data.phone,
                 password: data.password,
             });
 
-            if (response.status === "success") {
-                setRegisterData(data);
-                setOtpOpen(true);
+            if (response?.status === 200 || response?.status === "success") {
+                setSuccessDialogOpen(true);
             } else {
-                console.error("Đăng ký thất bại:", response.message);
+                form.setError("phone", {
+                    type: "manual",
+                    message: response?.data?.message || "Đăng ký thất bại",
+                });
             }
         } catch (error) {
+            form.setError("phone", {
+                type: "manual",
+                message: error?.response?.data?.message || "Lỗi khi đăng ký",
+            });
             console.error("Lỗi đăng ký:", error);
         }
     };
 
-    const handleOtpSubmit = async (otp) => {
-        try {
-            const response = await axiosClient.post("/auth/verify-otp", {
-                otp,
-                phoneNumber: registerData.phone,
-                fullName: registerData.fullName,
-                password: registerData.password,
-            });
-
-            setOtpOpen(false);
-            setIsLogin(true);
-        } catch (error) {
-            console.error("Lỗi xác minh OTP:", error);
-        }
-    };
     return (
         <div className="grid grid-cols-10">
-            {/* Banner phần trái */}
+            {/* Banner trái */}
             <div className="col-span-4 place-content-center">
                 <img src={BannerLogin} alt="Login" className="w-full object-contain" />
             </div>
 
-            {/* Form Đăng nhập / Đăng ký */}
+            {/* Form */}
             <div className="col-span-6 p-8">
                 <p className="font-bold text-base">Xin chào bạn</p>
                 <p className="font-bold text-xl">{isLogin ? "Đăng nhập để tiếp tục" : "Đăng ký tài khoản"}</p>
 
-                {/* Form */}
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(isLogin ? handleSubmit : handleRegister)} className="my-4 space-y-4">
+                    <form
+                        onSubmit={form.handleSubmit(isLogin ? handleSubmit : handleRegister)}
+                        className="my-4 space-y-4"
+                    >
                         {!isLogin && (
                             <>
-                                {/* Form Đăng ký: Họ và tên */}
                                 <FormInput form={form} name="fullName" label="Họ và tên" placeholder="VD: Nguyễn Văn A" />
-
+                                <FormInput form={form} name="email" label="Email" placeholder="VD: example@gmail.com" />
                             </>
                         )}
 
-                        {/* Form chung cho cả Đăng nhập và Đăng ký: Số điện thoại */}
                         <FormInput form={form} name="phone" label="Số điện thoại" placeholder="VD: 0123456789" />
-
-                        {/* Form chung cho cả Đăng nhập và Đăng ký: Mật khẩu */}
-                        <FormInput form={form} name="password" label="Mật khẩu" placeholder="Mật khẩu tối thiểu 6 kí tự" type="password" />
+                        <FormInput form={form} name="password" label="Mật khẩu" placeholder="Tối thiểu 6 ký tự" type="password" />
 
                         {!isLogin && (
-                            <>
-                                {/* Form Đăng ký: Xác nhận mật khẩu */}
-                                <FormInput
-                                    form={form}
-                                    name="confirmPassword"
-                                    label="Xác nhận mật khẩu"
-                                    placeholder="Nhập lại mật khẩu"
-                                    type="password"
-                                />
-                            </>
+                            <FormInput
+                                form={form}
+                                name="confirmPassword"
+                                label="Xác nhận mật khẩu"
+                                placeholder="Nhập lại mật khẩu"
+                                type="password"
+                            />
                         )}
 
-                        {/* Nút Submit */}
                         <Button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-primary to-secondary hover:bg-bg-gradient-to-r hover:from-secondary hover:bg-primary transition-all duration-600 text-white px-3 py-1"
+                            className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white px-3 py-1 transition-all duration-300"
                         >
                             {isLogin ? "Đăng nhập" : "Đăng ký"}
                         </Button>
                     </form>
                 </Form>
-                {/* Quên mật khẩu */}
+
                 {isLogin && (
                     <p className="text-right text-sm mt-2">
                         <span
@@ -198,19 +190,18 @@ const Login = () => {
                         </span>
                     </p>
                 )}
-                <OtpDialog open={otpOpen} onClose={() => setOtpOpen(false)} onSubmit={handleOtpSubmit} />
+
+                <OtpDialog open={otpOpen} onClose={() => setOtpOpen(false)} onSubmit={() => { }} />
 
                 <div className="w-full h-6 flex items-center relative my-4">
                     <div className="w-full h-[1px] bg-stone-200"></div>
                     <p className="absolute inset-0 w-fit mx-auto bg-white text-sm px-2">Hoặc</p>
                 </div>
 
-                {/* Đăng nhập bằng Google */}
-                <Button className="w-full flex items-center justify-center border border-stone-200 bg-white px-3 py-2 text-sm text-gray-700 hover:border-primary hover:bg-white focus:outline-none active:border-primary transition-all duration-300 mt-4">
+                <Button className="w-full flex items-center justify-center border border-stone-200 bg-white px-3 py-2 text-sm text-gray-700 hover:border-primary hover:bg-white transition-all duration-300 mt-4">
                     <FcGoogle className="mr-2 text-lg" /> Đăng nhập bằng Google
                 </Button>
 
-                {/* Chuyển giữa Đăng nhập và Đăng ký */}
                 <p className="text-center text-sm mt-4">
                     {isLogin ? (
                         <>
@@ -236,11 +227,31 @@ const Login = () => {
                         </>
                     )}
                 </p>
-
-
             </div>
+
             <ForgotPasswordDialog open={forgotOpen} onClose={() => setForgotOpen(false)} />
 
+            {/* ✅ Dialog thông báo đăng ký thành công */}
+            <AlertDialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Đăng ký thành công</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Hệ thống đã gửi một liên kết xác nhận đến email của bạn. Vui lòng kiểm tra hộp thư đến (hoặc thư rác).
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogAction
+                            onClick={() => {
+                                setSuccessDialogOpen(false);
+                                setIsLogin(true);
+                            }}
+                        >
+                            Đăng nhập ngay
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

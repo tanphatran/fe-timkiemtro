@@ -29,6 +29,7 @@ import PaymentResult from './pages/users/PaymentResult';
 import TransactionHistory from './pages/users/TransactionHistory';
 import ChatLayout from './pages/users/ChatApp/ChatLayout ';
 import ChatRoom from './pages/users/ChatApp/ChatRoom ';
+import VerifyEmail from './pages/publics/VerifyEmail';
 
 const routes = [
     {
@@ -46,6 +47,7 @@ const routes = [
                     { path: pathnames.publics.landlord, element: <LandlordList /> },
                     { path: pathnames.publics.landlord_id, element: <LandlordProfile /> },
                     { path: pathnames.publics.resetpassword, element: <ResetPassword /> },
+                    { path: pathnames.publics.registerVerify, element: <VerifyEmail /> },
 
                     {
                         path: pathnames.users.chatlayout,
