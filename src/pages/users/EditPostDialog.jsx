@@ -13,9 +13,11 @@ import { Button } from "@/components/ui/button";
 import AddressModal from "@/components/Address/AddressModal";
 import ImageUploader from "@/components/ImageUploader/ImageUploader";
 import axiosClient from "@/apis/axiosClient";
+import { useToast } from "@/hooks/use-toast";
 
 const EditPostDialog = ({ postId, onSaveSuccess }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { toast } = useToast();
     const [address, setAddress] = useState({
         province: "",
         district: "",
@@ -102,13 +104,21 @@ const EditPostDialog = ({ postId, onSaveSuccess }) => {
 
         try {
             const { data } = await axiosClient.put(`/post/update/${postId}`, payload);
-            alert(data.message || "Cập nhật bài đăng thành công!");
+            toast({
+                title: "Cập nhật thành công",
+                description: data.message || "Bài đăng đã được cập nhật.",
+            });
             if (onSaveSuccess) onSaveSuccess();
         } catch (error) {
             console.error("Update failed:", error);
-            alert("Cập nhật bài đăng thất bại.");
+            toast({
+                title: "Cập nhật thất bại",
+                description: "Đã xảy ra lỗi khi cập nhật bài đăng. Vui lòng thử lại.",
+                variant: "destructive",
+            });
         }
     };
+
 
     return (
         <Dialog open={!!postId} onOpenChange={(open) => !open && onSaveSuccess()}>

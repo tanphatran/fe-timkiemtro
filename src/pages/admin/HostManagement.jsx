@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PaginationAdmin from "@/components/Admin/PaginationAdmin";
 import axiosClient from "@/apis/axiosClient"; // Import axiosClient
+import { useToast } from "@/hooks/use-toast";
 
 const HostManagement = () => {
     const [activeTab, setActiveTab] = useState("pending");
@@ -28,6 +29,7 @@ const HostManagement = () => {
     });
     const [loading, setLoading] = useState(false);
     const [totalPages, setTotalPages] = useState(1);
+    const { toast } = useToast();
 
     // Hàm gọi API lấy dữ liệu theo tab
     const fetchData = async (tab) => {
@@ -76,24 +78,40 @@ const HostManagement = () => {
     const handleApprove = async (userId) => {
         try {
             await axiosClient.put(`/user/admin/approve-landlord/${userId}`);
-            //     alert("Bài viết đã được duyệt.");
+            toast({
+                title: "Duyệt thành công",
+                description: "Hồ sơ đã được duyệt.",
+                variant: "default",
+            });
             handleCloseDialog();
             fetchData(activeTab, currentPage);
         } catch (err) {
             console.error("Lỗi khi duyệt bài viết:", err);
-            //       alert("Lỗi khi duyệt bài viết.");
+            toast({
+                title: "Duyệt thất bại",
+                description: "Đã xảy ra lỗi khi duyệt hồ sơ.",
+                variant: "destructive",
+            });
         }
     };
 
     const handleReject = async (userId) => {
         try {
             await axiosClient.put(`/user/admin/reject-landlord/${userId}`);
-            alert("Bài viết đã bị từ chối.");
+            toast({
+                title: "Từ chối thành công",
+                description: "Hồ sơ đã bị từ chối.",
+                variant: "default",
+            });
             handleCloseDialog();
             fetchData(activeTab, currentPage);
         } catch (err) {
             console.error("Lỗi khi từ chối bài viết:", err);
-            alert("Lỗi khi từ chối bài viết.");
+            toast({
+                title: "Từ chối thất bại",
+                description: "Đã xảy ra lỗi khi từ chối hồ sơ.",
+                variant: "destructive",
+            });
         }
     };
 
