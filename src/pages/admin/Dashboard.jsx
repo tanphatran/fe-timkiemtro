@@ -206,7 +206,8 @@ const Dashboard = () => {
             {/* Dialog */}
             {activeTab === "reported" ? (
                 <PostReportDialog
-                    postId={selectedPost?.reportId}
+                    postId={selectedPost?.postId}
+                    reportId={selectedPost?.reportId}
                     onApprove={() => handleApproveReport(selectedPost?.reportId)}
                     onReject={() => handleRejectReport(selectedPost?.reportId)}
                     onCancel={() => setSelectedPost(null)}

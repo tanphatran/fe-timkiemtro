@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import axiosClient from "@/apis/axiosClient"; // Axios client đã cấu hình
 
-const PostReportDialog = ({ postId, onApprove, onReject, onCancel, onRefresh }) => {
+const PostReportDialog = ({ postId, reportId, onApprove, onReject, onCancel, onRefresh }) => {
     const [reportDetails, setReportDetails] = useState(null);
     const [reportInfo, setReportInfo] = useState(null); // Thêm state cho thông tin báo cáo
     const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ const PostReportDialog = ({ postId, onApprove, onReject, onCancel, onRefresh }) 
                 setReportDetails(postRes.data);
 
                 // Lấy thông tin báo cáo
-                const reportRes = await axiosClient.getOne(`/reports/admin/detail/${postId}`);
+                const reportRes = await axiosClient.getOne(`/reports/admin/detail/${reportId}`);
                 setReportInfo(reportRes.data);
 
                 setError(null);
