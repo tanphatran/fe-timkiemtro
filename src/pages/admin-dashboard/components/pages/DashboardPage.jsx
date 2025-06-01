@@ -21,11 +21,11 @@ const DashboardPage = () => {
                             <ToursData />
                         </Animate>
                     </Grid>
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                         <Animate delay={1.5}>
-                            {/* <UserBookingCard /> */}
+                            <UserBookingCard />
                         </Animate>
-                    </Grid>
+                    </Grid> */}
                 </Grid>
             </Grid>
             <Grid item xs={12} lg={8}>
@@ -35,11 +35,11 @@ const DashboardPage = () => {
                             <TotalIncome />
                         </Animate>
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    {/* <Grid item xs={12} md={6}>
                         <Animate type="fade" delay={2} sx={{ height: "100%" }}>
                             <BookedData />
                         </Animate>
-                    </Grid>
+                    </Grid> */}
                     <Grid item xs={12}>
                         <Animate delay={2.5}>
                             <StatisticData />

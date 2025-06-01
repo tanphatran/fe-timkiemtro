@@ -11,7 +11,8 @@ const useChatStore = create((set) => ({
                 id,
                 name,
                 avatar,
-                info
+                info,
+                isOnline
             }
         }),
 }));

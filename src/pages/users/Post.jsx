@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 
 const Post = () => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { toast } = useToast();
     const [postCount, setPostCount] = useState(null);
@@ -66,6 +67,8 @@ const Post = () => {
         fetchPostCount();
     }, []);
     const handleSubmit = async () => {
+        if (isSubmitting) return; // Ngăn bấm nhiều lần
+
         if (postCount <= 0) {
             setIsLimitDialogOpen(true);
             return;
@@ -78,6 +81,8 @@ const Post = () => {
             });
             return;
         }
+
+        setIsSubmitting(true); // Khóa nút
 
         const payload = {
             postImages: formData.images,
@@ -114,8 +119,12 @@ const Post = () => {
             toast({
                 description: "Có lỗi xảy ra khi kết nối đến server. Vui lòng thử lại.",
             });
+        } finally {
+            // Đợi 2 giây rồi mở khóa lại
+            setTimeout(() => setIsSubmitting(false), 2000);
         }
     };
+
 
 
     return (
@@ -244,6 +253,7 @@ const Post = () => {
                             </label>
                             <Input placeholder="Nhập diện tích"
                                 type="number"
+                                min={0}
                                 value={formData.area}
                                 onChange={(e) => setFormData({ ...formData, area: e.target.value })}
                             />
@@ -254,6 +264,7 @@ const Post = () => {
                             </label>
                             <Input placeholder="Nhập giá thuê"
                                 type="number"
+                                min={0}
                                 value={formData.price}
                                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                             />
@@ -264,6 +275,7 @@ const Post = () => {
                             </label>
                             <Input placeholder="Nhập số tiền cọc"
                                 type="number"
+                                min={0}
                                 value={formData.depositAmount}
                                 onChange={(e) => setFormData({ ...formData, depositAmount: e.target.value })}
                             />
@@ -276,6 +288,7 @@ const Post = () => {
                             </label>
                             <Input placeholder="Nhập số lượng phòng trọ"
                                 type="number"
+                                min={0}
                                 value={formData.numberOfRooms}
                                 onChange={(e) => setFormData({ ...formData, numberOfRooms: e.target.value })}
                             />
@@ -286,6 +299,7 @@ const Post = () => {
                             </label>
                             <Input placeholder="Nhập giá điện"
                                 type="number"
+                                min={0}
                                 value={formData.electricityPrice}
                                 onChange={(e) => setFormData({ ...formData, electricityPrice: e.target.value })}
                             />
@@ -296,6 +310,7 @@ const Post = () => {
                             </label>
                             <Input placeholder="Nhập giá nước"
                                 type="number"
+                                min={0}
                                 value={formData.waterPrice}
                                 onChange={(e) => setFormData({ ...formData, waterPrice: e.target.value })}
                             />
@@ -324,7 +339,9 @@ const Post = () => {
                     {/* Buttons */}
                     <div className="flex justify-between">
                         <Button variant="outline">Xem trước</Button>
-                        <Button onClick={handleSubmit}>Đăng tin</Button>
+                        <Button onClick={handleSubmit} disabled={isSubmitting}>
+                            {isSubmitting ? "Đang đăng..." : "Đăng tin"}
+                        </Button>
                     </div>
                 </div>
             </div>

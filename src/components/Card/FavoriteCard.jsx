@@ -1,5 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import {
+    AlertDialog,
+    AlertDialogTrigger,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogCancel,
+    AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+
 import { IoFlashOutline } from "react-icons/io5"; // Icon điện
 import { BsDroplet } from "react-icons/bs"; // Icon nước
 import { MdSquareFoot } from "react-icons/md"; // Icon diện tích
@@ -8,20 +25,19 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import axiosClient from "@/apis/axiosClient";
 
 const FavoriteCard = ({ post, refreshFavoritePosts }) => {
-    const [liked, setLiked] = useState(true); // Trạng thái thích
-    const handleFavorite = async () => {
+    const [liked, setLiked] = useState(true);
+    const featuredImage =
+        post?.postImages?.[0] || "https://via.placeholder.com/150";
+
+    const handleRemoveFavorite = async () => {
         try {
-            // Gọi API xóa bài viết yêu thích
             await axiosClient.delete(`/favorite-posts/remove/${post.postUuid}`);
             refreshFavoritePosts();
+            setLiked(false);
         } catch (error) {
             console.error("Error updating favorite status:", error);
-            // Nếu API thất bại, rollback trạng thái thích
-            setLiked(!liked);
         }
     };
-    // Lấy hình ảnh đại diện từ mảng hình ảnh
-    const featuredImage = post?.postImages?.[0] || "https://via.placeholder.com/150";
 
     return (
         <Card className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 mb-4 h-auto shadow-md rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 transform hover:scale-[1.02] ease-in-out">
@@ -32,6 +48,7 @@ const FavoriteCard = ({ post, refreshFavoritePosts }) => {
                     className="w-32 h-32 object-cover rounded-t-lg"
                 />
             </CardHeader>
+
             <CardContent className="p-2 col-span-8 justify-center">
                 <CardTitle className="text-base font-semibold text-gray-900">
                     {post?.title || "Không có tiêu đề"}
@@ -40,7 +57,6 @@ const FavoriteCard = ({ post, refreshFavoritePosts }) => {
                     Giá tiền: {post?.price?.toLocaleString()} đ
                 </p>
                 <p className="text-sm text-gray-600 mt-2 flex flex-wrap items-center gap-2 ">
-                    {/* Giá điện */}
                     <span className="flex gap-2 items-center text-gray-500">
                         <IoFlashOutline size={15} />
                         <span className="font-medium text-sm">
@@ -48,7 +64,6 @@ const FavoriteCard = ({ post, refreshFavoritePosts }) => {
                         </span>
                     </span>
 
-                    {/* Giá nước */}
                     <span className="flex gap-2 items-center text-gray-500">
                         <BsDroplet size={15} />
                         <span className="font-medium text-sm">
@@ -56,7 +71,6 @@ const FavoriteCard = ({ post, refreshFavoritePosts }) => {
                         </span>
                     </span>
 
-                    {/* Diện tích */}
                     <span className="flex gap-2 items-center text-gray-500">
                         <MdSquareFoot size={18} />
                         <span className="font-medium text-sm">
@@ -74,24 +88,47 @@ const FavoriteCard = ({ post, refreshFavoritePosts }) => {
                     </span>
                 </p>
             </CardContent>
+
             <div className="p-4 flex justify-center items-center col-span-2">
-                <button
-                    onClick={handleFavorite}
-                    className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${liked ? "bg-red-100 hover:bg-red-200" : "bg-gray-100 hover:bg-gray-200"
-                        }`}
-                >
-                    {liked ? (
-                        <AiFillHeart
-                            size={28}
-                            className="text-red-500 hover:scale-110 transition-transform duration-300"
-                        />
-                    ) : (
-                        <AiOutlineHeart
-                            size={28}
-                            className="text-gray-500 hover:scale-110 transition-transform duration-300"
-                        />
-                    )}
-                </button>
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <button
+                            className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${liked
+                                    ? "bg-red-100 hover:bg-red-200"
+                                    : "bg-gray-100 hover:bg-gray-200"
+                                }`}
+                        >
+                            {liked ? (
+                                <AiFillHeart
+                                    size={28}
+                                    className="text-red-500 hover:scale-110 transition-transform duration-300"
+                                />
+                            ) : (
+                                <AiOutlineHeart
+                                    size={28}
+                                    className="text-gray-500 hover:scale-110 transition-transform duration-300"
+                                />
+                            )}
+                        </button>
+                    </AlertDialogTrigger>
+
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Bạn có chắc muốn bỏ yêu thích bài viết này?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Hành động này sẽ xóa bài viết khỏi danh sách yêu thích của bạn.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Hủy</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleRemoveFavorite}>
+                                Đồng ý
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </div>
         </Card>
     );
