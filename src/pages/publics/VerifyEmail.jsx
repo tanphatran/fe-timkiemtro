@@ -16,7 +16,7 @@ export default function VerifyEmail() {
                     params: { secretKey },
                 });
 
-                if (response.status === 200) {
+                if (response.status === 200 || response.status === "success") {
                     setStatus("success");
                     setTimeout(() => navigate("/"), 2000);
                 } else {

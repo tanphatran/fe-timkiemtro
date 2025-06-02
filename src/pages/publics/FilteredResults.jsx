@@ -99,8 +99,9 @@ const FilteredResults = () => {
                 setNoResults(false);
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu phòng:", error);
+                setNoResults(true);
 
-                if (error.response?.status === 400) {
+                if (error.response?.status === 400 || error.response?.status === "error") {
                     console.warn("Không tìm thấy phòng phù hợp. (Lỗi 400)");
                     setNoResults(true);
                 } else {

@@ -8,6 +8,7 @@ import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import HomeWorkOutlinedIcon from '@mui/icons-material/HomeWorkOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 
 import Logo from "@/assets/logo.png";
 import Animate from "./Animate";
@@ -26,20 +27,24 @@ const menuPathMap = {
 
     user: "/admin/usermana",
     landlord: "/admin/hostmanagenment",
-    staff: "/admin/employeemana"
+    staff: "/admin/employeemana",
+
+    transaction: "/admin/transaction-history"
 };
 
 // Định nghĩa các menu
 const menus = [
-    { title: "Inbox", icon: <MailOutlinedIcon />, state: "inbox" },
     { title: "Tổng quan", icon: <DashboardCustomizeOutlinedIcon />, state: "overview" },
     { title: "Thông báo", icon: <NotificationsOutlinedIcon />, state: "notification" }
+];
+
+const transactionMenus = [
+    { title: "Lịch sử giao dịch", icon: <PaymentsOutlinedIcon />, state: "transaction" }
 ];
 
 const serviceMenus = [
     { title: "Quản lý bài đăng", icon: <ArticleOutlinedIcon />, state: "post" },
 ];
-
 const investmentMenus = [
     { title: "Người dùng", icon: <PersonOutlineOutlinedIcon />, state: "user" },
     { title: "Chủ trọ", icon: <HomeWorkOutlinedIcon />, state: "landlord" },
@@ -151,6 +156,20 @@ const Sidebar = ({ sidebarWidth }) => {
                         ))}
                     </List>
 
+                    <List>
+                        <ListItem>
+                            <Typography fontWeight={600} mt={1} color={colors.grey[600]}>
+                                Giao dịch
+                            </Typography>
+                        </ListItem>
+                        {transactionMenus.map((item, index) => (
+                            <MenuItem
+                                key={index}
+                                item={item}
+                                isActive={item.state === activeState}
+                            />
+                        ))}
+                    </List>
                     {/* menu group 3 */}
                     <List>
                         <ListItem>

@@ -30,6 +30,7 @@ import TransactionHistory from './pages/users/TransactionHistory';
 import ChatLayout from './pages/users/ChatApp/ChatLayout ';
 import ChatRoom from './pages/users/ChatApp/ChatRoom ';
 import VerifyEmail from './pages/publics/VerifyEmail';
+import TransactionHistoryAdmin from './pages/admin/TransactionHistoryAdmin';
 
 const routes = [
     {
@@ -132,6 +133,10 @@ const routes = [
                     {
                         path: pathnames.admin.usermana,
                         element: <UserManagement />,
+                    },
+                    {
+                        path: pathnames.admin.transactionhistory,
+                        element: <TransactionHistoryAdmin />,
                     },
                 ]
             },

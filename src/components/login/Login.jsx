@@ -55,6 +55,7 @@ const Login = () => {
     const [forgotOpen, setForgotOpen] = useState(false);
     const [successDialogOpen, setSuccessDialogOpen] = useState(false);
     const [registerData, setRegisterData] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm({
         resolver: zodResolver(isLogin ? loginSchema : registerSchema),
@@ -109,6 +110,7 @@ const Login = () => {
     };
 
     const handleRegister = async (data) => {
+        setIsSubmitting(true); // Bắt đầu loading
         try {
             const response = await axiosClient.post("/auth/register", {
                 fullName: data.fullName,
@@ -131,8 +133,11 @@ const Login = () => {
                 message: error?.response?.data?.message || "Lỗi khi đăng ký",
             });
             console.error("Lỗi đăng ký:", error);
+        } finally {
+            setIsSubmitting(false); // Kết thúc loading
         }
     };
+
 
     return (
         <div className="grid grid-cols-10">
@@ -173,10 +178,12 @@ const Login = () => {
 
                         <Button
                             type="submit"
+                            disabled={isSubmitting}
                             className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white px-3 py-1 transition-all duration-300"
                         >
-                            {isLogin ? "Đăng nhập" : "Đăng ký"}
+                            {isSubmitting ? "Đang xử lý..." : isLogin ? "Đăng nhập" : "Đăng ký"}
                         </Button>
+
                     </form>
                 </Form>
 

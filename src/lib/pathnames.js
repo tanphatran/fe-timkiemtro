@@ -34,6 +34,7 @@ const pathnames = {
         layout: "/admin",
         dashboard: "dashboard",
         post: "post",
+        transactionhistory: "transaction-history",
         hostmanagenment: "hostmanagenment",
         employeemana: "employeemana",
         usermana: "usermana",

@@ -26,6 +26,7 @@ const Navbar = () => {
     const { role } = useMeStore();
     const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false); // Thêm trạng thái cho dialog
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const handleLogout = async () => {
         try {
@@ -82,7 +83,7 @@ const Navbar = () => {
                     {isLoggedIn ? (
                         <div className="flex items-center gap-2">
                             <NotificationBell />
-                            <DropdownMenu>
+                            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                                 <DropdownMenuTrigger asChild>
                                     <button className="hover:underline">
                                         Chào, {me || "Người dùng"}!
@@ -97,7 +98,15 @@ const Navbar = () => {
                                         <BsChatDots className="mr-2 text-gray-500" /> {/* Icon Thông tin cá nhân */}
                                         Tin Nhắn
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+                                    <DropdownMenuItem
+                                        onSelect={(e) => {
+                                            e.preventDefault(); // Ngăn auto-close
+                                            setDropdownOpen(false); // Đóng dropdown
+                                            setTimeout(() => {
+                                                setIsDialogOpen(true); // Mở dialog
+                                            }, 50);
+                                        }}
+                                    >
                                         <SiHomeadvisor className="mr-2 text-gray-500" />
                                         Yêu cầu tìm phòng
                                     </DropdownMenuItem>
