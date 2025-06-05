@@ -4,13 +4,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ImageUploader from "@/components/ImageUploader/ImageUploader";
+import { useToast } from "@/hooks/use-toast";
 
 const VerificationSteps = () => {
+    const { toast } = useToast();
     const [currentStep, setCurrentStep] = useState(1); // Mặc định là bước 1
     const [verificationStatus, setVerificationStatus] = useState(null); // Trạng thái xác minh
     const [cccdImages, setCccdImages] = useState({
-        frontCccdUrl: "",
-        backCccdUrl: "",
+        frontCccd: null,
+        backCccd: null,
     });
     const [loading, setLoading] = useState(false);
 
@@ -43,33 +45,53 @@ const VerificationSteps = () => {
     }, []);
 
     // Hàm xử lý khi ảnh được tải lên thành công
-    const handleImageUpload = (type, uploadedImageUrl) => {
+    const handleImageUpload = (type, file) => {
         setCccdImages((prevImages) => ({
             ...prevImages,
-            [type]: uploadedImageUrl,
+            [type]: file,
         }));
     };
+
+
 
     // Hàm gửi dữ liệu đăng ký
     const handleVerify = async () => {
         if (currentStep === 2) {
-            if (!cccdImages.frontCccdUrl || !cccdImages.backCccdUrl) {
-                alert("Vui lòng tải đủ mặt trước và mặt sau của CCCD.");
+            if (!cccdImages.frontCccd || !cccdImages.backCccd) {
+                toast({
+                    title: "Thiếu ảnh CCCD",
+                    description: "Vui lòng tải đủ mặt trước và mặt sau của CCCD.",
+                    variant: "destructive",
+                });
                 return;
             }
 
             setLoading(true);
             try {
-                const payload = {
-                    frontCccdUrl: cccdImages.frontCccdUrl[0],
-                    backCccdUrl: cccdImages.backCccdUrl[0],
-                };
-                // Gọi API để gửi ảnh CCCD
-                await axiosClient.post(`/user/register-landlord`, payload);
+                const formData = new FormData();
+                formData.append("frontCccd", cccdImages.frontCccd);
+                formData.append("backCccd", cccdImages.backCccd);
+
+
+                await axiosClient.postMultipart(`/user/register-landlord-upload-cccd`, formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+
+
                 setCurrentStep(3);
+
+                toast({
+                    title: "Gửi thành công",
+                    description: "Thông tin xác thực đã được gửi, vui lòng đợi duyệt.",
+                    variant: "default",
+                });
             } catch (error) {
                 console.error("Lỗi khi gửi API:", error);
-                alert("Đã xảy ra lỗi khi gửi thông tin xác thực. Vui lòng thử lại!");
+                toast({
+                    title: "Lỗi gửi thông tin",
+                    description: "Đã xảy ra lỗi khi gửi thông tin xác thực. Vui lòng thử lại!",
+                    variant: "destructive",
+                });
             } finally {
                 setLoading(false);
             }
@@ -79,6 +101,7 @@ const VerificationSteps = () => {
             console.log("Hoàn thành quy trình!");
         }
     };
+
 
     return (
         <Card className="max-w-2xl mx-auto p-6">
@@ -120,23 +143,19 @@ const VerificationSteps = () => {
                             Tải ảnh CCCD
                         </label>
                         <div className="grid lg:grid-cols-2 gap-4">
-                            <div className="border-2 border-dashed border-primary/40 rounded-md p-2 flex justify-center items-center">
-                                <ImageUploader
-                                    label="Mặt trước CCCD"
-                                    maxFiles={1}
-                                    onUploadSuccess={(uploadedImageUrl) =>
-                                        handleImageUpload("frontCccdUrl", uploadedImageUrl)
-                                    }
-                                />
-                            </div>
+                            <ImageUploader
+                                label="Mặt trước CCCD"
+                                maxFiles={1}
+                                onImagesChange={(files) => handleImageUpload("frontCccd", files[0].file)}
+                            />
                             <div className="border-2 border-dashed border-primary/40 rounded-md p-2 flex justify-center items-center">
                                 <ImageUploader
                                     label="Mặt sau CCCD"
                                     maxFiles={1}
-                                    onUploadSuccess={(uploadedImageUrl) =>
-                                        handleImageUpload("backCccdUrl", uploadedImageUrl)
-                                    }
+                                    onImagesChange={(files) => handleImageUpload("backCccd", files[0].file)}
+
                                 />
+
                             </div>
                         </div>
                     </div>
@@ -144,18 +163,19 @@ const VerificationSteps = () => {
 
                 {currentStep === 3 && (
                     <div className="text-center">
-                        {verificationStatus === "PENDING_APPROVAL" && (
+                        {verificationStatus === "APPROVED" ? (
+                            <p className="text-base font-medium">
+                                Bạn đã được phê duyệt, bạn có thể đăng bài ngay bây giờ.
+                            </p>
+                        ) : (
                             <p className="text-base font-medium">
                                 Cảm ơn bạn đã gửi hồ sơ, chúng tôi sẽ duyệt hồ sơ của bạn sớm nhất!
                             </p>
                         )}
-                        {verificationStatus === "APPROVED" && (
-                            <p className="text-base font-medium">
-                                Bạn đã được phê duyệt, bạn có thể đăng bài ngay bây giờ.
-                            </p>
-                        )}
                     </div>
                 )}
+
+
 
                 {/* Nút Xác Thực */}
                 <div className="mt-6 text-center">

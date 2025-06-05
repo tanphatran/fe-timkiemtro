@@ -67,65 +67,89 @@ const Post = () => {
         fetchPostCount();
     }, []);
     const handleSubmit = async () => {
-        if (isSubmitting) return; // Ngăn bấm nhiều lần
+        if (isSubmitting) return;
 
         if (postCount <= 0) {
             setIsLimitDialogOpen(true);
             return;
         }
 
-        if (!formData.title || !formData.description || !formData.furnitureStatus || !formData.price || !formData.area || !formData.depositAmount || !formData.numberOfRooms || !formData.electricityPrice || !formData.waterPrice || formData.images.length === 0) {
-            toast({
-                title: "Thông báo",
-                description: "Vui lòng điền đầy đủ thông tin!",
-            });
+        if (!formData.title || !formData.description || !formData.furnitureStatus || !formData.price || !formData.area || !formData.depositAmount || !formData.numberOfRooms || !formData.electricityPrice || !formData.waterPrice) {
+            toast({ title: "Thông báo", description: "Vui lòng điền đầy đủ thông tin!" });
             return;
         }
 
-        setIsSubmitting(true); // Khóa nút
+        // Kiểm tra bắt buộc phải có ít nhất 5 ảnh nhà trọ
+        if (!formData.images || formData.images.length < 5) {
+            toast({ title: "Thông báo", description: "Vui lòng tải lên ít nhất 5 ảnh nhà trọ!" });
+            return;
+        }
 
-        const payload = {
-            postImages: formData.images,
-            title: formData.title || "Untitled",
-            description: formData.description || "No description",
-            depositAmount: parseFloat(formData.depositAmount) || 0,
-            price: parseFloat(formData.price) || 0,
-            area: parseFloat(formData.area) || 0,
-            furnitureStatus: formData.furnitureStatus || "UNKNOWN",
-            numberOfRooms: parseInt(formData.numberOfRooms, 10) || 0,
-            electricityPrice: parseFloat(formData.electricityPrice) || 0,
-            waterPrice: parseFloat(formData.waterPrice) || 0,
-            city: address.province || "UNKNOWN",
-            district: address.district || "UNKNOWN",
-            ward: address.commune || "UNKNOWN",
-            street: address.street || "",
-            houseNumber: address.houseNumber || "",
-            licensePcccUrl: formData.licensePcccUrl || "",
-            licenseBusinessUrl: formData.licenseBusinessUrl || ""
-        };
+        const numericFields = [
+            { label: "Diện tích", value: formData.area },
+            { label: "Giá thuê", value: formData.price },
+            { label: "Số tiền cọc", value: formData.depositAmount },
+            { label: "Số lượng phòng", value: formData.numberOfRooms },
+            { label: "Giá điện", value: formData.electricityPrice },
+            { label: "Giá nước", value: formData.waterPrice },
+        ];
+
+        for (const field of numericFields) {
+            if (parseFloat(field.value) < 0) {
+                toast({
+                    title: "Thông báo",
+                    description: `${field.label} không được là số âm!`,
+                });
+                return;
+            }
+        }
+        setIsSubmitting(true);
 
         try {
-            const response = await axiosClient.post(`/post/create`, payload);
-            if (response) {
-                toast({
-                    description: "Tin đã được gửi để được phê duyệt!",
-                });
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            }
-        } catch (err) {
-            console.error("Network Error:", err);
-            toast({
-                description: "Có lỗi xảy ra khi kết nối đến server. Vui lòng thử lại.",
+            const data = new FormData();
+
+            formData.images.forEach((file) => {
+                data.append("postImages", file);
             });
+
+            if (formData.licensePcccUrl instanceof File) {
+                data.append("licensePccc", formData.licensePcccUrl);
+            }
+
+            if (formData.licenseBusinessUrl instanceof File) {
+                data.append("licenseBusiness", formData.licenseBusinessUrl);
+            }
+
+            data.append("title", formData.title);
+            data.append("description", formData.description);
+            data.append("depositAmount", parseFloat(formData.depositAmount) || 0);
+            data.append("price", parseFloat(formData.price) || 0);
+            data.append("area", parseFloat(formData.area) || 0);
+            data.append("furnitureStatus", formData.furnitureStatus);
+            data.append("numberOfRooms", parseInt(formData.numberOfRooms, 10) || 0);
+            data.append("electricityPrice", parseFloat(formData.electricityPrice) || 0);
+            data.append("waterPrice", parseFloat(formData.waterPrice) || 0);
+            data.append("city", address.province || "UNKNOWN");
+            data.append("district", address.district || "UNKNOWN");
+            data.append("ward", address.commune || "UNKNOWN");
+            data.append("street", address.street || "");
+            data.append("houseNumber", address.houseNumber || "");
+
+            const response = await axiosClient.postMultipart("/post/create-with-images", data, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            if (response) {
+                toast({ description: "Tin đã được gửi để được phê duyệt!" });
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        } catch (error) {
+            console.error("Network Error:", error);
+            toast({ description: "Có lỗi xảy ra khi kết nối đến server. Vui lòng thử lại." });
         } finally {
-            // Đợi 2 giây rồi mở khóa lại
             setTimeout(() => setIsSubmitting(false), 2000);
         }
     };
-
-
 
     return (
 
@@ -157,7 +181,7 @@ const Post = () => {
                                     minFiles={5}
                                     maxFiles={9}
 
-                                    onUploadSuccess={(uploadedImages) => {
+                                    onImagesChange={(uploadedImages) => {
                                         // Kiểm tra dữ liệu uploadedImages
                                         console.log("Dữ liệu ảnh đã upload:", uploadedImages);
 
@@ -177,7 +201,7 @@ const Post = () => {
                                     className="mt-2"
                                     label="Ảnh giấy chứng nhận PCCC"
                                     maxFiles={1}
-                                    onUploadSuccess={(uploadedImages) => {
+                                    onImagesChange={(uploadedImages) => {
                                         // uploadedImages là mảng, lấy phần tử đầu tiên
                                         setFormData({ ...formData, licensePcccUrl: uploadedImages[0] });
                                     }}
@@ -192,7 +216,7 @@ const Post = () => {
                                     className="mt-2"
                                     label="Ảnh giấy phép kinh doanh"
                                     maxFiles={1}
-                                    onUploadSuccess={(uploadedImages) => {
+                                    onImagesChange={(uploadedImages) => {
                                         // uploadedImages là mảng, lấy URL đầu tiên
                                         setFormData({ ...formData, licenseBusinessUrl: uploadedImages[0] });
                                     }}

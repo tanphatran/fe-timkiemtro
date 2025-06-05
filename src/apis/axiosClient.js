@@ -63,7 +63,18 @@ function createApiClient() {
                 throw new Error(`POST request to ${endpoint} failed: ${error}`);
             }
         },
-
+        postMultipart: async (endpoint, formData) => {
+            try {
+                const response = await client.post(endpoint, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+                return response.data;
+            } catch (error) {
+                throw new Error(`POST multipart request to ${endpoint} failed: ${error}`);
+            }
+        },
         put: async (endpoint, data) => {
             try {
                 const response = await client.put(endpoint, data);
