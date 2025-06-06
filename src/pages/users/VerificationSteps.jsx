@@ -143,11 +143,14 @@ const VerificationSteps = () => {
                             Tải ảnh CCCD
                         </label>
                         <div className="grid lg:grid-cols-2 gap-4">
-                            <ImageUploader
-                                label="Mặt trước CCCD"
-                                maxFiles={1}
-                                onImagesChange={(files) => handleImageUpload("frontCccd", files[0].file)}
-                            />
+                            <div className="border-2 border-dashed border-primary/40 rounded-md p-2 flex justify-center items-center">
+
+                                <ImageUploader
+                                    label="Mặt trước CCCD"
+                                    maxFiles={1}
+                                    onImagesChange={(files) => handleImageUpload("frontCccd", files[0].file)}
+                                />
+                            </div>
                             <div className="border-2 border-dashed border-primary/40 rounded-md p-2 flex justify-center items-center">
                                 <ImageUploader
                                     label="Mặt sau CCCD"

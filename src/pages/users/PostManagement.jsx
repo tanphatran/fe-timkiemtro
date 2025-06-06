@@ -15,6 +15,7 @@ const PostManagement = () => {
         approved: 0,
         pending: 0,
         rejected: 0,
+        anonymous: 0,
     });
 
     const handleSaveSuccess = () => {
@@ -46,33 +47,31 @@ const PostManagement = () => {
     const fetchPostsAndCounts = async () => {
         try {
             // Gọi API cho từng trạng thái và lấy số lượng bài viết
-            const statuses = ["approved", "pending", "rejected"];
+            const statuses = ["approved", "pending", "rejected", "anonymous"];
             const counts = {};
 
             for (let status of statuses) {
                 const response = await axiosClient.getMany(`/post/${status}`);
                 if (response.data) {
-                    counts[status] = response.data.totalElements;  // Lưu số lượng bài viết
+                    counts[status] = response.data.totalElements;
                 }
             }
 
-            setPostCounts(counts);  // Lưu số lượng bài viết vào state
-            fetchPosts(status);     // Lấy bài viết cho trạng thái hiện tại
+            setPostCounts(counts);
+            fetchPosts(status);
         } catch (error) {
             console.error("Error fetching posts counts:", error);
         }
     };
     useEffect(() => {
-        fetchPostsAndCounts();  // Gọi API để lấy cả số lượng bài viết và bài viết
+        fetchPostsAndCounts();
     }, []);
     useEffect(() => {
-        console.log("Bài viết đã được cập nhật 1:", posts);  // Kiểm tra khi posts thay đổi
-    }, [posts]);  // Chạy khi posts thay đổi
+    }, [posts]);
 
     // Gọi API khi trạng thái tab thay đổi
     useEffect(() => {
         fetchPosts(status);
-        console.log("Bài viết đã được cập nhật:", posts);
     }, [status]);
 
     // Tính tổng số trang (dùng posts trực tiếp)
@@ -101,11 +100,15 @@ const PostManagement = () => {
                 <TabsTrigger value="rejected" onClick={() => handleTabChange("rejected")}>
                     Bị từ chối ({postCounts.rejected})
                 </TabsTrigger>
+                <TabsTrigger value="anonymous" onClick={() => handleTabChange("anonymous")}>
+                    Bị ẩn ({postCounts.anonymous})
+                </TabsTrigger>
+
             </TabsList>
 
             <TabsContent value={status}>
                 {currentPosts.map((post, index) => (
-                    <PostCard key={index} post={post} onEdit={handleEditPost} status={status} />
+                    <PostCard key={index} post={post} onEdit={handleEditPost} status={status} onRefresh={fetchPostsAndCounts} />
                 ))}
 
                 <div className="flex justify-end mt-4">
