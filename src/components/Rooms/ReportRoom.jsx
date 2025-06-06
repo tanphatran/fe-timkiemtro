@@ -50,7 +50,7 @@ const ReportRoom = ({ roomId }) => {
         });
 
         if (video) {
-            formData.append("video", video.file);
+            formData.append("video", video);
         }
         console.log("Video:", video);
 
@@ -146,7 +146,7 @@ const ReportRoom = ({ roomId }) => {
                             <VideoUploader
                                 label="Tải video"
                                 maxFiles={1}
-                                onVideoChange={(files) => setVideo(files[0] || null)}
+                                onVideoChange={(file) => setVideo(file || null)}
                             />
                         </div>
                     </div>
