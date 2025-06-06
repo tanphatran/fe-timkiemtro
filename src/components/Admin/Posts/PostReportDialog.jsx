@@ -23,6 +23,7 @@ const PostReportDialog = ({ postId, reportId, onApprove, onReject, onCancel, onR
                 // Lấy thông tin báo cáo
                 const reportRes = await axiosClient.getOne(`/reports/admin/detail/${reportId}`);
                 setReportInfo(reportRes.data);
+                console.log("Video URL:", reportInfo.videoUrl);
 
                 setError(null);
             } catch (err) {
@@ -34,7 +35,7 @@ const PostReportDialog = ({ postId, reportId, onApprove, onReject, onCancel, onR
         };
 
         fetchData();
-    }, [postId]);
+    }, [postId, reportId]);
 
     if (!postId) return null;
 
@@ -82,19 +83,55 @@ const PostReportDialog = ({ postId, reportId, onApprove, onReject, onCancel, onR
 
                         <Separator className="my-4" />
 
+                        {/* Hình ảnh bài viết */}
                         <div>
-                            <strong>Hình ảnh:</strong>
+                            <strong>Hình ảnh bài viết:</strong>
                             <div className="mt-2 flex gap-2 overflow-x-auto">
                                 {reportDetails.postImages.map((image, index) => (
                                     <img
                                         key={index}
                                         src={image}
-                                        alt={`Hình ảnh ${index + 1}`}
+                                        alt={`Hình ảnh bài viết ${index + 1}`}
                                         className="w-32 h-32 rounded-lg border object-cover shadow"
                                     />
                                 ))}
                             </div>
                         </div>
+
+                        <Separator className="my-4" />
+
+                        {/* Hình ảnh báo cáo */}
+                        {reportInfo.reportImages && reportInfo.reportImages.length > 0 && (
+                            <div>
+                                <strong>Hình ảnh báo cáo:</strong>
+                                <div className="mt-2 flex gap-2 overflow-x-auto">
+                                    {reportInfo.reportImages.map((image, index) => (
+                                        <img
+                                            key={index}
+                                            src={image}
+                                            alt={`Hình ảnh báo cáo ${index + 1}`}
+                                            className="w-32 h-32 rounded-lg border object-cover shadow"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <Separator className="my-4" />
+
+                        {/* Video báo cáo */}
+                        {reportInfo.videoUrl && (
+                            <div>
+                                <strong>Video báo cáo:</strong>
+                                <div className="mt-2">
+                                    <video
+                                        controls
+                                        src={reportInfo.videoUrl}
+                                        className="w-full max-h-96 rounded-lg border shadow"
+                                    />
+                                </div>
+                            </div>
+                        )}
 
                         <Separator className="my-4" />
 

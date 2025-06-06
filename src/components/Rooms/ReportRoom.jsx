@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import {
-    Dialog,
-    DialogTrigger,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
+    Dialog, DialogTrigger, DialogContent,
+    DialogHeader, DialogTitle, DialogDescription,
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,12 +10,18 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CiWarning } from "react-icons/ci";
 import axiosClient from "@/apis/axiosClient";
 import { useToast } from "@/hooks/use-toast";
+import ImageUploader from "@/components/ImageUploader/ImageUploader";
+import VideoUploader from "../ImageUploader/VideoUploader";
 
 const ReportRoom = ({ roomId }) => {
     const [selectedReasons, setSelectedReasons] = useState([]);
     const [details, setDetails] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // state loading
     const { toast } = useToast();
+
+    const [images, setImages] = useState([]);
+    const [video, setVideo] = useState(null);
 
     const handleCheckboxChange = (reason) => {
         setSelectedReasons((prev) =>
@@ -37,23 +39,41 @@ const ReportRoom = ({ roomId }) => {
             return;
         }
 
-        const payload = {
-            reason: selectedReasons.join(", "),
-            details: details,
-        };
+        setIsLoading(true); // bật loading
+
+        const formData = new FormData();
+        formData.append("reason", selectedReasons.join(", "));
+        formData.append("details", details);
+
+        images.forEach((imgObj) => {
+            formData.append(`images`, imgObj.file);
+        });
+
+        if (video) {
+            formData.append("video", video.file);
+        }
+        console.log("Video:", video);
 
         try {
-            const response = await axiosClient.post(`/reports/create/${roomId}`, payload);
+            const response = await axiosClient.postMultipart(`/reports/create/${roomId}`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
 
             if (response.status === "success") {
                 toast({ description: response.message });
                 setIsDialogOpen(false);
+                setSelectedReasons([]);
+                setDetails("");
+                setImages([]);
+                setVideo(null);
             } else {
                 toast({ description: "Đã có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại." });
             }
         } catch (error) {
             console.error("Error submitting report:", error);
             toast({ description: "Đã có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại." });
+        } finally {
+            setIsLoading(false); // tắt loading
         }
     };
 
@@ -76,7 +96,7 @@ const ReportRoom = ({ roomId }) => {
                     Báo vi phạm
                 </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="text-l font-bold">Báo vi phạm</DialogTitle>
                     <DialogDescription className="text-base text-gray-600">
@@ -98,26 +118,53 @@ const ReportRoom = ({ roomId }) => {
                             </label>
                         </div>
                     ))}
-                    <div className="mb-6">
+
+                    <div>
                         <label className="block text-base font-medium text-gray-700 mb-2">
                             Nhập mô tả:
                         </label>
                         <Textarea
                             placeholder="Nhập mô tả chi tiết..."
-                            rows={5}
+                            rows={4}
                             value={details}
                             onChange={(e) => setDetails(e.target.value)}
                         />
                     </div>
+
+                    <div className="grid lg:grid-cols-2 gap-4">
+                        <div className="border-2 border-dashed border-primary/40 rounded-md p-2 flex flex-col justify-center items-center">
+                            <p className="text-base font-medium text-gray-700 text-center mb-2">Hình ảnh minh họa (tối đa 3 ảnh):</p>
+                            <ImageUploader
+                                label="Tải ảnh"
+                                maxFiles={3}
+                                onImagesChange={(files) => setImages(files)}
+                            />
+                        </div>
+
+                        <div className="border-2 border-dashed border-primary/40 rounded-md p-2 flex flex-col justify-center items-center">
+                            <p className="text-base font-medium text-gray-700 text-center mb-2">Video minh họa (1 video):</p>
+                            <VideoUploader
+                                label="Tải video"
+                                maxFiles={1}
+                                onVideoChange={(files) => setVideo(files[0] || null)}
+                            />
+                        </div>
+                    </div>
                 </div>
-                <DialogFooter>
-                    <Button className="text-base" onClick={handleSubmit}>
-                        Gửi
+
+                <DialogFooter className="mt-4">
+                    <Button
+                        className="text-base"
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "Đang gửi..." : "Gửi"}
                     </Button>
                     <Button
                         className="text-base"
                         variant="secondary"
                         onClick={() => setIsDialogOpen(false)}
+                        disabled={isLoading}
                     >
                         Bỏ qua
                     </Button>
