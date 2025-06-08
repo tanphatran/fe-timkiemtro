@@ -128,14 +128,25 @@ const VerificationSteps = () => {
                 </div>
 
                 {/* Nội dung các bước */}
-                {currentStep === 1 && verificationStatus === "NOT_REGISTERED" && (
+                {currentStep === 1 && (
                     <div className="text-center">
-                        <p className="text-base font-medium">
-                            Tài khoản của bạn cần được xác thực. Hãy nhấn nút{" "}
-                            <span className="font-bold text-red-500">"Xác thực"</span> để tiếp tục.
-                        </p>
+                        {verificationStatus === "NOT_REGISTERED" && (
+                            <p className="text-base font-medium">
+                                Tài khoản của bạn cần được xác thực. Hãy nhấn nút{" "}
+                                <span className="font-bold text-red-500">"Xác thực"</span> để tiếp tục.
+                            </p>
+                        )}
+
+                        {verificationStatus === "REJECTED" && (
+                            <div>
+                                <p className="text-base font-medium text-red-600">
+                                    Hồ sơ xác thực của bạn đã bị từ chối. Vui lòng liên hệ quản trị viên hoặc thử lại sau.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 )}
+
 
                 {currentStep === 2 && (
                     <div>
@@ -184,14 +195,16 @@ const VerificationSteps = () => {
                 <div className="mt-6 text-center">
                     <Button
                         onClick={handleVerify}
-                        disabled={loading}
+                        disabled={loading || verificationStatus === "REJECTED"}
                         className="w-full hover:bg-secondary bg-gradient-to-l from-secondary text-white font-medium"
                     >
                         {loading
                             ? "Đang gửi..."
-                            : currentStep < 3
-                                ? "Xác thực"
-                                : "Hoàn thành"}
+                            : verificationStatus === "REJECTED"
+                                ? "Đã bị từ chối"
+                                : currentStep < 3
+                                    ? "Xác thực"
+                                    : "Hoàn thành"}
                     </Button>
                 </div>
             </CardContent>
