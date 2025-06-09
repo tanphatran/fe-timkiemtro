@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"; // Assuming you have a Button c
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"; // For avatar image
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // For cards
 import { FaCamera } from "react-icons/fa";
-import axios from "axios";  // Import axios để gửi API request
 import { Alert } from "@/components/ui/alert"; // Assuming you have an Alert component from ShadCN UI
 
 const EditProfile = () => {
@@ -49,21 +48,19 @@ const EditProfile = () => {
 
         setLoading(true);
         try {
-            const baseURL = import.meta.env.VITE_API_URL;
-            const response = await axios.post(`${baseURL}/user/profile-picture`, formData, {
+            const response = await axiosClient.postMultipart(`/user/profile-picture`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                },
-                withCredentials: true,
+                }
             });
 
-            if (response.data.status === "success") {
-                const uploadedImageUrl = response.data.data;
+            if (response.status === "success") {
+                const uploadedImageUrl = response.data;
                 setProfileData((prevData) => ({
                     ...prevData,
                     profilePicture: uploadedImageUrl,
                 }));
-                setAlert({ message: response.data.message, type: "success" });
+                setAlert({ message: response.message, type: "success" });
             } else {
                 setAlert({ message: "Không thể tải ảnh lên. Vui lòng thử lại.", type: "error" });
             }
@@ -152,6 +149,7 @@ const EditProfile = () => {
                             </label>
                             <Input
                                 id="email"
+                                disabled
                                 value={profileData.email || ""}
                                 onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
                                 className="mt-1"
@@ -168,6 +166,7 @@ const EditProfile = () => {
                                 value={profileData.dateOfBirth || ""}
                                 onChange={(e) => setProfileData({ ...profileData, dateOfBirth: e.target.value })}
                                 className="mt-1"
+                                max={new Date().toISOString().split('T')[0]}
                             />
                         </div>
 

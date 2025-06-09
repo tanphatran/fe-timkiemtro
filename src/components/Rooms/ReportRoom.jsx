@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import ImageUploader from "@/components/ImageUploader/ImageUploader";
 import VideoUploader from "../ImageUploader/VideoUploader";
 
-const ReportRoom = ({ roomId }) => {
+const ReportRoom = ({ roomId, isLoggedIn = true }) => {
     const [selectedReasons, setSelectedReasons] = useState([]);
     const [details, setDetails] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -32,6 +32,11 @@ const ReportRoom = ({ roomId }) => {
     };
 
     const handleSubmit = async () => {
+        if (!isLoggedIn) {
+            toast({ description: "Vui lòng đăng nhập để sử dụng chức năng này!" });
+            return;
+        }
+
         if (selectedReasons.length === 0 && !details.trim()) {
             toast({
                 description: "Vui lòng chọn ít nhất một lý do hoặc nhập ý kiến phản hồi.",
@@ -156,7 +161,7 @@ const ReportRoom = ({ roomId }) => {
                     <Button
                         className="text-base"
                         onClick={handleSubmit}
-                        disabled={isLoading}
+                        disabled={isLoading || !isLoggedIn}
                     >
                         {isLoading ? "Đang gửi..." : "Gửi"}
                     </Button>

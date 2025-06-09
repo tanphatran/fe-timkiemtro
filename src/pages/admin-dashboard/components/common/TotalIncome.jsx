@@ -11,7 +11,6 @@ import dayjs from "dayjs";
 import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement } from "chart.js";
-import axios from "axios";
 import axiosClient from "@/apis/axiosClient";
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
@@ -65,8 +64,8 @@ const TotalIncome = () => {
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Paper elevation={0} sx={{ p: 3, backgroundColor: "#fff", color: customBlue }}>
-                <Stack spacing={3}>
+            <Paper elevation={0} sx={{ p: 3, backgroundColor: "#fff", color: customBlue, width: '100%' }}>
+                <Stack spacing={3} sx={{ width: '100%' }}>
                     {/* Bộ lọc tháng */}
                     <Stack direction="row" spacing={2}>
                         <DatePicker
@@ -115,7 +114,7 @@ const TotalIncome = () => {
                     </Stack>
 
                     {/* Biểu đồ */}
-                    <Box>
+                    <Box sx={{ width: '100%' }}>
                         <Line
                             data={{
                                 labels: selectedData.labels,

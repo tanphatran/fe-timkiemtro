@@ -1,14 +1,20 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosClient from "@/apis/axiosClient";
 import LandlordInfo from "@/components/Landlord/LandlordInfo";
 import RoomList from "@/components/Landlord/RoomList";
+import useChatStore from "@/zustand/useChatStore";
+import useAuth from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const LandlordProfile = () => {
     const { id } = useParams();
     const [landlord, setLandlord] = useState(null);
     const [rooms, setRooms] = useState([]);
     const [isFollowing, setIsFollowing] = useState(false);
+    const navigate = useNavigate();
+    const { isLoggedIn } = useAuth();
+    const { toast } = useToast();
 
     const fetchLandlord = async () => {
         try {
@@ -64,6 +70,10 @@ const LandlordProfile = () => {
     }, [id]);
 
     const handleFollowToggle = async () => {
+        if (!isLoggedIn) {
+            toast({ description: "Vui lòng đăng nhập để sử dụng chức năng này!" });
+            return;
+        }
         try {
             if (isFollowing) {
                 await axiosClient.delete(`/users/${id}/unfollow`);
@@ -76,6 +86,24 @@ const LandlordProfile = () => {
         }
     };
 
+    // Hàm nhắn tin
+    const handleSendMessage = () => {
+        if (!isLoggedIn) {
+            toast({ description: "Vui lòng đăng nhập để sử dụng chức năng này!" });
+            return;
+        }
+        if (landlord) {
+            useChatStore.getState().setPartner(
+                landlord.userUuid,
+                landlord.fullName,
+                landlord.profilePicture,
+                landlord.isOnline
+            );
+            navigate(`/users/chat/${landlord.userUuid}`);
+            window.scrollTo(0, 0);
+        }
+    };
+
     if (!landlord) return <p className="text-center">Đang tải...</p>;
 
     return (
@@ -85,6 +113,8 @@ const LandlordProfile = () => {
                     landlord={landlord}
                     isFollowing={isFollowing}
                     handleFollowToggle={handleFollowToggle}
+                    handleSendMessage={handleSendMessage}
+                    isLoggedIn={isLoggedIn}
                 />
             </div>
 

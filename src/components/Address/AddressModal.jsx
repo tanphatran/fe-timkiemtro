@@ -168,6 +168,13 @@ const AddressModal = ({ isOpen, onClose, address, onAddressChange, onSave }) => 
                             onSave(address);
                             onClose();
                         }}
+                        disabled={
+                            !address.province ||
+                            !address.district ||
+                            !address.commune ||
+                            !address.street ||
+                            !address.houseNumber
+                        }
                     >
                         Lưu địa chỉ
                     </Button>

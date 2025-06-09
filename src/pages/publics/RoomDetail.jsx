@@ -11,6 +11,8 @@ import RoomMap from "@/components/Map/RoomMap";
 import RelatedPosts from "@/components/Rooms/RelatedPosts";
 import useChatStore from "@/zustand/useChatStore";
 import { Badge } from "@/components/ui/badge";
+import useAuth from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const RoomDetail = () => {
     const { id } = useParams();
@@ -21,16 +23,21 @@ const RoomDetail = () => {
     const [error, setError] = useState(null);
     const [isRevealed, setIsRevealed] = useState(false);
     const navigate = useNavigate();
+    const { isLoggedIn } = useAuth();
+    const { toast } = useToast();
 
     const handleSendMessage = () => {
+        if (!isLoggedIn) {
+            toast({ description: "Vui lòng đăng nhập để sử dụng chức năng này!" });
+            return;
+        }
         if (userData) {
             useChatStore.getState().setPartner(
                 userData.userId,
                 userData.fullName,
                 userData.profilePicture,
-                "Hãy bắt đầu cuộc trò chuyện"
+                userData.isOnline,
             );
-
             // 👉 Điều hướng đến trang chat
             navigate(`/users/chat/${userData.userId}`);
             window.scrollTo(0, 0);
@@ -103,6 +110,15 @@ const RoomDetail = () => {
     const fullPhone = userData?.phoneNumber || "N/A";
     const hiddenPhone = fullPhone.slice(0, -3) + "xxx";
     const displayedPhone = isRevealed ? fullPhone : hiddenPhone;
+
+    // Hàm xử lý báo cáo (ReportRoom)
+    const handleReportClick = (openDialog) => {
+        if (!isLoggedIn) {
+            toast({ description: "Vui lòng đăng nhập để sử dụng chức năng này!" });
+            return false;
+        }
+        return openDialog();
+    };
 
     return (
         <div className="w-full mt-16 px-4 sm:px-8 lg:px-28">
@@ -185,7 +201,7 @@ const RoomDetail = () => {
                         </div>
                         <RelatedPosts currentPostId={id} />
                         <div className="flex justify-end mb-3">
-                            <ReportRoom roomId={id} />
+                            <ReportRoom roomId={id} isLoggedIn={isLoggedIn} onRequireLogin={() => toast({ description: "Vui lòng đăng nhập để sử dụng chức năng này!" })} />
                         </div>
                     </div>
 

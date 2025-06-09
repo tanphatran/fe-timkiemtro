@@ -1,14 +1,76 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { useNavigate } from "react-router-dom";
+import apiAddress from "@/apis/apiAddress";
 
 const Hero = () => {
     const [priceDisplay, setPriceDisplay] = useState("Tất cả mức giá");
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
-    const [appliedPrice, setAppliedPrice] = useState(""); // Mức giá đã áp dụng
-    const [selectedType, setSelectedType] = useState(""); // Lưu loại nhà đất đã chọn
-    const [selectedArea, setSelectedArea] = useState(""); // Lưu diện tích đã chọn
+    const [appliedPrice, setAppliedPrice] = useState("");
+    const [selectedType, setSelectedType] = useState("");
+    const [selectedArea, setSelectedArea] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
+
+    // Address states
+    const [city, setCity] = useState(null);
+    const [district, setDistrict] = useState(null);
+    const [ward, setWard] = useState(null);
+    const [provinces, setProvinces] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
+    const navigate = useNavigate();
+
+    // Fetch provinces on component mount
+    useEffect(() => {
+        const fetchProvinces = async () => {
+            try {
+                const data = await apiAddress.getProvinces();
+                setProvinces(data);
+            } catch (error) {
+                console.error("Không thể lấy danh sách tỉnh:", error);
+            }
+        };
+        fetchProvinces();
+    }, []);
+
+    // Fetch districts when city changes
+    useEffect(() => {
+        if (city) {
+            const fetchDistricts = async () => {
+                try {
+                    const data = await apiAddress.getDistricts(city);
+                    setDistricts(data);
+                    setDistrict(null);
+                    setWard(null);
+                } catch (error) {
+                    console.error("Không thể lấy danh sách quận/huyện:", error);
+                }
+            };
+            fetchDistricts();
+        } else {
+            setDistricts([]);
+        }
+    }, [city]);
+
+    // Fetch wards when district changes
+    useEffect(() => {
+        if (district) {
+            const fetchWards = async () => {
+                try {
+                    const data = await apiAddress.getWards(district);
+                    setWards(data);
+                    setWard(null);
+                } catch (error) {
+                    console.error("Không thể lấy danh sách phường/xã:", error);
+                }
+            };
+            fetchWards();
+        } else {
+            setWards([]);
+        }
+    }, [district]);
 
     const handleApplyPrice = () => {
         if (minPrice && maxPrice) {
@@ -18,7 +80,34 @@ const Hero = () => {
             setPriceDisplay("Tất cả mức giá");
             setAppliedPrice("Tất cả mức giá");
         }
-        console.log("Giá được áp dụng:", { minPrice, maxPrice });
+    };
+
+    const handleSearch = () => {
+        const queryParams = new URLSearchParams();
+
+        if (minPrice) {
+            queryParams.append('minPrice', minPrice);
+        }
+        if (maxPrice) {
+            queryParams.append('maxPrice', maxPrice);
+        }
+        if (city) {
+            queryParams.append('city', city);
+        }
+        if (district) {
+            queryParams.append('district', district);
+        }
+        if (ward) {
+            queryParams.append('ward', ward);
+        }
+        if (searchQuery) {
+            queryParams.append('keyword', searchQuery);
+        }
+        if (selectedArea) {
+            queryParams.append('area', selectedArea);
+        }
+
+        navigate(`/results?${queryParams.toString()}`, { replace: true });
     };
 
     return (
@@ -36,6 +125,8 @@ const Hero = () => {
                                 name="destination"
                                 id="destination"
                                 placeholder="Phòng trọ tốt"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full bg-gray-100 mt-2 focus:outline-primary focus:outline outline-1 rounded-sm p-2"
                             />
                         </div>
@@ -45,16 +136,18 @@ const Hero = () => {
                             {/* Loại nhà đất */}
                             <div>
                                 <label htmlFor="type" className="block text-gray-600 mb-1">
-                                    Địa chỉ
+                                    Địa chỉ
                                 </label>
-                                <Select onValueChange={(value) => setSelectedType(value)}>
+                                <Select onValueChange={(value) => setCity(value)}>
                                     <SelectTrigger className="w-full">
-                                        <span className="text-base" >{selectedType || "Địa chỉ"}</span>
+                                        <span className="text-base">{city || "Chọn thành phố"}</span>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Hồ Chí Minh">Nhà trọ</SelectItem>
-                                        <SelectItem value="Hà Nội">Chung cư mini</SelectItem>
-                                        <SelectItem value="Đà Nẵng">Studio</SelectItem>
+                                        {provinces.map((province) => (
+                                            <SelectItem key={province} value={province}>
+                                                {province}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -76,7 +169,8 @@ const Hero = () => {
                                         {/* Input giá */}
                                         <div className="flex items-center gap-2 mb-4">
                                             <input
-                                                type="text"
+                                                type="number"
+                                                min="0"
                                                 placeholder="Từ"
                                                 value={minPrice}
                                                 onChange={(e) => {
@@ -91,7 +185,8 @@ const Hero = () => {
                                             />
                                             <span className="text-gray-500">→</span>
                                             <input
-                                                type="text"
+                                                type="number"
+                                                min="0"
                                                 placeholder="Đến"
                                                 value={maxPrice}
                                                 onChange={(e) => {
@@ -170,10 +265,10 @@ const Hero = () => {
                                         <span className="text-base">{selectedArea || "Chọn diện tích"}</span>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Dưới 50m²">Dưới 50m²</SelectItem>
-                                        <SelectItem value="50 - 100m²">50 - 100m²</SelectItem>
-                                        <SelectItem value="100 - 200m²">100 - 200m²</SelectItem>
-                                        <SelectItem value="Trên 200m²">Trên 200m²</SelectItem>
+                                        <SelectItem value="Dưới 10m²">Dưới 10m²</SelectItem>
+                                        <SelectItem value="10 - 15m²">10 - 15m²</SelectItem>
+                                        <SelectItem value="15 - 20m²">15 - 20m²</SelectItem>
+                                        <SelectItem value="Trên 20m²">Trên 20m²</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -181,6 +276,7 @@ const Hero = () => {
 
                         {/* Nút "Tìm kiếm" */}
                         <button
+                            onClick={handleSearch}
                             className="bg-gradient-to-r from-primary to-secondary text-white hover:scale-105 px-4 py-2 rounded-full duration-200 absolute -bottom-5 left-1/2 -translate-x-1/2 shadow-md"
                             style={{ marginTop: "10px" }}
                         >

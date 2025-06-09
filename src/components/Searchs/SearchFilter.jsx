@@ -312,6 +312,7 @@ const SearchFilter = () => {
                     <div className="flex gap-2 mt-4">
                         <Input
                             type="number"
+                            min={0}
                             placeholder="Diện tích tối thiểu"
                             value={areaRange[0]}
                             onChange={(e) => {
@@ -326,6 +327,7 @@ const SearchFilter = () => {
                         <span>-</span>
                         <Input
                             type="number"
+                            min={0}
                             placeholder="Diện tích tối đa"
                             value={areaRange[1]}
                             onChange={(e) => {

@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ImageUploader from "@/components/ImageUploader/ImageUploader";
 import { useToast } from "@/hooks/use-toast";
+import useMeStore from "@/zustand/useMeStore";
 
 const VerificationSteps = () => {
     const { toast } = useToast();
+    const role = useMeStore((state) => state.role);
+    const setRole = useMeStore((state) => state.setRole);
     const [currentStep, setCurrentStep] = useState(1); // Mặc định là bước 1
     const [verificationStatus, setVerificationStatus] = useState(null); // Trạng thái xác minh
     const [cccdImages, setCccdImages] = useState({
@@ -33,6 +36,10 @@ const VerificationSteps = () => {
                     setCurrentStep(3);
                 } else if (status === "APPROVED") {
                     setCurrentStep(3);
+                    // Nếu đã được duyệt và role chưa phải LANDLORD thì cập nhật role
+                    if (role !== "LANDLORD") {
+                        setRole("LANDLORD");
+                    }
                 }
             } catch (error) {
                 console.error("Lỗi khi kiểm tra trạng thái xác minh:", error);
@@ -42,7 +49,7 @@ const VerificationSteps = () => {
         };
 
         checkVerificationStatus();
-    }, []);
+    }, [role, setRole]);
 
     // Hàm xử lý khi ảnh được tải lên thành công
     const handleImageUpload = (type, file) => {

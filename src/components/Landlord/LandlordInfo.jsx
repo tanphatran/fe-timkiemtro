@@ -2,8 +2,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FaCheckCircle, FaRegCheckCircle } from "react-icons/fa"; // Import thêm icon
 import { format } from "date-fns";
 import { FaUserPlus, FaUserMinus } from "react-icons/fa";
+import { AiFillMessage } from "react-icons/ai";
 
-const LandlordInfo = ({ landlord, isFollowing, handleFollowToggle }) => {
+const LandlordInfo = ({ landlord, isFollowing, handleFollowToggle, handleSendMessage }) => {
     return (
         <div className="space-y-6">
             <div className="bg-white shadow-xl rounded-2xl p-6 flex flex-col items-center text-center">
@@ -30,27 +31,36 @@ const LandlordInfo = ({ landlord, isFollowing, handleFollowToggle }) => {
                     </p>
                 </div>
 
-                {/* Nút Theo dõi */}
-                <button
-                    onClick={handleFollowToggle}
-                    className={`mt-4 px-5 py-2.5 rounded-full font-semibold flex items-center gap-2 transition-all duration-200
-        ${isFollowing
-                            ? "bg-gradient-to-r from-red-400 to-red-600 text-white hover:scale-105"
-                            : "bg-gradient-to-r from-primary to-secondary hover:bg-gradient-to-l  transition-all text-white hover:scale-105"
-                        }`}
-                >
-                    {isFollowing ? (
-                        <>
-                            <FaUserMinus />
-                            Bỏ theo dõi
-                        </>
-                    ) : (
-                        <>
-                            <FaUserPlus />
-                            Theo dõi
-                        </>
-                    )}
-                </button>
+                {/* Nút Theo dõi và Nhắn tin */}
+                <div className="mt-4 flex flex-row gap-2 w-full justify-center">
+                    <button
+                        onClick={handleFollowToggle}
+                        className={`px-5 py-2.5 rounded-full font-semibold flex items-center gap-2 transition-all duration-200
+            ${isFollowing
+                                ? "bg-gradient-to-r from-red-400 to-red-600 text-white hover:scale-105"
+                                : "bg-gradient-to-r from-primary to-secondary hover:bg-gradient-to-l  transition-all text-white hover:scale-105"
+                            }`}
+                    >
+                        {isFollowing ? (
+                            <>
+                                <FaUserMinus />
+                                Bỏ theo dõi
+                            </>
+                        ) : (
+                            <>
+                                <FaUserPlus />
+                                Theo dõi
+                            </>
+                        )}
+                    </button>
+                    <button
+                        onClick={handleSendMessage}
+                        className="px-5 py-2.5 rounded-full font-semibold flex items-center gap-2 bg-white border border-primary text-primary hover:bg-primary hover:text-white transition-all duration-200"
+                    >
+                        <AiFillMessage />
+                        Nhắn tin
+                    </button>
+                </div>
             </div>
 
             {/* Thông tin xác nhận */}

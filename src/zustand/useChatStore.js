@@ -5,7 +5,7 @@ const useChatStore = create((set) => ({
     setConversationList: (list) => set({ conversationList: list }),
 
     partner: null,
-    setPartner: (id, name, avatar = "", info = "") =>
+    setPartner: (id, name, avatar = "", info = "", isOnline) =>
         set({
             partner: {
                 id,
