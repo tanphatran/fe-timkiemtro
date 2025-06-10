@@ -22,6 +22,13 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(false);
     const [totalPage, setTotalPage] = useState(1);
 
+    // Hàm xử lý khi thay đổi tab
+    const handleTabChange = (value) => {
+        setActiveTab(value);
+        setCurrentPage(1); // Reset về trang 1 khi đổi tab
+        setSelectedPost(null); // Reset selected post khi đổi tab
+    };
+
     const fetchData = async (tab, page) => {
         setLoading(true);
         try {
@@ -128,7 +135,7 @@ const Dashboard = () => {
         <div className="p-6 bg-gray-50 min-h-screen">
             {/* Tabs và Tìm kiếm */}
             <div className="flex items-center justify-between mb-4">
-                <Tabs defaultValue="pending" onValueChange={(value) => setActiveTab(value)}>
+                <Tabs defaultValue="pending" onValueChange={handleTabChange}>
                     <TabsList>
                         <TabsTrigger value="pending">Chờ duyệt</TabsTrigger>
                         <TabsTrigger value="approved">Đã duyệt</TabsTrigger>

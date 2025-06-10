@@ -3,11 +3,13 @@ import axiosClient from "@/apis/axiosClient"; // Import axiosClient
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import ImagePreviewDialog from "@/components/ImagePreview/ImagePreviewDialog";
 
 const HostInfoDialog = ({ isOpen, onClose, hostId, onApprove, onReject }) => {
     const [hostData, setHostData] = useState(null); // State to store the host data
     const [loading, setLoading] = useState(false);  // Loading state
     const [error, setError] = useState(null);       // Error state
+    const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
         if (isOpen && hostId) {
@@ -64,21 +66,35 @@ const HostInfoDialog = ({ isOpen, onClose, hostId, onApprove, onReject }) => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Mặt trước CCCD:</label>
                                     <div className="mt-2">
-                                        <img
-                                            src={hostData.frontCccdUrl}
-                                            alt="Mặt trước CCCD"
-                                            className="w-full h-48 rounded-lg border object-cover shadow"
-                                        />
+                                        {hostData.frontCccdUrl && hostData.frontCccdUrl !== "null" ? (
+                                            <img
+                                                src={hostData.frontCccdUrl}
+                                                alt="Mặt trước CCCD"
+                                                className="w-full h-48 rounded-lg border object-cover shadow cursor-pointer hover:opacity-80 transition-opacity"
+                                                onClick={() => setSelectedImage(hostData.frontCccdUrl)}
+                                            />
+                                        ) : (
+                                            <div className="w-full h-48 rounded-lg border flex items-center justify-center bg-gray-50 text-gray-500">
+                                                Không có ảnh CCCD mặt trước
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Mặt sau CCCD:</label>
                                     <div className="mt-2">
-                                        <img
-                                            src={hostData.backCccdUrl}
-                                            alt="Mặt sau CCCD"
-                                            className="w-full h-48 rounded-lg border object-cover shadow"
-                                        />
+                                        {hostData.backCccdUrl && hostData.backCccdUrl !== "null" ? (
+                                            <img
+                                                src={hostData.backCccdUrl}
+                                                alt="Mặt sau CCCD"
+                                                className="w-full h-48 rounded-lg border object-cover shadow cursor-pointer hover:opacity-80 transition-opacity"
+                                                onClick={() => setSelectedImage(hostData.backCccdUrl)}
+                                            />
+                                        ) : (
+                                            <div className="w-full h-48 rounded-lg border flex items-center justify-center bg-gray-50 text-gray-500">
+                                                Không có ảnh CCCD mặt sau
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -104,6 +120,13 @@ const HostInfoDialog = ({ isOpen, onClose, hostId, onApprove, onReject }) => {
                     </Button>
                 </div>
             </DialogContent>
+
+            {/* Image Preview Dialog */}
+            <ImagePreviewDialog
+                isOpen={!!selectedImage}
+                onClose={() => setSelectedImage(null)}
+                imageUrl={selectedImage}
+            />
         </Dialog>
     );
 };

@@ -3,12 +3,14 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import axiosClient from "@/apis/axiosClient"; // Axios client đã cấu hình
+import ImagePreviewDialog from "@/components/ImagePreview/ImagePreviewDialog";
 
 const PostReportDialog = ({ postId, reportId, onApprove, onReject, onCancel, onRefresh }) => {
     const [reportDetails, setReportDetails] = useState(null);
     const [reportInfo, setReportInfo] = useState(null); // Thêm state cho thông tin báo cáo
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
         if (!postId) return;
@@ -92,7 +94,8 @@ const PostReportDialog = ({ postId, reportId, onApprove, onReject, onCancel, onR
                                         key={index}
                                         src={image}
                                         alt={`Hình ảnh bài viết ${index + 1}`}
-                                        className="w-32 h-32 rounded-lg border object-cover shadow"
+                                        className="w-32 h-32 rounded-lg border object-cover shadow cursor-pointer hover:opacity-80 transition-opacity"
+                                        onClick={() => setSelectedImage(image)}
                                     />
                                 ))}
                             </div>
@@ -110,7 +113,8 @@ const PostReportDialog = ({ postId, reportId, onApprove, onReject, onCancel, onR
                                             key={index}
                                             src={image}
                                             alt={`Hình ảnh báo cáo ${index + 1}`}
-                                            className="w-32 h-32 rounded-lg border object-cover shadow"
+                                            className="w-32 h-32 rounded-lg border object-cover shadow cursor-pointer hover:opacity-80 transition-opacity"
+                                            onClick={() => setSelectedImage(image)}
                                         />
                                     ))}
                                 </div>
@@ -139,21 +143,35 @@ const PostReportDialog = ({ postId, reportId, onApprove, onReject, onCancel, onR
                             <div>
                                 <strong>Chứng nhận đủ PCCC:</strong>
                                 <div className="mt-2">
-                                    <img
-                                        src={reportDetails.licensePcccUrl}
-                                        alt="Chứng nhận PCCC"
-                                        className="w-full h-72 rounded-lg border object-cover shadow"
-                                    />
+                                    {reportDetails.licensePcccUrl && reportDetails.licensePcccUrl !== "null" ? (
+                                        <img
+                                            src={reportDetails.licensePcccUrl}
+                                            alt="Chứng nhận PCCC"
+                                            className="w-full h-72 rounded-lg border object-cover shadow cursor-pointer hover:opacity-80 transition-opacity"
+                                            onClick={() => setSelectedImage(reportDetails.licensePcccUrl)}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-72 rounded-lg border flex items-center justify-center bg-gray-50 text-gray-500">
+                                            Không có chứng nhận PCCC
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div>
                                 <strong>Giấy phép kinh doanh:</strong>
                                 <div className="mt-2">
-                                    <img
-                                        src={reportDetails.licenseBusinessUrl}
-                                        alt="Giấy phép kinh doanh"
-                                        className="w-full h-72 rounded-lg border object-cover shadow"
-                                    />
+                                    {reportDetails.licenseBusinessUrl && reportDetails.licenseBusinessUrl !== "null" ? (
+                                        <img
+                                            src={reportDetails.licenseBusinessUrl}
+                                            alt="Giấy phép kinh doanh"
+                                            className="w-full h-72 rounded-lg border object-cover shadow cursor-pointer hover:opacity-80 transition-opacity"
+                                            onClick={() => setSelectedImage(reportDetails.licenseBusinessUrl)}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-72 rounded-lg border flex items-center justify-center bg-gray-50 text-gray-500">
+                                            Không có giấy phép kinh doanh
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -176,6 +194,13 @@ const PostReportDialog = ({ postId, reportId, onApprove, onReject, onCancel, onR
                     <p className="text-gray-500">Không có dữ liệu báo cáo.</p>
                 )}
             </DialogContent>
+
+            {/* Image Preview Dialog */}
+            <ImagePreviewDialog
+                isOpen={!!selectedImage}
+                onClose={() => setSelectedImage(null)}
+                imageUrl={selectedImage}
+            />
         </Dialog>
     );
 };

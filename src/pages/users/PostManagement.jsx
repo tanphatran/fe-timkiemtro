@@ -107,13 +107,20 @@ const PostManagement = () => {
             </TabsList>
 
             <TabsContent value={status}>
-                {currentPosts.map((post, index) => (
-                    <PostCard key={index} post={post} onEdit={handleEditPost} status={status} onRefresh={fetchPostsAndCounts} />
-                ))}
-
-                <div className="flex justify-end mt-4">
-                    <PaginationAdmin total={totalPages} page={activePage} onChange={setActivePage} />
-                </div>
+                {currentPosts.length > 0 ? (
+                    <>
+                        {currentPosts.map((post, index) => (
+                            <PostCard key={index} post={post} onEdit={handleEditPost} status={status} onRefresh={fetchPostsAndCounts} />
+                        ))}
+                        <div className="flex justify-end mt-4">
+                            <PaginationAdmin total={totalPages} page={activePage} onChange={setActivePage} />
+                        </div>
+                    </>
+                ) : (
+                    <div className="text-center py-8 text-gray-500">
+                        Chưa có bài viết nào
+                    </div>
+                )}
             </TabsContent>
 
             {editingPost && (

@@ -3,11 +3,13 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import axiosClient from "@/apis/axiosClient"; // Import API client
+import ImagePreviewDialog from "@/components/ImagePreview/ImagePreviewDialog";
 
 const PostDetailsDialog = ({ postId, onApprove, onReject, onCancel }) => {
     const [postDetails, setPostDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     // Gọi API để lấy chi tiết bài viết
     useEffect(() => {
@@ -76,7 +78,8 @@ const PostDetailsDialog = ({ postId, onApprove, onReject, onCancel }) => {
                                             key={index}
                                             src={image}
                                             alt={`Hình ảnh ${index + 1}`}
-                                            className="w-32 h-32 rounded-lg border object-cover shadow"
+                                            className="w-32 h-32 rounded-lg border object-cover shadow cursor-pointer hover:opacity-80 transition-opacity"
+                                            onClick={() => setSelectedImage(image)}
                                         />
                                     ))}
                                 </div>
@@ -89,21 +92,35 @@ const PostDetailsDialog = ({ postId, onApprove, onReject, onCancel }) => {
                                 <div>
                                     <strong>Chứng nhận đủ PCCC:</strong>
                                     <div className="mt-2">
-                                        <img
-                                            src={postDetails.licensePcccUrl}
-                                            alt="Chứng nhận PCCC"
-                                            className="w-full h-72 rounded-lg border object-cover shadow"
-                                        />
+                                        {postDetails.licensePcccUrl && postDetails.licensePcccUrl !== "null" ? (
+                                            <img
+                                                src={postDetails.licensePcccUrl}
+                                                alt="Chứng nhận PCCC"
+                                                className="w-full h-72 rounded-lg border object-cover shadow cursor-pointer hover:opacity-80 transition-opacity"
+                                                onClick={() => setSelectedImage(postDetails.licensePcccUrl)}
+                                            />
+                                        ) : (
+                                            <div className="w-full h-72 rounded-lg border flex items-center justify-center bg-gray-50 text-gray-500">
+                                                Không có chứng nhận PCCC
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div>
                                     <strong>Giấy phép kinh doanh:</strong>
                                     <div className="mt-2">
-                                        <img
-                                            src={postDetails.licenseBusinessUrl}
-                                            alt="Giấy phép kinh doanh"
-                                            className="w-full h-72 rounded-lg border object-cover shadow"
-                                        />
+                                        {postDetails.licenseBusinessUrl && postDetails.licenseBusinessUrl !== "null" ? (
+                                            <img
+                                                src={postDetails.licenseBusinessUrl}
+                                                alt="Giấy phép kinh doanh"
+                                                className="w-full h-72 rounded-lg border object-cover shadow cursor-pointer hover:opacity-80 transition-opacity"
+                                                onClick={() => setSelectedImage(postDetails.licenseBusinessUrl)}
+                                            />
+                                        ) : (
+                                            <div className="w-full h-72 rounded-lg border flex items-center justify-center bg-gray-50 text-gray-500">
+                                                Không có giấy phép kinh doanh
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -133,9 +150,15 @@ const PostDetailsDialog = ({ postId, onApprove, onReject, onCancel }) => {
                     <p className="text-gray-500">Không có dữ liệu bài viết.</p>
                 )}
             </DialogContent>
+
+            {/* Sử dụng component ImagePreviewDialog */}
+            <ImagePreviewDialog
+                isOpen={!!selectedImage}
+                onClose={() => setSelectedImage(null)}
+                imageUrl={selectedImage}
+            />
         </Dialog>
     );
-
 };
 
 export default PostDetailsDialog;

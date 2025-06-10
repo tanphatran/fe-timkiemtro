@@ -26,6 +26,16 @@ const SearchInfoDialog = ({ open, onOpenChange }) => {
         ward: "",
     });
 
+    // Hàm xử lý input số, chuyển số âm thành 0
+    const handleNumberInput = (value, field) => {
+        const numValue = parseInt(value);
+        if (isNaN(numValue) || numValue < 0) {
+            setSearchInfo(prev => ({ ...prev, [field]: "0" }));
+        } else {
+            setSearchInfo(prev => ({ ...prev, [field]: value }));
+        }
+    };
+
     useEffect(() => {
         if (open) {
             fetchSearchInfo();
@@ -76,8 +86,9 @@ const SearchInfoDialog = ({ open, onOpenChange }) => {
                             <Label>Giá tối thiểu</Label>
                             <Input
                                 type="number"
+                                min="0"
                                 value={searchInfo.minPrice}
-                                onChange={(e) => setSearchInfo({ ...searchInfo, minPrice: e.target.value })}
+                                onChange={(e) => handleNumberInput(e.target.value, "minPrice")}
                                 placeholder="VNĐ"
                             />
                         </div>
@@ -85,8 +96,9 @@ const SearchInfoDialog = ({ open, onOpenChange }) => {
                             <Label>Giá tối đa</Label>
                             <Input
                                 type="number"
+                                min="0"
                                 value={searchInfo.maxPrice}
-                                onChange={(e) => setSearchInfo({ ...searchInfo, maxPrice: e.target.value })}
+                                onChange={(e) => handleNumberInput(e.target.value, "maxPrice")}
                                 placeholder="VNĐ"
                             />
                         </div>
@@ -96,8 +108,9 @@ const SearchInfoDialog = ({ open, onOpenChange }) => {
                             <Label>Diện tích tối thiểu</Label>
                             <Input
                                 type="number"
+                                min="0"
                                 value={searchInfo.minArea}
-                                onChange={(e) => setSearchInfo({ ...searchInfo, minArea: e.target.value })}
+                                onChange={(e) => handleNumberInput(e.target.value, "minArea")}
                                 placeholder="m²"
                             />
                         </div>
@@ -105,8 +118,9 @@ const SearchInfoDialog = ({ open, onOpenChange }) => {
                             <Label>Diện tích tối đa</Label>
                             <Input
                                 type="number"
+                                min="0"
                                 value={searchInfo.maxArea}
-                                onChange={(e) => setSearchInfo({ ...searchInfo, maxArea: e.target.value })}
+                                onChange={(e) => handleNumberInput(e.target.value, "maxArea")}
                                 placeholder="m²"
                             />
                         </div>

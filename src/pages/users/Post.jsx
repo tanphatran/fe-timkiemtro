@@ -103,21 +103,24 @@ const Post = () => {
                 return;
             }
         }
+
         setIsSubmitting(true);
 
         try {
             const data = new FormData();
 
-            formData.images.forEach((file) => {
-                data.append("postImages", file);
+            // Sửa lại cách append ảnh - lấy file từ object ảnh
+            formData.images.forEach((imageObj) => {
+                data.append("postImages", imageObj.file);
             });
 
-            if (formData.licensePcccUrl instanceof File) {
-                data.append("licensePccc", formData.licensePcccUrl);
+            // Sửa lại cách append giấy phép - lấy file từ object
+            if (formData.licensePcccUrl?.file) {
+                data.append("licensePccc", formData.licensePcccUrl.file);
             }
 
-            if (formData.licenseBusinessUrl instanceof File) {
-                data.append("licenseBusiness", formData.licenseBusinessUrl);
+            if (formData.licenseBusinessUrl?.file) {
+                data.append("licenseBusiness", formData.licenseBusinessUrl.file);
             }
 
             data.append("title", formData.title);
@@ -141,7 +144,7 @@ const Post = () => {
 
             if (response) {
                 toast({ description: "Tin đã được gửi để được phê duyệt!" });
-                setTimeout(() => window.location.reload(), 1000);
+                //     setTimeout(() => window.location.reload(), 1000);
             }
         } catch (error) {
             console.error("Network Error:", error);

@@ -35,6 +35,16 @@ const NotificationDialog = ({ open, onOpenChange }) => {
         furnitureStatus: "",
     });
 
+    // Hàm xử lý input số, chuyển số âm thành 0
+    const handleNumberInput = (value, field) => {
+        const numValue = parseInt(value);
+        if (isNaN(numValue) || numValue < 0) {
+            setUserInfo(prev => ({ ...prev, [field]: "0" }));
+        } else {
+            setUserInfo(prev => ({ ...prev, [field]: value }));
+        }
+    };
+
     const handleAddressChange = (newAddress) => {
         setUserInfo({ ...userInfo, address: newAddress });
     };
@@ -102,8 +112,9 @@ const NotificationDialog = ({ open, onOpenChange }) => {
                             <Input
                                 id="minPrice"
                                 type="number"
+                                min="0"
                                 value={userInfo.minPrice}
-                                onChange={(e) => setUserInfo({ ...userInfo, minPrice: e.target.value })}
+                                onChange={(e) => handleNumberInput(e.target.value, "minPrice")}
                                 placeholder="VNĐ"
                             />
                         </div>
@@ -112,8 +123,9 @@ const NotificationDialog = ({ open, onOpenChange }) => {
                             <Input
                                 id="maxPrice"
                                 type="number"
+                                min="0"
                                 value={userInfo.maxPrice}
-                                onChange={(e) => setUserInfo({ ...userInfo, maxPrice: e.target.value })}
+                                onChange={(e) => handleNumberInput(e.target.value, "maxPrice")}
                                 placeholder="VNĐ"
                             />
                         </div>
@@ -124,8 +136,9 @@ const NotificationDialog = ({ open, onOpenChange }) => {
                             <Input
                                 id="minArea"
                                 type="number"
+                                min="0"
                                 value={userInfo.minArea}
-                                onChange={(e) => setUserInfo({ ...userInfo, minArea: e.target.value })}
+                                onChange={(e) => handleNumberInput(e.target.value, "minArea")}
                                 placeholder="m²"
                             />
                         </div>
@@ -134,8 +147,9 @@ const NotificationDialog = ({ open, onOpenChange }) => {
                             <Input
                                 id="maxArea"
                                 type="number"
+                                min="0"
                                 value={userInfo.maxArea}
-                                onChange={(e) => setUserInfo({ ...userInfo, maxArea: e.target.value })}
+                                onChange={(e) => handleNumberInput(e.target.value, "maxArea")}
                                 placeholder="m²"
                             />
                         </div>
