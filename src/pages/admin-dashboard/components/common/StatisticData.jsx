@@ -35,10 +35,21 @@ ChartJS.register(
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+// Generate array of years from current year to 15 years ago
+const generateYears = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let year = currentYear; year >= currentYear - 15; year--) {
+        years.push(year.toString());
+    }
+    return years;
+};
+
 const StatisticData = () => {
-    const [year, setYear] = useState('2024');
+    const [year, setYear] = useState(new Date().getFullYear().toString());
     const [approvedData, setApprovedData] = useState(new Array(12).fill(0));
     const [rejectedData, setRejectedData] = useState(new Array(12).fill(0));
+    const years = generateYears();
 
     useEffect(() => {
         axiosClient.getOne(`/post/year/${year}`)
@@ -110,9 +121,11 @@ const StatisticData = () => {
                         onChange={(e) => setYear(e.target.value)}
                         size="small"
                     >
-                        <MenuItem value="2022">2022</MenuItem>
-                        <MenuItem value="2023">2023</MenuItem>
-                        <MenuItem value="2024">2024</MenuItem>
+                        {years.map((year) => (
+                            <MenuItem key={year} value={year}>
+                                {year}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </Stack>
 

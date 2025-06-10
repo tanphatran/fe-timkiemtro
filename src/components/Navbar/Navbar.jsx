@@ -16,6 +16,7 @@ import {
 import { FaUser, FaSignOutAlt } from "react-icons/fa"; // Import icons
 import axiosClient from "@/apis/axiosClient";
 import SearchInfoDialog from "../Notification/SearchInfoDialog ";
+import NotificationDialog from "../Notification/NotificationDialog";
 import NotificationBell from "./NotificationBell";
 import { BsChatDots } from "react-icons/bs";
 
@@ -26,6 +27,7 @@ const Navbar = () => {
     const { role } = useMeStore();
     const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false); // Thêm trạng thái cho dialog
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const handleLogout = async () => {
@@ -58,6 +60,20 @@ const Navbar = () => {
         }
     };
 
+    const handleSearchInfoClick = async () => {
+        try {
+            const response = await axiosClient.get("/search-information/has-search-information");
+            if (response.data === false) {
+                // Nếu chưa có thông tin tìm kiếm, mở dialog tạo mới
+                setIsDialogOpen(true);
+            } else {
+                // Nếu đã có thông tin tìm kiếm, mở dialog cập nhật
+                setIsUpdateDialogOpen(true);
+            }
+        } catch (error) {
+            console.error("Lỗi khi kiểm tra thông tin tìm kiếm:", error);
+        }
+    };
 
     return (
         <div className="fixed top-0 right-0 w-full z-50 bg-white/80 backdrop-blur-sm text-black shadow-md">
@@ -100,10 +116,10 @@ const Navbar = () => {
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onSelect={(e) => {
-                                            e.preventDefault(); // Ngăn auto-close
-                                            setDropdownOpen(false); // Đóng dropdown
+                                            e.preventDefault();
+                                            setDropdownOpen(false);
                                             setTimeout(() => {
-                                                setIsDialogOpen(true); // Mở dialog
+                                                handleSearchInfoClick();
                                             }, 50);
                                         }}
                                     >
@@ -186,7 +202,8 @@ const Navbar = () => {
                     </button>
                 </div>
             )}
-            <SearchInfoDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+            <SearchInfoDialog open={isUpdateDialogOpen} onOpenChange={setIsUpdateDialogOpen} />
+            <NotificationDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
 
         </div>
     );

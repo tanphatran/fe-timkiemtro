@@ -111,7 +111,7 @@ const Post = () => {
 
             // Sửa lại cách append ảnh - lấy file từ object ảnh
             formData.images.forEach((imageObj) => {
-                data.append("postImages", imageObj.file);
+                data.append("images", imageObj.file);
             });
 
             // Sửa lại cách append giấy phép - lấy file từ object

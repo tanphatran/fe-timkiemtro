@@ -13,6 +13,7 @@ import {
 import SearchFilter from "@/components/Searchs/SearchFilter";
 import { Button } from "@/components/ui/button";
 import NotificationDialog from "@/components/Notification/NotificationDialog";
+import SearchInfoDialog from "@/components/Notification/SearchInfoDialog ";
 import useAuth from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
@@ -24,6 +25,7 @@ const FilteredResults = () => {
     const location = useLocation();
     const [noResults, setNoResults] = useState(false); // Thêm state kiểm tra kết quả
     const [openDialog, setOpenDialog] = useState(false);
+    const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
     const { isLoggedIn } = useAuth();
     const { toast } = useToast();
     // Lấy tham số từ URL
@@ -117,7 +119,7 @@ const FilteredResults = () => {
         fetchFilteredRooms(currentPage);
     }, [location.search, currentPage]);  // Gọi lại khi tham số URL thay đổi
 
-    const handleOpenDialog = () => {
+    const handleOpenDialog = async () => {
         if (!isLoggedIn) {
             toast({
                 description: "Vui lòng đăng nhập để đăng ký nhận thông báo!",
@@ -125,7 +127,23 @@ const FilteredResults = () => {
             });
             return;
         }
-        setOpenDialog(true);
+
+        try {
+            const response = await axiosClient.get("/search-information/has-search-information");
+            if (response.data === false) {
+                // Nếu chưa có thông tin tìm kiếm, mở dialog tạo mới
+                setOpenDialog(true);
+            } else {
+                // Nếu đã có thông tin tìm kiếm, mở dialog cập nhật
+                setOpenUpdateDialog(true);
+            }
+        } catch (error) {
+            console.error("Lỗi khi kiểm tra thông tin tìm kiếm:", error);
+            toast({
+                description: "Có lỗi xảy ra, vui lòng thử lại!",
+                variant: "destructive",
+            });
+        }
     };
 
 
@@ -154,6 +172,7 @@ const FilteredResults = () => {
                                     Đăng ký tìm phòng
                                 </Button>
                                 <NotificationDialog open={openDialog} onOpenChange={setOpenDialog} />
+                                <SearchInfoDialog open={openUpdateDialog} onOpenChange={setOpenUpdateDialog} />
                             </div>
                         ) : (
                             <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">

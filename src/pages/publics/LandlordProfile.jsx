@@ -94,12 +94,12 @@ const LandlordProfile = () => {
         }
         if (landlord) {
             useChatStore.getState().setPartner(
-                landlord.userUuid,
+                landlord.userId,
                 landlord.fullName,
                 landlord.profilePicture,
                 landlord.isOnline
             );
-            navigate(`/users/chat/${landlord.userUuid}`);
+            navigate(`/users/chat/${landlord.userId}`);
             window.scrollTo(0, 0);
         }
     };
