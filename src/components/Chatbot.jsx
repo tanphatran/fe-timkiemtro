@@ -42,6 +42,16 @@ const Chatbot = () => {
         scrollToBottom();
     }, [messages]);
 
+    // Reset chatbot state when user logs out
+    useEffect(() => {
+        if (!userId) {
+            setMessages([]);
+            setConversationId(null);
+            setInput("");
+            setInitializing(false);
+        }
+    }, [userId]);
+
     const pulseAnimation = keyframes`
   0% { transform: scale(1); }
   50% { transform: scale(1.1); }
