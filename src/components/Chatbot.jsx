@@ -20,6 +20,8 @@ import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import useMeStore from "../zustand/useMeStore";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 
+const baseURL = import.meta.env.VITE_API_URL;
+
 const Chatbot = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
@@ -107,7 +109,7 @@ const Chatbot = () => {
         try {
             // Try to get existing conversation
             const historyResponse = await axios.get(
-                `http://localhost:8080/api/v1/chatbot/conversations/latest?userId=${userId}`
+                `${baseURL}/v1/chatbot/conversations/latest?userId=${userId}`
             );
 
             if (historyResponse.data.conversationId) {
@@ -128,14 +130,14 @@ const Chatbot = () => {
 
             // No history - create new conversation
             const response = await axios.post(
-                `http://localhost:8080/api/v1/chatbot/conversations?userId=${userId}`
+                `${baseURL}/v1/chatbot/conversations?userId=${userId}`
             );
 
             setConversationId(response.data);
 
             // Add welcome message
             const welcomeResponse = await axios.post(
-                "http://localhost:8080/api/v1/chatbot/chat",
+                `${baseURL}/v1/chatbot/chat`,
                 {
                     conversationId: response.data,
                     content: "Xin chào",
@@ -152,14 +154,14 @@ const Chatbot = () => {
             ) {
                 // Create new conversation for user
                 const response = await axios.post(
-                    `http://localhost:8080/api/v1/chatbot/conversations?userId=${userId}`
+                    `${baseURL}/v1/chatbot/conversations?userId=${userId}`
                 );
 
                 setConversationId(response.data);
 
                 // Add welcome message
                 const welcomeResponse = await axios.post(
-                    "http://localhost:8080/api/v1/chatbot/chat",
+                    `${baseURL}/v1/chatbot/chat`,
                     {
                         conversationId: response.data,
                         content: "Xin chào",
@@ -201,7 +203,7 @@ const Chatbot = () => {
 
         try {
             const response = await axios.post(
-                "http://localhost:8080/api/v1/chatbot/chat",
+                `${baseURL}/v1/chatbot/chat`,
                 {
                     conversationId,
                     content: userMessage,
@@ -328,7 +330,7 @@ const Chatbot = () => {
                     {/* Header */}
                     <Box
                         sx={{
-                            p: 2,
+                            p: 1,
                             background: "linear-gradient(135deg, #0287a8 0%, #43c6e6 100%)",
                             color: "white",
                             display: "flex",
@@ -338,8 +340,8 @@ const Chatbot = () => {
                     >
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                             <Box sx={{
-                                width: 40,
-                                height: 40,
+                                width: 32,
+                                height: 32,
                                 bgcolor: "#fff",
                                 borderRadius: "50%",
                                 display: "flex",
@@ -348,12 +350,13 @@ const Chatbot = () => {
                                 boxShadow: 2,
                                 mr: 1,
                             }}>
-                                <SupportAgentIcon sx={{ color: "#0287a8", fontSize: 28 }} />
+                                <SupportAgentIcon sx={{ color: "#0287a8", fontSize: 22 }} />
                             </Box>
                             <Typography
                                 variant="h6"
                                 sx={{
                                     fontWeight: 600,
+                                    fontSize: 18,
                                     textShadow: "0 2px 4px rgba(0,0,0,0.08)",
                                 }}
                             >
