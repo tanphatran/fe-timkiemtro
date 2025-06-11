@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import Sidebar from '../common/Sidebar';
 import { Outlet, useNavigate } from 'react-router-dom';
 import useMeStore from '@/zustand/useMeStore';
+import { Toaster } from '@/components/ui/toaster';
 
 const sidebarWidth = 350;
 
@@ -34,6 +35,7 @@ const MainLayout = () => {
             >
                 <Outlet />
             </Box>
+            <Toaster />
         </Box>
     );
 };
