@@ -32,7 +32,7 @@ const HostManagement = () => {
     const { toast } = useToast();
 
     // Hàm gọi API lấy dữ liệu theo tab
-    const fetchData = async (tab) => {
+    const fetchData = async (tab, page = 1) => {
         setLoading(true);
         try {
             let url = "";
@@ -44,8 +44,8 @@ const HostManagement = () => {
                 url = "/user/admin/not-registered";
             }
 
-            // Gọi API để lấy dữ liệu
-            const response = await axiosClient.getMany(url);
+            // Gọi API để lấy dữ liệu, truyền page (page - 1 vì backend thường bắt đầu từ 0)
+            const response = await axiosClient.getMany(url, { page: page - 1 });
 
             // Cập nhật dữ liệu vào state
             setUsers((prevState) => ({
@@ -62,7 +62,7 @@ const HostManagement = () => {
 
     // Sử dụng useEffect để fetch data khi thay đổi tab hoặc trang
     useEffect(() => {
-        fetchData(activeTab);
+        fetchData(activeTab, currentPage);
     }, [activeTab, currentPage]);
 
     const handleOpenDialog = (host) => {
