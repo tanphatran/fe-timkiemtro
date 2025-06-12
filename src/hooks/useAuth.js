@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import useMeStore from "@/zustand/useMeStore";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const useAuth = () => {
     const { token, refreshToken, setToken, setRefreshToken, clearAuth, setMe, setRole, me, id } = useMeStore();
     const [isLoggedIn, setIsLoggedIn] = useState(!!token);
@@ -13,7 +15,7 @@ const useAuth = () => {
         }
 
         try {
-            const response = await axios.post("http://localhost:8080/api/auth/refresh", {
+            const response = await axios.post(`${API_URL}/auth/refresh`, {
                 refreshToken,
             });
 
@@ -36,7 +38,7 @@ const useAuth = () => {
 
     const fetchMe = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/api/users/me", {
+            const res = await axios.get(`${API_URL}/users/me`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -58,7 +60,7 @@ const useAuth = () => {
             }
 
             try {
-                await axios.post("http://localhost:8080/api/auth/introspect", { token });
+                await axios.post(`${API_URL}/auth/introspect`, { token });
                 setIsLoggedIn(true);
 
                 if (!me) {
