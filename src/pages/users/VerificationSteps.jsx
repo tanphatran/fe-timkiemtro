@@ -160,6 +160,14 @@ const VerificationSteps = () => {
                 const formData = new FormData();
                 formData.append("frontCccd", cccdImages.frontCccd);
                 formData.append("backCccd", cccdImages.backCccd);
+                formData.append("fullName", editableCCCD.name);
+                formData.append("dateOfBirth", editableCCCD.dob);
+                formData.append("address", editableCCCD.address);
+                formData.append("cccdNumber", editableCCCD.id);
+                formData.append("gender", editableCCCD.sex);
+                formData.append("nationality", editableCCCD.nationality);
+                formData.append("hometown", editableCCCD.home);
+                formData.append("cccdIssueDate", editableCCCD.issue_date);
                 await axiosClient.postMultipart(`/user/register-landlord-upload-cccd`, formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });

@@ -37,11 +37,11 @@ const HostInfoDialog = ({ isOpen, onClose, hostId, onApprove, onReject }) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent>
+            <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Thông tin chủ trọ</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4">
+                <div className="overflow-y-auto max-h-[60vh] px-1">
                     {loading && <p>Đang tải...</p>}
                     {error && <p className="text-red-500">{error}</p>}
                     {hostData ? (
@@ -61,6 +61,30 @@ const HostInfoDialog = ({ isOpen, onClose, hostId, onApprove, onReject }) => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Ngày sinh</label>
                                 <Input value={hostData.dateOfBirth || ""} readOnly />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Địa chỉ</label>
+                                <Input value={hostData.address || ""} readOnly />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Số CCCD</label>
+                                <Input value={hostData.cccdNumber || ""} readOnly />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Giới tính</label>
+                                <Input value={hostData.gender || ""} readOnly />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Quốc tịch</label>
+                                <Input value={hostData.nationality || ""} readOnly />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Nguyên quán</label>
+                                <Input value={hostData.hometown || ""} readOnly />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Ngày cấp CCCD</label>
+                                <Input value={hostData.cccdIssueDate || ""} readOnly />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
