@@ -14,6 +14,7 @@ import Logo from "@/assets/logo.png";
 import Animate from "./Animate";
 import useAuth from "@/hooks/useAuth";
 import LogoutIcon from '@mui/icons-material/Logout';
+import axiosClient from '@/apis/axiosClient';
 
 // Định nghĩa ánh xạ menuPathMap
 const menuPathMap = {
@@ -61,9 +62,14 @@ const Sidebar = ({ sidebarWidth }) => {
     const activeState = Object.keys(menuPathMap).find(
         (key) => menuPathMap[key] === location.pathname
     );
-    const handleLogout = () => {
-        clearAuth();
-        navigate("/");
+    const handleLogout = async () => {
+        try {
+            await axiosClient.post("/auth/logout");
+            clearAuth();
+            navigate("/");
+        } catch (error) {
+            console.error("Lỗi khi đăng xuất:", error.response?.data || error.message);
+        }
     };
     const MenuItem = (props) => {
         const path = menuPathMap[props.item.state] || "/"; // Fallback nếu không có route tương ứng

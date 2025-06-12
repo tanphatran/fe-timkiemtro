@@ -43,7 +43,7 @@ const RelatedPosts = ({ currentPostId }) => {
                             <CarouselItem key={room.id || `room-${index}`} className="basis-1/3 px-2">
                                 <div className="border rounded-md hover:shadow-lg transform hover:scale-[1.03] ease-in-out">
                                     <img
-                                        src={room?.featuredImage || Room1}
+                                        src={room?.postImages[0] || Room1}
                                         alt="Room"
                                         className="w-full h-[180px] rounded-t-md object-cover"
                                     />
