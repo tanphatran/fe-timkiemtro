@@ -19,6 +19,7 @@ import SearchInfoDialog from "../Notification/SearchInfoDialog ";
 import NotificationDialog from "../Notification/NotificationDialog";
 import NotificationBell from "./NotificationBell";
 import { BsChatDots } from "react-icons/bs";
+import pathnames from "@/lib/pathnames";
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -46,15 +47,13 @@ const Navbar = () => {
 
     const handlePostNavigation = () => {
         if (!isLoggedIn) {
-            // Nếu chưa đăng nhập, hiển thị dialog đăng nhập
-            setIsLoginDialogOpen(true); // Mở dialog đăng nhập
+            setIsLoginDialogOpen(true);
             return;
         }
         if (role === "LANDLORD") {
-            navigate("/users/create-posts"); // Điều hướng phù hợp với LANDLORD
+            navigate(pathnames.users.createposts); // Điều hướng phù hợp với LANDLORD
         } else if (role === "TENANT") {
-            navigate("/users/verification"); // Điều hướng phù hợp với LANDLORD
-
+            navigate(pathnames.users.verification); // Điều hướng phù hợp với TENANT
         } else {
             // Mặc định
         }
@@ -80,18 +79,18 @@ const Navbar = () => {
             <div className="container flex justify-between items-center p-0">
                 {/* Logo */}
                 <div className="flex items-center gap-4 font-bold text-2xl">
-                    <Link to="/" onClick={() => window.scrollTo(0, 0)}>
+                    <Link to={pathnames.publics.home} onClick={() => window.scrollTo(0, 0)}>
                         <img src={Logo} alt="Logo" className="h-14" />
                     </Link>
                 </div>
 
                 {/* Menu lớn - Chỉ hiển thị trên màn hình >= md */}
                 <div className="hidden md:flex items-center gap-5">
-                    <Link to="/search" className="hover:underline">
+                    <Link to={pathnames.publics.search} className="hover:underline">
                         Tìm phòng
                     </Link>
 
-                    <Link to="/landlord" className="hover:underline">
+                    <Link to={pathnames.publics.landlord} className="hover:underline">
                         Chủ trọ
                     </Link>
 
@@ -106,11 +105,11 @@ const Navbar = () => {
                                     </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="w-48">
-                                    <DropdownMenuItem onClick={() => window.location.href = "/users/editprofile"}>
+                                    <DropdownMenuItem onClick={() => window.location.href = pathnames.users.editprofile}>
                                         <FaUser className="mr-2 text-gray-500" /> {/* Icon Thông tin cá nhân */}
                                         Thông tin cá nhân
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => window.location.href = "/users/chat"}>
+                                    <DropdownMenuItem onClick={() => window.location.href = pathnames.users.chatlayout}>
                                         <BsChatDots className="mr-2 text-gray-500" /> {/* Icon Thông tin cá nhân */}
                                         Tin Nhắn
                                     </DropdownMenuItem>
@@ -169,7 +168,7 @@ const Navbar = () => {
             {isMenuOpen && (
                 <div className="md:hidden bg-white shadow-lg absolute top-full right-0 left-0 p-4 flex flex-col gap-3">
                     <Link
-                        to="/search"
+                        to={pathnames.publics.search}
                         className="hover:underline"
                         onClick={() => setIsMenuOpen(false)}
                     >
