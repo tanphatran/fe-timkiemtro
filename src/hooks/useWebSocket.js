@@ -6,10 +6,13 @@ export default function useWebSocket(userId) {
     const [messages, setMessages] = useState([]);
     const clientRef = useRef(null);
 
+    // Lấy URL WebSocket từ biến môi trường
+    const WS_URL = import.meta.env.VITE_WS_URL || "http://localhost:8080/ws";
+
     useEffect(() => {
         if (!userId) return;
 
-        const socket = new SockJS("http://localhost:8080/ws");
+        const socket = new SockJS(WS_URL);
         const client = new Client({
             webSocketFactory: () => socket,
             onConnect: () => {
@@ -31,7 +34,7 @@ export default function useWebSocket(userId) {
         return () => {
             if (client.connected) client.deactivate();
         };
-    }, [userId]);
+    }, [userId, WS_URL]);
 
     const sendMessage = (messageData) => {
         if (clientRef.current && clientRef.current.connected) {
