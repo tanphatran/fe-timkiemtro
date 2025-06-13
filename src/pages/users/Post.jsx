@@ -144,7 +144,7 @@ const Post = () => {
 
             if (response) {
                 toast({ description: "Tin đã được gửi để được phê duyệt!" });
-                //     setTimeout(() => window.location.reload(), 1000);
+                setTimeout(() => window.location.reload(), 1000);
             }
         } catch (error) {
             console.error("Network Error:", error);
