@@ -96,7 +96,7 @@ const Dashboard = () => {
             });
             toast({
                 title: "Thành công",
-                description: response.data.message || "Đã duyệt báo cáo.",
+                description: response.message || "Đã duyệt báo cáo.",
             });
             setSelectedPost(null);
             fetchData(activeTab, currentPage);
