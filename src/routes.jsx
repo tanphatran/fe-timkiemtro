@@ -31,6 +31,9 @@ import ChatLayout from './pages/users/ChatApp/ChatLayout ';
 import ChatRoom from './pages/users/ChatApp/ChatRoom ';
 import VerifyEmail from './pages/publics/VerifyEmail';
 import TransactionHistoryAdmin from './pages/admin/TransactionHistoryAdmin';
+import DepositTerms from './pages/publics/DepositTerms';
+import DepositResult from './pages/users/DepositResult';
+import DepositPostManagement from './pages/users/DepositPostManagement';
 
 const routes = [
     {
@@ -49,6 +52,8 @@ const routes = [
                     { path: pathnames.publics.landlord_id, element: <LandlordProfile /> },
                     { path: pathnames.publics.resetpassword, element: <ResetPassword /> },
                     { path: pathnames.publics.registerVerify, element: <VerifyEmail /> },
+                    { path: pathnames.publics.depositTerms, element: <DepositTerms /> },
+                    { path: pathnames.users.depositResult, element: <DepositResult /> },
 
                     {
                         path: pathnames.users.chatlayout,
@@ -105,8 +110,10 @@ const routes = [
                                 path: pathnames.users.changepassword,
                                 element: <ChangePassword />,
                             },
-
-
+                            {
+                                path: pathnames.users.depositPostManagement,
+                                element: <DepositPostManagement />,
+                            },
                         ]
                     },
                 ],

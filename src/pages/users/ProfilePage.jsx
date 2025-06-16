@@ -39,6 +39,8 @@ const ProfilePage = () => {
             setActiveButton("createPosts");
         } else if (pathname.includes("history")) {
             setActiveButton("history");
+        } else if (pathname.includes("deposit-post-management")) {
+            setActiveButton("depositPostManagement");
         } else {
             setActiveButton(null);
         }
@@ -166,6 +168,17 @@ const ProfilePage = () => {
                                         }`}
                                 >
                                     Lịch sử giao dịch
+                                </Button>
+                            </Link>
+                            <Link to={pathnames.users.depositPostManagement}>
+                                <Button
+                                    variant="secondary"
+                                    className={`w-full mt-2 bg-white text-gray border border-secondary/50 ${activeButton === "depositPostManagement"
+                                        ? "bg-gradient-to-l from-secondary to-primary text-white"
+                                        : "hover:bg-gradient-to-l hover:from-secondary hover:to-primary hover:text-white"
+                                        }`}
+                                >
+                                    Quản lý bài cọc
                                 </Button>
                             </Link>
                             <Button

@@ -13,6 +13,8 @@ import useChatStore from "@/zustand/useChatStore";
 import { Badge } from "@/components/ui/badge";
 import useAuth from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import DepositDialog from "@/components/Rooms/DepositDialog";
+import { Button } from "@/components/ui/button";
 
 const RoomDetail = () => {
     const { id } = useParams();
@@ -25,6 +27,9 @@ const RoomDetail = () => {
     const navigate = useNavigate();
     const { isLoggedIn } = useAuth();
     const { toast } = useToast();
+    const [depositDialogOpen, setDepositDialogOpen] = useState(false);
+    const [agreePolicy, setAgreePolicy] = useState(false);
+    const [depositLoading, setDepositLoading] = useState(false);
 
     const handleSendMessage = () => {
         if (!isLoggedIn) {
@@ -61,6 +66,26 @@ const RoomDetail = () => {
             console.error("Error updating favorite status:", error);
             // Nếu API thất bại, rollback trạng thái thích
             setLiked(!liked);
+        }
+    };
+    const handleDeposit = async () => {
+        setDepositLoading(true);
+        try {
+            const res = await axiosClient.post("/v1/deposit/vn-pay", {
+                amount: room.depositAmount,
+                postId: room.postId,
+            });
+            if (res?.data?.paymentUrl) {
+                window.location.href = res.data.paymentUrl;
+            } else {
+                toast({ description: "Không thể lấy liên kết thanh toán, vui lòng thử lại!", variant: "destructive" });
+            }
+        } catch (error) {
+            toast({ description: "Có lỗi khi tạo yêu cầu đặt cọc!", variant: "destructive" });
+        } finally {
+            setDepositLoading(false);
+            setDepositDialogOpen(false);
+            setAgreePolicy(false);
         }
     };
     useEffect(() => {
@@ -252,10 +277,10 @@ const RoomDetail = () => {
                         </div>
 
                         {/* Lưu tin */}
-                        <div className="my-4 flex justify-center items-center">
+                        <div className="my-4 flex flex-col gap-3 items-center">
                             <button
-                                onClick={handleFavorite} // Gắn hàm xử lý
-                                className="flex items-center justify-center w-1/2 px-4 py-2 text-gray-700 bg-white border border-primary/50 rounded-lg hover:bg-gray-100"
+                                onClick={handleFavorite}
+                                className="flex items-center justify-center w-full px-4 py-2 text-gray-700 bg-white border border-primary/50 rounded-lg hover:bg-gray-100 transition-all duration-200 shadow-sm"
                             >
                                 {liked ? (
                                     <AiFillHeart size={24} className="text-red-500 mr-2" />
@@ -264,11 +289,37 @@ const RoomDetail = () => {
                                 )}
                                 <span>Lưu tin</span>
                             </button>
+                            {/* Nút đặt cọc đẹp mắt */}
+                            <Button
+                                className="w-full flex items-center justify-center gap-2 font-semibold shadow-lg border-0 py-2 text-base rounded-lg transition-all duration-200"
+                                style={{
+                                    background: 'linear-gradient(90deg, #0287a8 0%, #4fd1c5 100%)',
+                                    color: '#fff',
+                                    minHeight: 44
+                                }}
+                                onClick={() => setDepositDialogOpen(true)}
+                                disabled={!room.depositAmount || room.depositAmount <= 0}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" style={{ color: '#fff' }}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Đặt cọc giữ chỗ
+                            </Button>
                         </div>
 
                     </div>
                 </div>
             </div>
+
+            <DepositDialog
+                open={depositDialogOpen}
+                onOpenChange={setDepositDialogOpen}
+                room={room}
+                loading={depositLoading}
+                onConfirm={handleDeposit}
+                agreePolicy={agreePolicy}
+                setAgreePolicy={setAgreePolicy}
+            />
         </div>
     );
 };

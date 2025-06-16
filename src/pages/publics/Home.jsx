@@ -2,6 +2,8 @@ import React from 'react'
 import NatureVid from "../../assets/video/main.mp4";
 import Hero from "../../components/Hero/Hero";
 import Rooms from '../../components/Rooms/Rooms';
+import PopularAreas from '@/components/PopularAreas';
+import AboutUs from '@/components/AboutUs';
 
 
 const Home = () => {
@@ -18,8 +20,9 @@ const Home = () => {
                 </video>
                 <Hero />
             </div>
-            <Rooms />
-
+            {/* <Rooms /> */}
+            <PopularAreas />
+            <AboutUs />
         </div>
     )
 }

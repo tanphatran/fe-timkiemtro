@@ -11,6 +11,7 @@ const pathnames = {
         landlord_id: "/landlord/:id",
         resetpassword: "/reset-password",
         registerVerify: "/register",
+        depositTerms: "/deposit-terms",
     },
     users: {
         layout: "/users",
@@ -27,7 +28,8 @@ const pathnames = {
         postpackage: "/users/postpackage",
         paymentresult: "/users/payment-result",
         history: "/users/history",
-
+        depositResult: "/users/deposit-result",
+        depositPostManagement: "/users/deposit-post-management",
     },
 
     admin: {
