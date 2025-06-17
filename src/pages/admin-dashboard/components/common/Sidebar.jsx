@@ -30,7 +30,8 @@ const menuPathMap = {
     landlord: "/admin/hostmanagenment",
     staff: "/admin/employeemana",
 
-    transaction: "/admin/transaction-history"
+    transaction: "/admin/transaction-history",
+    deposit: "/admin/deposit-management"
 };
 
 // Định nghĩa các menu
@@ -40,7 +41,8 @@ const menus = [
 ];
 
 const transactionMenus = [
-    { title: "Lịch sử giao dịch", icon: <PaymentsOutlinedIcon />, state: "transaction" }
+    { title: "Lịch sử giao dịch", icon: <PaymentsOutlinedIcon />, state: "transaction" },
+    { title: "Quản lý đặt cọc", icon: <PaymentsOutlinedIcon />, state: "deposit" }
 ];
 
 const serviceMenus = [

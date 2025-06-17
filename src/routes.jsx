@@ -34,6 +34,7 @@ import TransactionHistoryAdmin from './pages/admin/TransactionHistoryAdmin';
 import DepositTerms from './pages/publics/DepositTerms';
 import DepositResult from './pages/users/DepositResult';
 import DepositPostManagement from './pages/users/DepositPostManagement';
+import DepositManagement from './pages/admin/DepositManagement';
 
 const routes = [
     {
@@ -144,6 +145,10 @@ const routes = [
                     {
                         path: pathnames.admin.transactionhistory,
                         element: <TransactionHistoryAdmin />,
+                    },
+                    {
+                        path: pathnames.admin.depositmanagement,
+                        element: <DepositManagement />,
                     },
                 ]
             },

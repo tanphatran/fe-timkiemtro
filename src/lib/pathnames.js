@@ -40,6 +40,7 @@ const pathnames = {
         hostmanagenment: "hostmanagenment",
         employeemana: "employeemana",
         usermana: "usermana",
+        depositmanagement: "deposit-management",
     },
 }
 
