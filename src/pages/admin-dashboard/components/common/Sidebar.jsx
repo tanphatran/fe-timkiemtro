@@ -9,6 +9,9 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import HomeWorkOutlinedIcon from '@mui/icons-material/HomeWorkOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
+import HistoryIcon from '@mui/icons-material/History';
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
 
 import Logo from "@/assets/logo.png";
 import Animate from "./Animate";
@@ -31,18 +34,20 @@ const menuPathMap = {
     staff: "/admin/employeemana",
 
     transaction: "/admin/transaction-history",
-    deposit: "/admin/deposit-management"
+    deposit: "/admin/deposit-management",
+    refund: "/admin/refund-management"
 };
 
 // Định nghĩa các menu
 const menus = [
     { title: "Tổng quan", icon: <DashboardCustomizeOutlinedIcon />, state: "overview" },
-    { title: "Thông báo", icon: <NotificationsOutlinedIcon />, state: "notification" }
+    // { title: "Thông báo", icon: <NotificationsOutlinedIcon />, state: "notification" }
 ];
 
 const transactionMenus = [
-    { title: "Lịch sử giao dịch", icon: <PaymentsOutlinedIcon />, state: "transaction" },
-    { title: "Quản lý đặt cọc", icon: <PaymentsOutlinedIcon />, state: "deposit" }
+    { title: "Lịch sử giao dịch", icon: <HistoryIcon />, state: "transaction" },
+    { title: "Quản lý đặt cọc", icon: <AccountBalanceWalletOutlinedIcon />, state: "deposit" },
+    { title: "Quản lý hoàn cọc", icon: <SwapHorizOutlinedIcon />, state: "refund" }
 ];
 
 const serviceMenus = [
@@ -51,7 +56,7 @@ const serviceMenus = [
 const investmentMenus = [
     { title: "Người dùng", icon: <PersonOutlineOutlinedIcon />, state: "user" },
     { title: "Chủ trọ", icon: <HomeWorkOutlinedIcon />, state: "landlord" },
-    { title: "Nhân viên", icon: <BadgeOutlinedIcon />, state: "staff" }
+    // { title: "Nhân viên", icon: <BadgeOutlinedIcon />, state: "staff" }
 ];
 
 

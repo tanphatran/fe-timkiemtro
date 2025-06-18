@@ -41,6 +41,7 @@ const pathnames = {
         employeemana: "employeemana",
         usermana: "usermana",
         depositmanagement: "deposit-management",
+        refundmanagement: "refund-management",
     },
 }
 

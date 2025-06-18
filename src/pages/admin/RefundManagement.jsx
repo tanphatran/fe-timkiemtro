@@ -8,19 +8,17 @@ import { TfiReload } from "react-icons/tfi";
 import PaginationAdmin from "@/components/Admin/PaginationAdmin";
 import axiosClient from "@/apis/axiosClient";
 import { useToast } from "@/hooks/use-toast";
-import PostDetailsDialog from "@/components/Dialog/PostDetailsDialog";
-import DisputeDetailsDialog from "@/components/Dialog/DisputeDetailsDialog";
+import RefundDetailsDialog from "@/components/Dialog/RefundDetailsDialog";
 
-const DepositManagement = () => {
+const RefundManagement = () => {
     const { toast } = useToast();
-    const [activeTab, setActiveTab] = useState("paid");
+    const [activeTab, setActiveTab] = useState("pending");
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedDeposit, setSelectedDeposit] = useState(null);
     const [deposits, setDeposits] = useState([]);
     const [loading, setLoading] = useState(false);
     const [totalPage, setTotalPage] = useState(1);
-    const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
-    const [isDisputeDialogOpen, setIsDisputeDialogOpen] = useState(false);
+    const [isRefundDialogOpen, setIsRefundDialogOpen] = useState(false);
     const [postUuid, setPostUuid] = useState(null);
 
     const handleTabChange = (value) => {
@@ -34,20 +32,22 @@ const DepositManagement = () => {
         try {
             let endpoint = "";
             switch (tab) {
-                case "paid":
-                    endpoint = "/v1/deposit/status/paid";
+                case "pending":
+                    endpoint = "/v1/deposit/status/multiplepending";
                     break;
-                case "confirmed":
-                    endpoint = "/v1/deposit/status/confirmed";
-                    break;
-                case "cancelled":
-                    endpoint = "/v1/deposit/status/canelled";
+                case "success":
+                    endpoint = "/v1/deposit/status/multiplesuccess";
                     break;
                 default:
-                    endpoint = "/v1/deposit/status/paid";
+                    endpoint = "/v1/deposit/status/multiplepending";
             }
 
-            const response = await axiosClient.get(endpoint, { page: page - 1 });
+            const response = await axiosClient.get(endpoint, {
+                params: {
+                    page: page - 1,
+                    size: 10
+                }
+            });
             setDeposits(response.data.content);
             setTotalPage(response.data.totalPages);
         } catch (error) {
@@ -71,13 +71,44 @@ const DepositManagement = () => {
         }).format(amount);
     };
 
-    const handleViewPost = (deposit) => {
+    const handleViewDetails = (deposit) => {
         setSelectedDeposit(deposit);
         setPostUuid(deposit.postUuid);
-        if (activeTab === "cancelled") {
-            setIsDisputeDialogOpen(true);
-        } else {
-            setIsPostDialogOpen(true);
+        setIsRefundDialogOpen(true);
+    };
+
+    const getStatusText = (status) => {
+        switch (status) {
+            case "CONFIRMEDPENDING":
+                return "Giao dịch thuận lợi";
+            case "REFUNDED":
+                return "Người thuê chờ hoàn";
+            case "COMMISSION":
+                return "Chủ trọ chờ hoàn";
+            case "SUCCESS":
+                return "Giao dịch thuận lợi";
+            case "COMMISSIONSUCCESS":
+                return "Đã thanh toán chủ trọ";
+            case "REFUNDEDSUCCESS":
+                return "Đã thanh toán người thuê";
+            default:
+                return status;
+        }
+    };
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case "SUCCESS":
+            case "CONFIRMEDPENDING":
+                return "text-green-600";
+            case "REFUNDED":
+            case "REFUNDEDSUCCESS":
+                return "text-yellow-600";
+            case "COMMISSION":
+            case "COMMISSIONSUCCESS":
+                return "text-blue-600";
+            default:
+                return "text-gray-600";
         }
     };
 
@@ -85,11 +116,10 @@ const DepositManagement = () => {
         <div className="p-6 bg-gray-50 min-h-screen">
             {/* Tabs và Tìm kiếm */}
             <div className="flex items-center justify-between mb-4">
-                <Tabs defaultValue="paid" onValueChange={handleTabChange}>
+                <Tabs defaultValue="pending" onValueChange={handleTabChange}>
                     <TabsList>
-                        <TabsTrigger value="paid">Chờ xác nhận</TabsTrigger>
-                        <TabsTrigger value="confirmed">Đã xác nhận</TabsTrigger>
-                        <TabsTrigger value="cancelled">Tranh chấp</TabsTrigger>
+                        <TabsTrigger value="pending">Chờ xác nhận</TabsTrigger>
+                        <TabsTrigger value="success">Đã thanh toán</TabsTrigger>
                     </TabsList>
                 </Tabs>
 
@@ -110,32 +140,39 @@ const DepositManagement = () => {
                     <TableHeader>
                         <TableRow className="bg-primary/5 text-black font-bold">
                             <TableHead className="text-center">ID</TableHead>
-                            <TableHead>Mã giao dịch</TableHead>
-
                             <TableHead>Số tiền</TableHead>
                             <TableHead>Phương thức thanh toán</TableHead>
+                            <TableHead>Mã giao dịch</TableHead>
+                            <TableHead>Trạng thái</TableHead>
+                            <TableHead>Thao tác</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan="5" className="text-center">Đang tải dữ liệu...</TableCell>
+                                <TableCell colSpan="6" className="text-center">Đang tải dữ liệu...</TableCell>
                             </TableRow>
                         ) : deposits.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan="5" className="text-center">Không có dữ liệu</TableCell>
+                                <TableCell colSpan="6" className="text-center">Không có dữ liệu</TableCell>
                             </TableRow>
                         ) : (
                             deposits.map((deposit) => (
                                 <TableRow
                                     key={deposit.depositId}
                                     className="cursor-pointer hover:bg-gray-50"
-                                    onClick={() => handleViewPost(deposit)}
+                                    onClick={() => handleViewDetails(deposit)}
                                 >
                                     <TableCell className="text-center">{deposit.depositId}</TableCell>
-                                    <TableCell>{deposit.transactionId}</TableCell>
                                     <TableCell>{formatCurrency(deposit.amount)}</TableCell>
                                     <TableCell>{deposit.paymentMethod}</TableCell>
+                                    <TableCell>{deposit.transactionId || "N/A"}</TableCell>
+                                    <TableCell>
+                                        <span className={getStatusColor(deposit.status)}>
+                                            {getStatusText(deposit.status)}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell></TableCell>
                                 </TableRow>
                             ))
                         )}
@@ -143,27 +180,15 @@ const DepositManagement = () => {
                 </Table>
             </div>
 
-            {/* Dialog chi tiết bài đăng */}
-            {activeTab !== "cancelled" && (
-                <PostDetailsDialog
-                    open={isPostDialogOpen}
-                    onClose={() => setIsPostDialogOpen(false)}
-                    postUuid={postUuid}
-                    depositId={selectedDeposit?.depositId}
-                    onSuccess={() => fetchData(activeTab, currentPage)}
-                />
-            )}
-
-            {/* Dialog chi tiết tranh chấp */}
-            {activeTab === "cancelled" && (
-                <DisputeDetailsDialog
-                    open={isDisputeDialogOpen}
-                    onClose={() => setIsDisputeDialogOpen(false)}
-                    postUuid={postUuid}
-                    depositId={selectedDeposit?.depositId}
-                    onSuccess={() => fetchData(activeTab, currentPage)}
-                />
-            )}
+            {/* Dialog chi tiết hoàn cọc */}
+            <RefundDetailsDialog
+                open={isRefundDialogOpen}
+                onClose={() => setIsRefundDialogOpen(false)}
+                postUuid={postUuid}
+                depositId={selectedDeposit?.depositId}
+                onSuccess={() => fetchData(activeTab, currentPage)}
+                activeTab={activeTab}
+            />
 
             {/* Phân trang */}
             <div className="mt-4 flex justify-end items-center gap-4">
@@ -177,4 +202,4 @@ const DepositManagement = () => {
     );
 };
 
-export default DepositManagement; 
+export default RefundManagement; 

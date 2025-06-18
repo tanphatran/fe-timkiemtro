@@ -35,6 +35,7 @@ import DepositTerms from './pages/publics/DepositTerms';
 import DepositResult from './pages/users/DepositResult';
 import DepositPostManagement from './pages/users/DepositPostManagement';
 import DepositManagement from './pages/admin/DepositManagement';
+import RefundManagement from './pages/admin/RefundManagement';
 
 const routes = [
     {
@@ -149,6 +150,10 @@ const routes = [
                     {
                         path: pathnames.admin.depositmanagement,
                         element: <DepositManagement />,
+                    },
+                    {
+                        path: pathnames.admin.refundmanagement,
+                        element: <RefundManagement />,
                     },
                 ]
             },

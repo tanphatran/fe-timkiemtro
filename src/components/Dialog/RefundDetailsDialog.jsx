@@ -7,17 +7,16 @@ import ImagePreviewDialog from "@/components/ImagePreview/ImagePreviewDialog";
 import { useToast } from "@/hooks/use-toast";
 import ConfirmDialog from "./ConfirmDialog";
 
-const DisputeDetailsDialog = ({ open, onClose, postUuid, depositId, onSuccess }) => {
+const RefundDetailsDialog = ({ open, onClose, postUuid, depositId, onSuccess, activeTab }) => {
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
     const [post, setPost] = useState(null);
     const [error, setError] = useState(null);
     const [depositDetails, setDepositDetails] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
-    const [showRefundDialog, setShowRefundDialog] = useState(false);
     const [isRefunding, setIsRefunding] = useState(false);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-    const [selectedRefundType, setSelectedRefundType] = useState(null);
+    const [selectedAction, setSelectedAction] = useState(null);
 
     useEffect(() => {
         if (!open || !postUuid) return;
@@ -40,6 +39,161 @@ const DisputeDetailsDialog = ({ open, onClose, postUuid, depositId, onSuccess })
             .catch(() => setError("Không thể tải dữ liệu bài đăng."))
             .finally(() => setLoading(false));
     }, [open, postUuid, depositId]);
+
+    const handleConfirm = async (type) => {
+        if (!depositId) return;
+
+        setIsRefunding(true);
+        try {
+            let endpoint = "";
+            switch (type) {
+                case "REFUNDED":
+                    endpoint = `/v1/deposit/update-refunded-success/${depositId}`;
+                    break;
+                case "COMMISSION":
+                    endpoint = `/v1/deposit/update-commission-success/${depositId}`;
+                    break;
+                case "CONFIRMEDPENDING":
+                    endpoint = `/v1/deposit/update-success/${depositId}`;
+                    break;
+                default:
+                    return;
+            }
+
+            const response = await axiosClient.post(endpoint);
+            if (response.status === "success") {
+                toast({
+                    title: "Thành công",
+                    description: "Đã xác nhận thành công",
+                });
+                onSuccess?.();
+                onClose();
+            } else {
+                toast({
+                    title: "Lỗi",
+                    description: response.message || "Không thể xác nhận",
+                    variant: "destructive",
+                });
+            }
+        } catch (error) {
+            toast({
+                title: "Lỗi",
+                description: "Không thể xác nhận, vui lòng thử lại",
+                variant: "destructive",
+            });
+        } finally {
+            setIsRefunding(false);
+            setShowConfirmDialog(false);
+        }
+    };
+
+    const renderActionButton = () => {
+        if (activeTab !== "pending") return null;
+
+        switch (depositDetails?.status) {
+            case "REFUNDED":
+                return (
+                    <Button
+                        onClick={() => {
+                            setShowConfirmDialog(true);
+                            setSelectedAction("REFUNDED");
+                        }}
+                        disabled={isRefunding}
+                        className="bg-primary hover:bg-primary/80 text-white"
+                    >
+                        {isRefunding ? "Đang xử lý..." : "Xác nhận hoàn cọc"}
+                    </Button>
+                );
+            case "COMMISSION":
+                return (
+                    <Button
+                        onClick={() => {
+                            setShowConfirmDialog(true);
+                            setSelectedAction("COMMISSION");
+                        }}
+                        disabled={isRefunding}
+                        className="bg-primary hover:bg-primary/80 text-white"
+                    >
+                        {isRefunding ? "Đang xử lý..." : "Xác nhận hoàn cọc chủ trọ"}
+                    </Button>
+                );
+            case "CONFIRMEDPENDING":
+                return (
+                    <Button
+                        onClick={() => {
+                            setShowConfirmDialog(true);
+                            setSelectedAction("CONFIRMEDPENDING");
+                        }}
+                        disabled={isRefunding}
+                        className="bg-primary hover:bg-primary/80 text-white"
+                    >
+                        {isRefunding ? "Đang xử lý..." : "Xác nhận giao dịch"}
+                    </Button>
+                );
+            default:
+                return null;
+        }
+    };
+
+    const getConfirmDialogContent = () => {
+        switch (selectedAction) {
+            case "REFUNDED":
+                return {
+                    title: "Xác nhận hoàn cọc",
+                    description: "Bạn có chắc chắn muốn xác nhận hoàn cọc cho người thuê? Hành động này không thể hoàn tác."
+                };
+            case "COMMISSION":
+                return {
+                    title: "Xác nhận hoàn cọc chủ trọ",
+                    description: "Bạn có chắc chắn muốn xác nhận hoàn cọc cho chủ trọ? Hành động này không thể hoàn tác."
+                };
+            case "CONFIRMEDPENDING":
+                return {
+                    title: "Xác nhận giao dịch",
+                    description: "Bạn có chắc chắn muốn xác nhận giao dịch thuận lợi? Hành động này không thể hoàn tác."
+                };
+            default:
+                return {
+                    title: "Xác nhận",
+                    description: "Bạn có chắc chắn muốn thực hiện hành động này?"
+                };
+        }
+    };
+
+    const getStatusText = (status) => {
+        switch (status) {
+            case "CONFIRMEDPENDING":
+                return "Giao dịch thuận lợi";
+            case "REFUNDED":
+                return "Người thuê chờ hoàn";
+            case "COMMISSION":
+                return "Chủ trọ chờ hoàn";
+            case "SUCCESS":
+                return "Giao dịch thuận lợi";
+            case "COMMISSIONSUCCESS":
+                return "Đã thanh toán chủ trọ";
+            case "REFUNDEDSUCCESS":
+                return "Đã thanh toán người thuê";
+            default:
+                return status;
+        }
+    };
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case "SUCCESS":
+            case "CONFIRMEDPENDING":
+                return "text-green-600";
+            case "REFUNDED":
+            case "REFUNDEDSUCCESS":
+                return "text-yellow-600";
+            case "COMMISSION":
+            case "COMMISSIONSUCCESS":
+                return "text-blue-600";
+            default:
+                return "text-gray-600";
+        }
+    };
 
     const renderConfirmationStatus = (status) => {
         if (status === true) return <span className="text-green-600">Đã xác nhận</span>;
@@ -96,55 +250,12 @@ const DisputeDetailsDialog = ({ open, onClose, postUuid, depositId, onSuccess })
         );
     };
 
-    const handleRefund = async (type) => {
-        if (!depositId) return;
-
-        setIsRefunding(true);
-        try {
-            const endpoint = type === 'tenant'
-                ? `/v1/deposit/refund/${depositId}`
-                : `/v1/deposit/pay-commission/${depositId}`;
-
-            const response = await axiosClient.post(endpoint);
-            if (response.status === "success") {
-                toast({
-                    title: "Thành công",
-                    description: `Đã hoàn cọc cho ${type === 'tenant' ? 'người thuê' : 'chủ nhà'} thành công`,
-                });
-                onSuccess?.();
-                onClose();
-            } else {
-                toast({
-                    title: "Lỗi",
-                    description: response.message || "Không thể hoàn cọc",
-                    variant: "destructive",
-                });
-            }
-        } catch (error) {
-            toast({
-                title: "Lỗi",
-                description: "Không thể hoàn cọc, vui lòng thử lại",
-                variant: "destructive",
-            });
-        } finally {
-            setIsRefunding(false);
-            setShowRefundDialog(false);
-            setShowConfirmDialog(false);
-        }
-    };
-
-    const handleRefundSelection = (type) => {
-        setSelectedRefundType(type);
-        setShowRefundDialog(false);
-        setShowConfirmDialog(true);
-    };
-
     return (
         <>
             <Dialog open={open} onOpenChange={onClose}>
                 <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-6 bg-white shadow-lg rounded-lg">
                     <DialogHeader>
-                        <DialogTitle className="text-lg font-bold text-red-600">Chi tiết tranh chấp</DialogTitle>
+                        <DialogTitle className="text-lg font-bold">Chi tiết hoàn cọc</DialogTitle>
                     </DialogHeader>
 
                     {loading ? (
@@ -214,6 +325,12 @@ const DisputeDetailsDialog = ({ open, onClose, postUuid, depositId, onSuccess })
                                                     <b>Trạng thái chủ trọ:</b>{" "}
                                                     {renderConfirmationStatus(depositDetails.landlordConfirmed)}
                                                 </div>
+                                                <div>
+                                                    <b>Trạng thái:</b>{" "}
+                                                    <span className={getStatusColor(depositDetails.status)}>
+                                                        {getStatusText(depositDetails.status)}
+                                                    </span>
+                                                </div>
                                                 <div><b>Ngày tạo:</b> {new Date(depositDetails.createdAt).toLocaleString('vi-VN')}</div>
                                             </div>
                                         </div>
@@ -229,15 +346,9 @@ const DisputeDetailsDialog = ({ open, onClose, postUuid, depositId, onSuccess })
 
                             <Separator className="my-4" />
 
-                            {/* Nút đóng và hoàn cọc */}
+                            {/* Nút đóng và xác nhận */}
                             <div className="flex justify-end gap-2">
-                                <Button
-                                    onClick={() => setShowRefundDialog(true)}
-                                    disabled={isRefunding}
-                                    className="bg-primary hover:bg-primary/80 text-white"
-                                >
-                                    {isRefunding ? "Đang xử lý..." : "Hoàn cọc"}
-                                </Button>
+                                {renderActionButton()}
                                 <Button variant="outline" onClick={onClose} className="text-stone-700 border-stone-700">
                                     Đóng
                                 </Button>
@@ -256,41 +367,13 @@ const DisputeDetailsDialog = ({ open, onClose, postUuid, depositId, onSuccess })
                 />
             </Dialog>
 
-            {/* Dialog chọn người nhận hoàn cọc */}
-            <Dialog open={showRefundDialog} onOpenChange={setShowRefundDialog}>
-                <DialogContent className="max-w-[400px]">
-                    <DialogHeader>
-                        <DialogTitle>Chọn người nhận hoàn cọc</DialogTitle>
-                        <DialogDescription>
-                            Vui lòng chọn người sẽ nhận được tiền hoàn cọc
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="flex flex-col gap-3 mt-4">
-                        <Button
-                            onClick={() => handleRefundSelection('tenant')}
-                            disabled={isRefunding}
-                            className="w-full bg-primary hover:bg-primary/80 text-white"
-                        >
-                            Hoàn cọc cho người thuê
-                        </Button>
-                        <Button
-                            onClick={() => handleRefundSelection('landlord')}
-                            disabled={isRefunding}
-                            className="w-full bg-primary hover:bg-primary/80 text-white"
-                        >
-                            Hoàn cọc cho chủ nhà
-                        </Button>
-                    </div>
-                </DialogContent>
-            </Dialog>
-
-            {/* Dialog xác nhận hoàn cọc */}
+            {/* Dialog xác nhận */}
             <ConfirmDialog
                 open={showConfirmDialog}
                 onOpenChange={setShowConfirmDialog}
-                title="Xác nhận hoàn cọc"
-                description={`Bạn có chắc chắn muốn hoàn cọc cho ${selectedRefundType === 'tenant' ? 'người thuê' : 'chủ nhà'}? Hành động này không thể hoàn tác.`}
-                onConfirm={() => handleRefund(selectedRefundType)}
+                title={getConfirmDialogContent().title}
+                description={getConfirmDialogContent().description}
+                onConfirm={() => handleConfirm(selectedAction)}
                 onCancel={() => setShowConfirmDialog(false)}
                 isLoading={isRefunding}
             />
@@ -298,4 +381,4 @@ const DisputeDetailsDialog = ({ open, onClose, postUuid, depositId, onSuccess })
     );
 };
 
-export default DisputeDetailsDialog; 
+export default RefundDetailsDialog; 

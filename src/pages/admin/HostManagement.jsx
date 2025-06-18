@@ -206,6 +206,7 @@ const HostManagement = () => {
                     hostId={selectedHost.userId}
                     onApprove={() => handleApprove(selectedHost.userId)}
                     onReject={() => handleReject(selectedHost.userId)}
+                    isApprovedTab={activeTab === "approved"}
                 />
             )}
         </div>

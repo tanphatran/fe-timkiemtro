@@ -4,12 +4,14 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ImagePreviewDialog from "@/components/ImagePreview/ImagePreviewDialog";
+import { useToast } from "@/hooks/use-toast";
 
-const HostInfoDialog = ({ isOpen, onClose, hostId, onApprove, onReject }) => {
+const HostInfoDialog = ({ isOpen, onClose, hostId, onApprove, onReject, isApprovedTab }) => {
     const [hostData, setHostData] = useState(null); // State to store the host data
     const [loading, setLoading] = useState(false);  // Loading state
     const [error, setError] = useState(null);       // Error state
     const [selectedImage, setSelectedImage] = useState(null);
+    const { toast } = useToast();
 
     useEffect(() => {
         if (isOpen && hostId) {
@@ -34,6 +36,25 @@ const HostInfoDialog = ({ isOpen, onClose, hostId, onApprove, onReject }) => {
             fetchHostData();
         }
     }, [isOpen, hostId]);
+
+    const handleLockAccount = async () => {
+        try {
+            await axiosClient.put(`/user/admin/lock-account/${hostId}`);
+            toast({
+                title: "Khóa tài khoản thành công",
+                description: "Tài khoản đã bị khóa.",
+                variant: "default",
+            });
+            onClose();
+        } catch (err) {
+            console.error("Lỗi khi khóa tài khoản:", err);
+            toast({
+                title: "Khóa tài khoản thất bại",
+                description: "Đã xảy ra lỗi khi khóa tài khoản.",
+                variant: "destructive",
+            });
+        }
+    };
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -138,6 +159,11 @@ const HostInfoDialog = ({ isOpen, onClose, hostId, onApprove, onReject }) => {
                                 Từ chối
                             </Button>
                         </>
+                    )}
+                    {isApprovedTab && (
+                        <Button variant="outline" onClick={handleLockAccount} className="text-red-600 border-red-600">
+                            Khóa tài khoản
+                        </Button>
                     )}
                     <Button variant="outline" onClick={onClose} className="text-stone-700 border-stone-700">
                         Hủy
