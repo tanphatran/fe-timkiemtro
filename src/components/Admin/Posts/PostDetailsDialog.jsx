@@ -10,6 +10,7 @@ const PostDetailsDialog = ({ postId, onApprove, onReject, onCancel }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [actionLoading, setActionLoading] = useState(false);
 
     // Gọi API để lấy chi tiết bài viết
     useEffect(() => {
@@ -132,11 +133,21 @@ const PostDetailsDialog = ({ postId, onApprove, onReject, onCancel }) => {
                         <div className="mt-3 flex justify-end gap-3">
                             {postDetails.status !== "LOCKED" && postDetails.status !== "APPROVED" && postDetails.status !== "REJECTED" && (
                                 <>
-                                    <Button variant="default" onClick={onApprove} className="bg-gradient-to-r from-primary to-secondary text-white">
-                                        Duyệt
+                                    <Button
+                                        variant="default"
+                                        onClick={async () => { setActionLoading(true); await onApprove(); setActionLoading(false); }}
+                                        className="bg-gradient-to-r from-primary to-secondary text-white"
+                                        disabled={actionLoading}
+                                    >
+                                        {actionLoading ? 'Đang xử lý...' : 'Duyệt'}
                                     </Button>
-                                    <Button variant="outline" onClick={onReject} className="text-red-600 border-red-600">
-                                        Từ chối
+                                    <Button
+                                        variant="outline"
+                                        onClick={async () => { setActionLoading(true); await onReject(); setActionLoading(false); }}
+                                        className="text-red-600 border-red-600"
+                                        disabled={actionLoading}
+                                    >
+                                        {actionLoading ? 'Đang xử lý...' : 'Từ chối'}
                                     </Button>
                                 </>
                             )}
