@@ -14,6 +14,9 @@ import {
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 const Post = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,6 +24,7 @@ const Post = () => {
     const { toast } = useToast();
     const [postCount, setPostCount] = useState(null);
     const [isLimitDialogOpen, setIsLimitDialogOpen] = useState(false);
+    const [agreePolicy, setAgreePolicy] = useState(false);
 
     const [address, setAddress] = useState({
         province: '',
@@ -41,7 +45,8 @@ const Post = () => {
         waterPrice: '',
         images: [],
         licensePcccUrl: '',
-        licenseBusinessUrl: ''
+        licenseBusinessUrl: '',
+        allowDeposit: false,
     });
 
 
@@ -76,6 +81,11 @@ const Post = () => {
 
         if (!formData.title || !formData.description || !formData.furnitureStatus || !formData.price || !formData.area || !formData.depositAmount || !formData.numberOfRooms || !formData.electricityPrice || !formData.waterPrice) {
             toast({ title: "Thông báo", description: "Vui lòng điền đầy đủ thông tin!" });
+            return;
+        }
+
+        if (formData.allowDeposit && !agreePolicy) {
+            toast({ title: "Thông báo", description: "Bạn phải đồng ý với điều khoản đặt cọc!" });
             return;
         }
 
@@ -137,6 +147,7 @@ const Post = () => {
             data.append("ward", address.commune || "UNKNOWN");
             data.append("street", address.street || "");
             data.append("houseNumber", address.houseNumber || "");
+            data.append("allowDeposit", formData.allowDeposit);
 
             const response = await axiosClient.postMultipart("/post/create-with-images", data, {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -363,9 +374,40 @@ const Post = () => {
                         />
                     </div>
 
+                    {/* Thanh kéo/toggle cho phép đặt cọc */}
+                    <div className="mb-6 flex items-center gap-3">
+                        <Switch
+                            id="allowDeposit"
+                            checked={formData.allowDeposit}
+                            onCheckedChange={checked => setFormData({ ...formData, allowDeposit: !!checked })}
+                        />
+                        <Label htmlFor="allowDeposit">Cho phép đặt cọc trực tuyến</Label>
+                    </div>
+                    {/* Nếu cho phép đặt cọc thì hiện tickbox điều khoản */}
+                    {formData.allowDeposit && (
+                        <div className="mb-6 flex items-center gap-3">
+                            <Checkbox
+                                id="agreePolicy"
+                                checked={agreePolicy}
+                                onCheckedChange={setAgreePolicy}
+                            />
+                            <Label htmlFor="agreePolicy" className="text-sm">
+                                Tôi đã đọc và đồng ý với{' '}
+                                <a
+                                    href="/deposit-terms"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-primary underline hover:text-primary/80 transition-colors"
+                                >
+                                    điều khoản đặt cọc
+                                </a>.
+                            </Label>
+                        </div>
+                    )}
+
                     {/* Buttons */}
-                    <div className="flex justify-between">
-                        <Button variant="outline">Xem trước</Button>
+                    <div className="flex justify-end">
+                        {/* <Button variant="outline">Xem trước</Button> */}
                         <Button onClick={handleSubmit} disabled={isSubmitting}>
                             {isSubmitting ? "Đang đăng..." : "Đăng tin"}
                         </Button>

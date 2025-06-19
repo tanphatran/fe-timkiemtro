@@ -298,21 +298,23 @@ const RoomDetail = () => {
                                 <span>Lưu tin</span>
                             </button>
                             {/* Nút đặt cọc đẹp mắt */}
-                            <Button
-                                className="w-full flex items-center justify-center gap-2 font-semibold shadow-lg border-0 py-2 text-base rounded-lg transition-all duration-200"
-                                style={{
-                                    background: 'linear-gradient(90deg, #0287a8 0%, #4fd1c5 100%)',
-                                    color: '#fff',
-                                    minHeight: 44
-                                }}
-                                onClick={() => setDepositDialogOpen(true)}
-                                disabled={!room.depositAmount || room.depositAmount <= 0}
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" style={{ color: '#fff' }}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Đặt cọc giữ chỗ
-                            </Button>
+                            {room.allowDeposit && (
+                                <Button
+                                    className="w-full flex items-center justify-center gap-2 font-semibold shadow-lg border-0 py-2 text-base rounded-lg transition-all duration-200"
+                                    style={{
+                                        background: 'linear-gradient(90deg, #0287a8 0%, #4fd1c5 100%)',
+                                        color: '#fff',
+                                        minHeight: 44
+                                    }}
+                                    onClick={() => setDepositDialogOpen(true)}
+                                    disabled={!room.depositAmount || room.depositAmount <= 0}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" style={{ color: '#fff' }}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Đặt cọc giữ chỗ
+                                </Button>
+                            )}
                         </div>
 
                     </div>
