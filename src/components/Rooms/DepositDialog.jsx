@@ -29,7 +29,6 @@ const DepositDialog = ({
                 <div className="text-sm text-gray-600 mb-4 space-y-2">
                     <div><b>Phòng:</b> {room.title}</div>
                     <div><b>Số tiền cọc:</b> {room.depositAmount?.toLocaleString()} VND</div>
-                    <div><b>Thời gian giữ chỗ:</b> 24h</div>
                     <div><b>Chính sách hoàn cọc:</b> Hoàn lại nếu chủ trọ từ chối hoặc hết hạn giữ chỗ.</div>
                 </div>
                 <div className="flex items-center">
