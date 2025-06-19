@@ -152,11 +152,21 @@ const HostInfoDialog = ({ isOpen, onClose, hostId, onApprove, onReject, isApprov
                 <div className="mt-3 flex justify-end gap-3">
                     {hostData?.isLandlordActivated !== "APPROVED" && hostData?.isLandlordActivated !== "REJECTED" && (
                         <>
-                            <Button variant="default" onClick={onApprove} className="bg-gradient-to-r from-primary to-secondary text-white">
-                                Duyệt
+                            <Button
+                                variant="default"
+                                onClick={onApprove}
+                                className="bg-gradient-to-r from-primary to-secondary text-white"
+                                disabled={loading}
+                            >
+                                {loading ? 'Đang xử lý...' : 'Duyệt'}
                             </Button>
-                            <Button variant="outline" onClick={onReject} className="text-red-600 border-red-600">
-                                Từ chối
+                            <Button
+                                variant="outline"
+                                onClick={onReject}
+                                className="text-red-600 border-red-600"
+                                disabled={loading}
+                            >
+                                {loading ? 'Đang xử lý...' : 'Từ chối'}
                             </Button>
                         </>
                     )}
