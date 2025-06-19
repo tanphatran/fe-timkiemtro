@@ -194,6 +194,14 @@ const RoomDetail = () => {
                                 </TableHeader>
                                 <TableBody>
                                     <TableRow>
+                                        <TableCell>Giá cọc</TableCell>
+                                        <TableCell>{room.depositAmount.toLocaleString()} đ</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>Số lượng phòng</TableCell>
+                                        <TableCell>{room.numberOfRooms.toLocaleString()} phòng</TableCell>
+                                    </TableRow>
+                                    <TableRow>
                                         <TableCell>Giá thuê</TableCell>
                                         <TableCell>{room.price.toLocaleString()} VND/tháng</TableCell>
                                     </TableRow>

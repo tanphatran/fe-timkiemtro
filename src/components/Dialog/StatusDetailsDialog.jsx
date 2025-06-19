@@ -39,11 +39,23 @@ const StatusDetailsDialog = ({ open, onOpenChange, depositId }) => {
     const getStatusText = (status) => {
         switch (status) {
             case "PAID":
-                return "Đã thanh toán";
+                return "Đã đặt cọc";
             case "CONFIRMED":
                 return "Đã xác nhận";
+            case "CONFIRMEDPENDING":
+                return "Chờ thanh toán";
+            case "SUCCESS":
+                return "Đã hoàn tất giao dịch";
             case "CANCELLED":
                 return "Đã hủy";
+            case "REFUNDED":
+                return "Chờ hoàn tiền";
+            case "REFUNDEDSUCCESS":
+                return "Đã hoàn tiền";
+            case "COMMISSION":
+                return "Chờ thanh toán chủ trọ";
+            case "COMMISSIONSUCCESS":
+                return "Đã thanh toán cho chủ trọ";
             default:
                 return "Không xác định";
         }

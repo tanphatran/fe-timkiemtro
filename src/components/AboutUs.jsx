@@ -4,7 +4,7 @@ import logo from "../assets/logo.png";
 
 const AboutUs = () => {
     return (
-        <div className=" mx-auto mt-2 mb-16 p-6">
+        <div className=" mx-auto mt-0 mb-16 p-6">
             <div className="flex items-center mb-8">
                 <div className="border-l-4 border-primary pl-3 text-xl font-bold mr-4">
                     Về chúng tôi
